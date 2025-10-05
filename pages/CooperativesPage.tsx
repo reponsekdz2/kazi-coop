@@ -298,11 +298,18 @@ const FinanceTab: React.FC<{ cooperative: Cooperative, onRequestLoan: () => void
         if (frequency === 'Weekly') {
             return new Date(lastDate.getTime() + 7 * 86400000);
         } else {
-            return new Date(lastDate.setMonth(lastDate.getMonth() + 1));
+            return new Date(new Date(lastDate).setMonth(lastDate.getMonth() + 1));
         }
     };
 
-    const myLastContribution = user ? cooperative.contributions.find(c => c.userId === user.id) : undefined;
+    const myLastContribution = useMemo(() => {
+        if (!user) return undefined;
+        const userContributions = cooperative.contributions.filter(c => c.userId === user.id);
+        if (userContributions.length === 0) return undefined;
+        // Sort by date descending to find the most recent contribution
+        return userContributions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+    }, [cooperative.contributions, user]);
+
     const nextDueDate = getNextDueDate(myLastContribution, cooperative.contributionSettings.frequency);
     const isContributionDue = new Date() > nextDueDate;
 
