@@ -1,11 +1,11 @@
 // FIX: Populated the empty constants.ts file with mock data.
-import { User, UserRole, Job, Application, Message, Notification, ActivityLog } from './types';
+import { User, UserRole, Job, Application, Message, Notification, ActivityLog, Cooperative, Punishment, LoanInvestment, LoanApplication } from './types';
 
 export const USERS: User[] = [
-  { id: 'user1', name: 'Aline Umutoni', email: 'aline@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user1', skills: ['Financial Analysis', 'Microsoft Excel', 'Accounting', 'Team Leadership'] },
-  { id: 'user2', name: 'Jean-Claude D.', email: 'jean@example.com', role: UserRole.EMPLOYER, avatarUrl: 'https://i.pravatar.cc/150?u=user2' },
+  { id: 'user1', name: 'Aline Umutoni', email: 'aline@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user1', skills: ['Financial Analysis', 'Microsoft Excel', 'Accounting', 'Team Leadership'], savingsBalance: 85000, cooperativeShare: 125000 },
+  { id: 'user2', name: 'Jean-Claude D.', email: 'jean@example.com', role: UserRole.EMPLOYER, avatarUrl: 'https://i.pravatar.cc/150?u=user2', savingsBalance: 500000 },
   { id: 'user3', name: 'Admin Kazi', email: 'admin@kazicoop.com', role: UserRole.COOP_ADMIN, avatarUrl: 'https://i.pravatar.cc/150?u=user3' },
-  { id: 'user4', name: 'Kwame Nkrumah', email: 'kwame@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user4', skills: ['Graphic Design', 'Adobe Creative Suite', 'Branding'] },
+  { id: 'user4', name: 'Kwame Nkrumah', email: 'kwame@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user4', skills: ['Graphic Design', 'Adobe Creative Suite', 'Branding'], savingsBalance: 42000, cooperativeShare: 50000 },
   { id: 'user5', name: 'Samuel M.', email: 'samuel@example.com', role: UserRole.COOP_ADMIN, avatarUrl: 'https://i.pravatar.cc/150?u=user5' },
 ];
 
@@ -71,4 +71,33 @@ export const ACTIVITY_LOG: ActivityLog[] = [
     { id: 'log2', type: 'NEW_JOB', description: 'Creative Minds Inc. posted a new job for Marketing Manager.', timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
     { id: 'log3', type: 'SAVINGS_GOAL', description: 'TechSolutions Innovators Circle reached their savings goal.', timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
     { id: 'log4', type: 'LARGE_DEPOSIT', description: 'Aline Umutoni made a large deposit of RWF 50,000.', timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() },
+];
+
+export const COOPERATIVES: Cooperative[] = [
+    { id: 'coop1', name: 'TechSolutions Innovators Circle', type: 'Corporate', creatorId: 'user2', members: ['user1', 'user4', 'user5'], totalSavings: 5250000, goal: "Purchase new laptops for all members", goalProgress: 68},
+    { id: 'coop2', name: 'Kigali Artisans Guild', type: 'Community', members: ['user1', 'user3', 'user4'], totalSavings: 1200000, goal: "Open a shared workshop", goalProgress: 45},
+];
+
+export const PUNISHMENTS: Punishment[] = [
+    { id: 'pun1', userId: 'user1', cooperativeId: 'coop1', reason: 'Late Contribution (July)', amount: 5000, dueDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(), status: 'Pending' }
+];
+
+export const LOAN_INVESTMENTS: LoanInvestment[] = [
+    { id: 'li1', lenderId: 'user1', borrowerId: 'user4', amount: 50000, interestRate: 8, term: 6, status: 'Active', nextPaymentDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString()}
+];
+
+export const LOAN_APPLICATIONS: LoanApplication[] = [
+    { id: 'la1', userId: 'user1', cooperativeId: 'coop1', amount: 250000, purpose: 'Small Business Startup', repaymentPeriod: 12, status: 'Pending', requestDate: new Date().toISOString() },
+    { id: 'la2', userId: 'user1', cooperativeId: 'coop1', amount: 50000, purpose: 'Emergency Medical Bills', repaymentPeriod: 6, status: 'Approved', requestDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() },
+    { id: 'la3', userId: 'user1', cooperativeId: 'coop1', amount: 100000, purpose: 'Home Improvement', repaymentPeriod: 12, status: 'Rejected', requestDate: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString() },
+];
+
+export const cooperativeFinancialsData = [
+  { name: 'Jan', "Total Savings": 40.1, "Loans Disbursed": 24.0 },
+  { name: 'Feb', "Total Savings": 45.3, "Loans Disbursed": 28.9 },
+  { name: 'Mar', "Total Savings": 52.5, "Loans Disbursed": 35.2 },
+  { name: 'Apr', "Total Savings": 58.8, "Loans Disbursed": 40.1 },
+  { name: 'May', "Total Savings": 65.2, "Loans Disbursed": 42.6 },
+  { name: 'Jun', "Total Savings": 71.9, "Loans Disbursed": 48.3 },
+  { name: 'Jul', "Total Savings": 78.4, "Loans Disbursed": 55.7 },
 ];

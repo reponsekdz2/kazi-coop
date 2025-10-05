@@ -5,6 +5,7 @@ import { UserRole } from '../types';
 import Card from '../components/ui/Card';
 import StatCard from '../components/ui/StatCard';
 import Button from '../components/ui/Button';
+import FinancialMetricCard from '../components/ui/FinancialMetricCard';
 import { Link } from 'react-router-dom';
 import { 
   BriefcaseIcon, 
@@ -13,12 +14,29 @@ import {
   WalletIcon,
   ArrowRightIcon,
   ChartBarIcon,
-  BanknotesIcon
+  BanknotesIcon,
+  CurrencyDollarIcon,
+  ScaleIcon
 } from '@heroicons/react/24/outline';
 
 const SeekerDashboard: React.FC = () => {
+    const { user } = useAuth();
+    const savings = user?.savingsBalance ?? 0;
+    const shares = user?.cooperativeShare ?? 0;
+    const netWorth = savings + shares;
+
     return (
         <div>
+            {/* Financial Snapshot */}
+            <div className="mb-6">
+                <h2 className="text-xl font-bold text-dark mb-4">Financial Snapshot</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <FinancialMetricCard title="Personal Savings" value={`RWF ${savings.toLocaleString()}`} change="+ RWF 5,000 this month" isPositive={true} icon={WalletIcon} />
+                    <FinancialMetricCard title="Cooperative Share" value={`RWF ${shares.toLocaleString()}`} change="+ RWF 10,000 this month" isPositive={true} icon={UserGroupIcon} />
+                    <FinancialMetricCard title="Total Net Worth" value={`RWF ${netWorth.toLocaleString()}`} change="+ RWF 15,000 this month" isPositive={true} icon={CurrencyDollarIcon} />
+                </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                 <StatCard icon={BriefcaseIcon} title="Active Applications" value={2} trend={1} data={[1, 1, 2, 2, 2]} />
                 <StatCard icon={ChatBubbleLeftRightIcon} title="Unread Messages" value={1} trend={0} data={[3, 2, 2, 1, 1]}/>

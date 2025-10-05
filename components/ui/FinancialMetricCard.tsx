@@ -14,15 +14,15 @@ const FinancialMetricCard: React.FC<FinancialMetricCardProps> = ({ title, value,
   const changeColor = isPositive ? 'text-green-500' : 'text-red-500';
 
   return (
-    <Card className="p-4">
-      <div className="flex items-center">
-        {Icon && <Icon className="h-8 w-8 text-gray-400 mr-4" />}
-        <div>
-          <p className="text-sm text-gray-500">{title}</p>
-          <p className="text-2xl font-bold text-dark">{value}</p>
-        </div>
+    <Card className="p-4 flex flex-col justify-between">
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-gray-500 font-medium">{title}</p>
+        {Icon && <Icon className="h-6 w-6 text-gray-400" />}
       </div>
-      <p className={`text-sm font-semibold mt-2 ${changeColor}`}>{change}</p>
+      <div>
+        <p className="text-3xl font-bold text-dark mt-2">{value}</p>
+        {change && <p className={`text-sm font-semibold mt-1 ${changeColor}`}>{change}</p>}
+      </div>
     </Card>
   );
 };
