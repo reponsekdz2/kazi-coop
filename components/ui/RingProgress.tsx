@@ -5,6 +5,9 @@ interface RingProgressProps {
   strokeWidth?: number;
   size?: number;
   className?: string;
+  trackColorClassName?: string;
+  progressColorClassName?: string;
+  textColorClassName?: string;
 }
 
 const RingProgress: React.FC<RingProgressProps> = ({
@@ -12,16 +15,21 @@ const RingProgress: React.FC<RingProgressProps> = ({
   strokeWidth = 8,
   size = 100,
   className = '',
+  trackColorClassName = 'text-gray-200',
+  progressColorClassName = 'text-primary',
+  textColorClassName = 'text-dark',
 }) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (percentage / 100) * circumference;
 
+  const textFontSizeClass = size < 90 ? 'text-lg' : 'text-xl';
+
   return (
     <div className={`relative flex items-center justify-center ${className}`} style={{ width: size, height: size }}>
       <svg width={size} height={size} className="transform -rotate-90">
         <circle
-          className="text-gray-200"
+          className={trackColorClassName}
           stroke="currentColor"
           strokeWidth={strokeWidth}
           fill="transparent"
@@ -30,7 +38,7 @@ const RingProgress: React.FC<RingProgressProps> = ({
           cy={size / 2}
         />
         <circle
-          className="text-primary"
+          className={progressColorClassName}
           stroke="currentColor"
           strokeWidth={strokeWidth}
           strokeDasharray={circumference}
@@ -42,7 +50,7 @@ const RingProgress: React.FC<RingProgressProps> = ({
           cy={size / 2}
         />
       </svg>
-      <span className="absolute text-xl font-bold text-dark">{`${percentage}%`}</span>
+      <span className={`absolute font-bold ${textFontSizeClass} ${textColorClassName}`}>{`${percentage}%`}</span>
     </div>
   );
 };
