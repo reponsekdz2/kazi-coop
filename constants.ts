@@ -1,12 +1,12 @@
-import { User, UserRole, Job, Application, Message, LearningModule, Cooperative, Transaction, SavingsGoal, LoanApplication, CooperativeBudget, CooperativeTransaction } from './types';
+import { User, UserRole, Job, Application, Message, LearningModule, Cooperative, Transaction, SavingsGoal, LoanApplication, CooperativeBudget, CooperativeTransaction, LearningPath } from './types';
 
 export const USERS: User[] = [
-  { id: 'user-1', name: 'Aline U.', email: 'aline@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user1', skills: ['React', 'TypeScript', 'Node.js', 'GraphQL'], cooperativeIds: ['coop-1'], careerProgress: 3 },
-  { id: 'user-2', name: 'Jean-Claude D.', email: 'jean@example.com', role: UserRole.EMPLOYER, avatarUrl: 'https://i.pravatar.cc/150?u=user2', skills: ['Management', 'Hiring'] },
-  { id: 'user-3', name: 'Admin User', email: 'admin@example.com', role: UserRole.ADMIN, avatarUrl: 'https://i.pravatar.cc/150?u=user3', skills: ['System Administration'] },
-  { id: 'user-4', name: 'Peter G.', email: 'peter@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user4', skills: ['Project Management', 'Agile', 'Scrum'], careerProgress: 1 },
-  { id: 'user-5', name: 'Samuel M.', email: 'samuel@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user5', skills: ['UX/UI Design', 'Figma', 'Adobe XD'], cooperativeIds: ['coop-2'], careerProgress: 5 },
-  { id: 'user-6', name: 'Grace K.', email: 'grace@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user6', skills: ['Marketing', 'SEO'], careerProgress: 2 },
+  { id: 'user-1', name: 'Aline U.', email: 'aline@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user1', skills: ['React', 'TypeScript', 'Node.js', 'GraphQL'], cooperativeIds: ['coop-1', 'coop-3'], careerProgress: 3, careerGoal: 'Senior Frontend Developer', completedModuleIds: ['lm-1'] },
+  { id: 'user-2', name: 'Jean-Claude D.', email: 'jean@example.com', role: UserRole.EMPLOYER, avatarUrl: 'https://i.pravatar.cc/150?u=user2', skills: ['Management', 'Hiring'], cooperativeIds: ['coop-1'] },
+  { id: 'user-3', name: 'Admin User', email: 'admin@example.com', role: UserRole.ADMIN, avatarUrl: 'https://i.pravatar.cc/150?u=user3', skills: ['System Administration'], cooperativeIds: ['coop-4'] },
+  { id: 'user-4', name: 'Peter G.', email: 'peter@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user4', skills: ['Project Management', 'Agile', 'Scrum'], careerProgress: 1, careerGoal: 'Project Manager', completedModuleIds: [] },
+  { id: 'user-5', name: 'Samuel M.', email: 'samuel@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user5', skills: ['UX/UI Design', 'Figma', 'Adobe XD'], cooperativeIds: ['coop-2', 'coop-1'], careerProgress: 5, careerGoal: 'Lead UX/UI Designer', completedModuleIds: ['lm-2', 'lm-3'] },
+  { id: 'user-6', name: 'Grace K.', email: 'grace@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user6', skills: ['Marketing', 'SEO'], careerProgress: 2, cooperativeIds: ['coop-1'], completedModuleIds: [] },
 ];
 
 export const JOBS: Job[] = [
@@ -55,8 +55,25 @@ export const LEARNING_MODULES: LearningModule[] = [
     { id: 'lm-5', title: 'Introduction to Digital Marketing', category: 'Entrepreneurship', type: 'video', duration: '2h 45m', coverImageUrl: 'https://images.unsplash.com/photo-1557862921-37829c790f19?q=80&w=871', content: { summary: 'Learn the fundamentals of SEO, SEM, and Social Media Marketing to grow your business online.', keyTakeaways: ['SEO Basics', 'Paid Advertising (PPC)', 'Content Marketing'], videoUrl: 'https://www.youtube.com/embed/nU-IIXbw_Hk', articleText: 'Digital marketing is essential for any modern business...' } },
 ];
 
+export const LEARNING_PATHS: LearningPath[] = [
+    {
+        id: 'lp-1',
+        title: 'Frontend Developer Path',
+        description: 'From fundamentals to advanced concepts, become a top-tier frontend developer.',
+        relevantGoal: 'Senior Frontend Developer',
+        moduleIds: ['lm-1', 'lm-3', 'lm-5'],
+    },
+    {
+        id: 'lp-2',
+        title: 'UX/UI Design Path',
+        description: 'Master the art of user-centered design and create beautiful, functional products.',
+        relevantGoal: 'Lead UX/UI Designer',
+        moduleIds: ['lm-3', 'lm-4', 'lm-2'],
+    },
+];
+
 export const COOPERATIVES: Cooperative[] = [
-    { id: 'coop-1', name: 'TechSolutions Innovators Circle', members: 5, totalSavings: 1250000, loanPool: 800000, creator: 'Jean-Claude D.', creatorId: 'user-2', imageUrl: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?q=80&w=870', joinRequests: [ { userId: 'user-4', status: 'pending' }, { userId: 'user-6', status: 'pending'} ], loansDisbursed: 250000, profit: 50000 },
+    { id: 'coop-1', name: 'TechSolutions Innovators Circle', members: 5, totalSavings: 1250000, loanPool: 800000, creator: 'Jean-Claude D.', creatorId: 'user-2', imageUrl: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?q=80&w=870', joinRequests: [ { userId: 'user-4', status: 'pending' }], loansDisbursed: 250000, profit: 50000, messages: [ {id: 'cm-1', userId: 'user-2', text: 'Welcome everyone! Let\'s discuss our investment strategy for this quarter.', timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() }, {id: 'cm-2', userId: 'user-5', text: 'Great idea! I have some thoughts on investing in local tech startups.', timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() }], communityGoal: 'Fund New Workspace', goalAmount: 2000000, goalProgress: 1250000 },
     { id: 'coop-2', name: 'Kigali Creatives Fund', members: 12, totalSavings: 3400000, loanPool: 2000000, creator: 'Samuel M.', creatorId: 'user-5', imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=871' },
     { id: 'coop-3', name: 'Future Builders Cooperative', members: 8, totalSavings: 980000, loanPool: 500000, creator: 'Aline U.', creatorId: 'user-1', imageUrl: 'https://images.unsplash.com/photo-1556761175-b413da4b248a?q=80&w=934' },
     { id: 'coop-4', name: 'Rwanda Agri-Ventures', members: 25, totalSavings: 8500000, loanPool: 5000000, creator: 'Admin User', creatorId: 'user-3', imageUrl: 'https://images.unsplash.com/photo-1492496913980-50133821932d?q=80&w=987' },
@@ -83,8 +100,8 @@ export const COOPERATIVE_TRANSACTIONS: CooperativeTransaction[] = [
 
 export const TRANSACTIONS: Transaction[] = [
     { id: 't-1', type: 'deposit', description: 'Salary from TechSolutions Ltd.', amount: 800000, date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
-    { id: 't-2', type: 'payment', description: 'Ikimina Contribution', amount: 50000, date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() },
-    { id: 't-3', type: 'withdrawal', description: 'Rent Payment', amount: 200000, date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString() },
+    { id: 't-2', type: 'payment', description: 'Ikimina Contribution', amount: -50000, date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() },
+    { id: 't-3', type: 'withdrawal', description: 'Rent Payment', amount: -200000, date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString() },
 ];
 
 export const SAVINGS_GOALS: SavingsGoal[] = [
@@ -92,7 +109,61 @@ export const SAVINGS_GOALS: SavingsGoal[] = [
     { id: 'sg-2', name: 'Emergency Fund', targetAmount: 1000000, currentAmount: 450000 },
 ];
 
+const today = new Date();
+const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 15);
+const twoMonths = new Date(today.getFullYear(), today.getMonth() + 2, 15);
+
 export const LOAN_APPLICATIONS: LoanApplication[] = [
-    { id: 'la-1', userId: 'user-1', amount: 250000, purpose: 'Laptop Purchase', repaymentPeriod: 6, status: 'Approved' },
-    { id: 'la-2', userId: 'user-5', amount: 500000, purpose: 'Business Startup', repaymentPeriod: 12, status: 'Pending' },
+    { 
+        id: 'la-1', 
+        userId: 'user-1', 
+        cooperativeId: 'coop-1',
+        amount: 250000,
+        remainingAmount: 125000, 
+        purpose: 'Laptop Purchase', 
+        repaymentPeriod: 6, 
+        status: 'Approved',
+        repayments: [
+            { amount: 41667, date: new Date(today.getFullYear(), today.getMonth() - 2, 15).toISOString() },
+            { amount: 41667, date: new Date(today.getFullYear(), today.getMonth() - 1, 15).toISOString() },
+        ],
+        repaymentSchedule: [
+            { dueDate: new Date(today.getFullYear(), today.getMonth() - 2, 15).toISOString(), amount: 41667, status: 'paid' },
+            { dueDate: new Date(today.getFullYear(), today.getMonth() - 1, 15).toISOString(), amount: 41667, status: 'paid' },
+            { dueDate: nextMonth.toISOString(), amount: 41667, status: 'pending' },
+            { dueDate: twoMonths.toISOString(), amount: 41667, status: 'pending' },
+            { dueDate: new Date(today.getFullYear(), today.getMonth() + 3, 15).toISOString(), amount: 41667, status: 'pending' },
+            { dueDate: new Date(today.getFullYear(), today.getMonth() + 4, 15).toISOString(), amount: 41667, status: 'pending' },
+        ]
+    },
+    { 
+        id: 'la-2', 
+        userId: 'user-5', 
+        cooperativeId: 'coop-2',
+        amount: 500000,
+        remainingAmount: 500000,
+        purpose: 'Business Startup', 
+        repaymentPeriod: 12, 
+        status: 'Pending',
+        repayments: [],
+        repaymentSchedule: [],
+    },
+    { 
+        id: 'la-3', 
+        userId: 'user-1', 
+        cooperativeId: 'coop-3',
+        amount: 100000,
+        remainingAmount: 0,
+        purpose: 'Emergency', 
+        repaymentPeriod: 2, 
+        status: 'Fully Repaid',
+        repayments: [
+            { amount: 50000, date: new Date(2024, 4, 15).toISOString() },
+            { amount: 50000, date: new Date(2024, 5, 15).toISOString() },
+        ],
+        repaymentSchedule: [
+             { dueDate: new Date(2024, 4, 15).toISOString(), amount: 50000, status: 'paid' },
+             { dueDate: new Date(2024, 5, 15).toISOString(), amount: 50000, status: 'paid' },
+        ],
+    },
 ];

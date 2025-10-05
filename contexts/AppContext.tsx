@@ -1,8 +1,11 @@
+
 import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback } from 'react';
 import { AuthProvider } from './AuthContext';
 import { ToastProvider } from './ToastContext';
 import { CooperativeProvider } from './CooperativeContext';
 import { LoanProvider } from './LoanContext';
+import { TransactionProvider } from './TransactionContext';
+import { SavingsGoalProvider } from './SavingsGoalContext';
 
 type Theme = 'light' | 'dark';
 type Language = 'en' | 'fr' | 'rw';
@@ -95,9 +98,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       <ToastProvider>
         <CooperativeProvider>
           <LoanProvider>
-            <AppContextProvider>
-              {children}
-            </AppContextProvider>
+            <TransactionProvider>
+              <SavingsGoalProvider>
+                <AppContextProvider>
+                  {children}
+                </AppContextProvider>
+              </SavingsGoalProvider>
+            </TransactionProvider>
           </LoanProvider>
         </CooperativeProvider>
       </ToastProvider>

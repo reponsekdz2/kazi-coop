@@ -10,6 +10,7 @@ import { ArrowTrendingUpIcon, BanknotesIcon, BriefcaseIcon, UserGroupIcon, UserP
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Link } from 'react-router-dom';
 import { useAppContext } from '../contexts/AppContext';
+import RingProgress from '../components/ui/RingProgress';
 
 const SeekerDashboard: React.FC = () => {
     const { user } = useAuth();
@@ -21,12 +22,15 @@ const SeekerDashboard: React.FC = () => {
                 <StatCard icon={BriefcaseIcon} title={t('dashboard.activeApplications')} value={3} trend={1} data={[1,2,2,3]}/>
                 <StatCard icon={UserGroupIcon} title={t('dashboard.interviewsScheduled')} value={1} trend={1} data={[0,0,1,1]}/>
                 <StatCard icon={BanknotesIcon} title={t('dashboard.totalSavings')} value="RWF 550k" trend={10} data={[200, 300, 450, 550]}/>
-                <StatCard icon={ArrowTrendingUpIcon} title={t('dashboard.profileViews')} value={28} trend={15} data={[10, 15, 22, 28]}/>
+                <Card className="flex flex-col items-center justify-center p-4 dark:bg-dark">
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">{t('dashboard.profileCompletion')}</h3>
+                    <RingProgress percentage={Math.round((user?.careerProgress || 0) / 5 * 100)} size={90} strokeWidth={8} />
+                </Card>
             </div>
-            <Card title={t('dashboard.careerJourney')} className="mb-6">
-                <CareerProgressTracker currentStep={3} />
+            <Card title={t('dashboard.careerJourney')} className="mb-6 dark:bg-dark">
+                <CareerProgressTracker currentStep={user?.careerProgress || 0} />
             </Card>
-            <Card title={t('dashboard.recommendedJobs')}>
+            <Card title={t('dashboard.recommendedJobs')} className="dark:bg-dark">
                 {JOBS.slice(0, 3).map(job => (
                     <div key={job.id} className="flex justify-between items-center p-3 border-b dark:border-gray-700 last:border-b-0">
                         <div>

@@ -81,10 +81,17 @@ const Sidebar: React.FC = () => {
             <Cog6ToothIcon className="h-5 w-5 mr-3" />
             {t('sidebar.myProfile')}
           </NavLink>
-          <a href="#" className="flex items-center px-4 py-2 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white dark:text-gray-400 dark:hover:bg-gray-600">
+          <NavLink
+            to="/help"
+            className={({ isActive }) =>
+              `flex items-center px-4 py-2 text-sm rounded-md transition-colors ${
+                isActive ? 'bg-primary text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white dark:text-gray-400 dark:hover:bg-gray-600'
+              }`
+            }
+          >
             <QuestionMarkCircleIcon className="h-5 w-5 mr-3" />
             {t('sidebar.helpCenter')}
-          </a>
+          </NavLink>
         <button onClick={logout} className="w-full flex items-center px-4 py-2 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white dark:text-gray-400 dark:hover:bg-gray-600 mt-2">
           <ArrowLeftOnRectangleIcon className="h-5 w-5 mr-3" />
           {t('header.logout')}

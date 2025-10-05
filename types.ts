@@ -1,3 +1,4 @@
+
 export enum UserRole {
   SEEKER = 'Job Seeker',
   EMPLOYER = 'Employer',
@@ -13,6 +14,8 @@ export interface User {
   skills?: string[];
   cooperativeIds?: string[];
   careerProgress?: number;
+  careerGoal?: string;
+  completedModuleIds?: string[];
 }
 
 export interface Job {
@@ -59,6 +62,14 @@ export interface LearningModule {
   };
 }
 
+export interface LearningPath {
+    id: string;
+    title: string;
+    description: string;
+    relevantGoal: string; // matches user's careerGoal
+    moduleIds: string[];
+}
+
 export interface CooperativeJoinRequest {
     userId: string;
     status: 'pending';
@@ -69,6 +80,13 @@ export interface Contributor {
     name: string;
     avatarUrl: string;
     amount: number;
+}
+
+export interface CooperativeMessage {
+    id: string;
+    userId: string;
+    text: string;
+    timestamp: string;
 }
 
 export interface Cooperative {
@@ -87,6 +105,7 @@ export interface Cooperative {
     topContributors?: Contributor[];
     loansDisbursed?: number;
     profit?: number;
+    messages?: CooperativeMessage[];
 }
 
 export interface CooperativeBudget {
@@ -120,11 +139,26 @@ export interface SavingsGoal {
     currentAmount: number;
 }
 
+export interface Repayment {
+    amount: number;
+    date: string;
+}
+
+export interface RepaymentInstallment {
+    dueDate: string;
+    amount: number;
+    status: 'pending' | 'paid';
+}
+
 export interface LoanApplication {
   id: string;
   userId: string;
+  cooperativeId: string;
   amount: number;
+  remainingAmount: number;
   purpose: string;
   repaymentPeriod: number; // in months
-  status: 'Pending' | 'Approved' | 'Rejected';
+  status: 'Pending' | 'Approved' | 'Rejected' | 'Fully Repaid';
+  repaymentSchedule: RepaymentInstallment[];
+  repayments: Repayment[];
 }

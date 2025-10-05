@@ -23,6 +23,7 @@ import MessagesPage from './pages/MessagesPage';
 import InterviewsPage from './pages/InterviewsPage';
 import UserAnalyticsPage from './pages/UserAnalyticsPage';
 import LearningModulePage from './pages/LearningModulePage';
+import HelpCenterPage from './pages/HelpCenterPage';
 import { UserRole } from './types';
 
 const PrivateRoute: React.FC<{ allowedRoles?: UserRole[] }> = ({ allowedRoles }) => {
@@ -66,6 +67,7 @@ const App: React.FC = () => {
 
           {/* Private Routes */}
           <Route element={<PrivateRoute />}>
+            <Route index element={<Navigate to="/dashboard" />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/jobs" element={<JobsPage />} />
             <Route path="/interviews" element={<InterviewsPage />} />
@@ -75,6 +77,7 @@ const App: React.FC = () => {
             <Route path="/learning/:moduleId" element={<LearningModulePage />} />
             <Route path="/messages" element={<MessagesPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/help" element={<HelpCenterPage />} />
             
             {/* Employer/Admin only routes */}
             <Route path="/analytics" element={<AnalyticsPage />} />
