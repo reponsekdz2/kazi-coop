@@ -7,16 +7,17 @@
         "wallet": "Ikofi",
         "learningHub": "Aho Kwigira",
         "messages": "Ubutumwa",
-        "myProfile": "Umwirondoro wanjye",
+        "settings": "Igenamiterere",
         "helpCenter": "Ubufasha",
         "jobManagement": "Gucunga Akazi",
         "talentPool": "Abashoboye",
         "platformAnalytics": "Ubusesenguzi",
         "walletManagement": "Gucunga Ikofi",
-        "cooperativeManagement": "Gucunga Amakoperative"
+        "cooperativeManagement": "Gucunga Amakoperative",
+        "logout": "Gusohoka"
     },
     "header": {
-        "profile": "Umwirondoro wanjye",
+        "settings": "Igenamiterere",
         "logout": "Gusohoka"
     },
     "login": {
@@ -62,10 +63,11 @@
     "wallet": {
         "title": "Ikofi yanjye",
         "employerTitle": "Gucunga Ikofi y'ikigo",
-        "sendMoney": "Kohereza amafaranga",
-        "addMoney": "Kuzigama",
+        "deposit": "Kubitsa",
+        "withdraw": "Kubikuza",
         "tabs": {
             "overview": "Incamake",
+            "transactions": "Ibikorwa byose",
             "savings": "Ubwizigame",
             "loans": "Inguzanyo",
             "budgeting": "Ingengo y'imari"
@@ -89,7 +91,9 @@
             "payouts": "Amafaranga yatanzwe",
             "marketing": "Kwamamaza",
             "operations": "Ibikorwa",
-            "investments": "Ishoramari"
+            "investments": "Ishoramari",
+            "deposit": "Kubitsa",
+            "withdrawal": "Kubikuza"
         },
         "budgeting": {
             "createNewBudget": "Ingengo y'imari nshya",
@@ -101,45 +105,35 @@
         },
         "loans": {
             "title": "Inguzanyo zanjye",
-            "applyForLoan": "Saba inguzanyo",
-            "viewDetails": "Reba ibisobanuro",
-            "status": {
-                "Pending": "Bitegereje",
-                "Approved": "Byemejwe",
-                "Rejected": "Byanzwe",
-                "FullyRepaid": "Byarangiye"
-            },
-            "loanDetailsTitle": "Ibisobanuro by'inguzanyo",
-            "remaining": "Asigaye",
-            "makeRepayment": "Kwishyura",
-            "summary": "Incamake",
-            "principal": "Umubare w'inguzanyo",
-            "interestRate": "Inyungu",
-            "totalPaid": "Yose yishyuwe",
-            "repaymentHistory": "Amateka y'ubwishyu",
-            "date": "Itariki",
-            "amount": "Umubare",
-            "noRepayments": "Nta bwishyu burakorwa.",
-            "repaymentAmount": "Umubare wishyurwa",
-            "newLoanApplication": "Gusaba inguzanyo nshya",
-            "loanAmount": "Umubare w'inguzanyo (RWF)",
-            "loanPurpose": "Impamvu y'inguzanyo",
-            "repaymentPeriod": "Igihe cyo kwishyura (amezi)",
-            "dueDate": "Itariki ntarengwa"
-        },
-        "upcomingPayments": {
-            "title": "Ubwishyu buri imbere",
-            "overdue": "Byarengeje",
-            "dueIn": "Hasigaye",
-            "days": "iminsi"
+            "amount": "Umubare"
         },
         "companyBalance": "Asigaye mu kigo",
         "totalPayouts": "Yose yatanzwe (umwaka)",
         "coopInvestments": "Ubwizigame mu makoperative",
-        "operationalBudget": "Ingengo y'imari y'ibikorwa"
+        "operationalBudget": "Ingengo y'imari y'ibikorwa",
+        "recentTransactions": "Ibikorwa bya vuba",
+        "allTransactions": "Ibikorwa byose",
+        "searchTransactions": "Shakisha ibikorwa...",
+        "filter": {
+            "allTypes": "Ubwoko bwose",
+            "income": "Inyungu",
+            "expenses": "Ibyasohotse",
+            "allCategories": "Ibyiciro byose"
+        },
+        "depositTitle": "Kubitsa Amafaranga",
+        "depositSubtitle": "Shyira amafaranga ku ikofi yawe ya KaziCoop ukoresheje Mobile Money.",
+        "withdrawTitle": "Kubikuza Amafaranga",
+        "withdrawSubtitle": "Kohereza amafaranga kuva ku ikofi yawe ya KaziCoop ujya kuri konti yawe ya Mobile Money.",
+        "momoNumber": "Nimero ya Mobile Money",
+        "confirm": "Emeza"
     },
-    "profile": {
-        "title": "Umwirondoro wanjye",
+    "settings": {
+        "title": "Igenamiterere",
+        "tabs": {
+            "profile": "Umwirondoro",
+            "account": "Konti",
+            "preferences": "Ibyo uhitamo"
+        },
         "changePicture": "Hindura ifoto",
         "skills": "Ubumenyi bwanjye",
         "profileStrength": "Imbaraga z'umwirondoro",
@@ -152,27 +146,43 @@
         "role": "Inshingano",
         "password": "Ijambobanga",
         "changePassword": "Hindura ijambobanga",
-        "activityTimeline": "Ibikorwa bya vuba"
+        "activityTimeline": "Ibikorwa bya vuba",
+        "applicantProfileTitle": "Umwirondoro wa {name}",
+        "viewFullProfile": "Reba umwirondoro wose",
+        "theme": "Insanganyamatsiko",
+        "themeLight": "Urumuri",
+        "themeDark": "Umwijima",
+        "language": "Ururimi",
+        "notifications": "Imenyesha",
+        "notificationEmail": "Imenyesha kuri imeri",
+        "notificationPush": "Imenyesha ako kanya"
     },
     "helpCenter": {
         "title": "Ubufasha",
         "subtitle": "Turagufasha iki uyu munsi?",
         "searchPlaceholder": "Shakisha ingingo...",
+        "contactSupport": "Vugana natwe",
+        "contactSupportSubtitle": "Nta gisubizo wabonye? Turahari ngo tugufashe.",
         "categories": {
             "general": "Rusange",
-            "jobs": "Akazi",
-            "cooperatives": "Amakoperative",
-            "wallet": "Ikofi"
+            "jobs": "Akazi n'Ubusabe",
+            "cooperatives": "Amakoperative (Ikimina)",
+            "wallet": "Ikofi n'Ubwishyu",
+            "account": "Konti n'Umwirondoro"
         },
         "faqs": {
             "q1": "Nasaba akazi nte?",
-            "a1": "Jya kuri paji ya \"Shaka Akazi\", reba akazi gahari, hanyuma ukande \"Saba\" ku kazi ushaka.",
+            "a1": "Jya kuri paji ya \"Shaka Akazi\", reba akazi gahari, hanyuma ukande \"Saba\" ku kazi ushaka. Amakuru yawe yoherezwa ako kanya ku mukoresha.",
             "q2": "Ikimina ni iki?",
-            "a2": "Ikimina ni itsinda ry'abantu bizigamira hamwe aho buri wese atanga umusanzu buri gihe kandi ashobora no kugurizwa muri ayo mafaranga.",
+            "a2": "Ikimina ni itsinda ry'abantu bizigamira hamwe aho buri wese atanga umusanzu buri gihe (icyumweru cyangwa ukwezi) kandi ashobora no kugurizwa muri ayo mafaranga. Ni uburyo bugezweho bwo gucunga Ikimina cya Kinyarwanda.",
             "q3": "Ninjira mu ikimina nte?",
-            "a3": "Ushobora kureba amakoperative ariho kuri paji ya \"Amakoperative\" ugasaba kuyinjiramo. Abakoresha nabo bashobora gukora ayabo.",
+            "a3": "Ushobora kureba amakoperative ariho kuri paji ya \"Amakoperative\" ugasaba kuyinjiramo. Umuyobozi w'ikimina azasuzuma ubusabe bwawe. Abakoresha nabo bashobora gukora ayabo makoperative.",
             "q4": "Nshyira amafaranga mu ikofi yanjye nte?",
-            "a4": "Kanda buto ya \"Kuzigama\" kuri paji y'Ikofi hanyuma ukurikize amabwiriza."
+            "a4": "Kanda buto ya \"Kubitsa\" kuri paji y'Ikofi hanyuma ukurikize amabwiriza. Ubyishyura ukoresheje Mobile Money kandi bihita bigeramo ako kanya.",
+            "q5": "Amafaranga yanjye atekanye mu ikofi ya KaziCoop?",
+            "a5": "Yego, amafaranga yawe abikwa mu mutekano usesuye n'abafatanyabikorwa bacu bemewe. Dukoresha uburyo buhanitse bw'umutekano mu kurinda konti yawe.",
+            "q6": "Nahindura nte amakuru yanjye?",
+            "a6": "Jya ku ipaji ya 'Igenamiterere' uhereye ku ruhande. Ushobora guhindura amakuru yawe bwite, ubumenyi, n'ifoto yawe mu gace ka 'Umwirondoro'."
         }
     },
     "cooperatives": {
@@ -237,7 +247,9 @@
         "overdue": "Byarengeje igihe",
         "contributionDueTitle": "Umusanzu Uteganyijwe",
         "contributionDueText": "Umusanzu wawe wa RWF {amount} urakenewe. Ishyura kugirango ugume ku gihe.",
-        "contributeNow": "Tanga Umusanzu Nonaha"
+        "contributeNow": "Tanga Umusanzu Nonaha",
+        "settings": "Igenamiterere",
+        "saveSettings": "Bika"
     },
     "jobs": {
         "apply": "Saba Akazi",
@@ -252,7 +264,10 @@
         "newInterviewTitle": "Tegura ikibazo",
         "interviewDate": "Itariki n'isaha by'ikibazo",
         "interviewType": "Ubwoko bw'ikibazo",
-        "interviewDetails": "Ibindi bisobanuro (urugero: aho kizabera)"
+        "interviewDetails": "Ibindi bisobanuro (urugero: aho kizabera)",
+        "viewProfile": "Umwirondoro",
+        "matchScore": "Inota rijyanye",
+        "generatingScore": "Inota ririmo gukorwa..."
     },
     "common": {
         "cancel": "Kureka",
@@ -262,5 +277,10 @@
         "deny": "Hakana",
         "close": "Funga",
         "save": "Bika"
+    },
+    "notifications": {
+        "title": "Imenyesha",
+        "markAllRead": "Soma byose",
+        "noNotifications": "Nta menyesha mashya ufite."
     }
 }

@@ -7,17 +7,18 @@ import {
   WalletIcon,
   AcademicCapIcon,
   ChatBubbleLeftRightIcon,
-  UserCircleIcon,
+  Cog6ToothIcon,
   QuestionMarkCircleIcon,
   UsersIcon,
-  BuildingOffice2Icon
+  BuildingOffice2Icon,
+  ArrowLeftOnRectangleIcon
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../../contexts/AuthContext';
 import { UserRole } from '../../types';
 import { useAppContext } from '../../contexts/AppContext';
 
 const Sidebar: React.FC = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { t } = useAppContext();
 
   const seekerLinks = [
@@ -41,7 +42,7 @@ const Sidebar: React.FC = () => {
   ];
   
   const bottomLinks = [
-    { name: t('sidebar.myProfile'), to: '/profile', icon: UserCircleIcon },
+    { name: t('sidebar.settings'), to: '/settings', icon: Cog6ToothIcon },
     { name: t('sidebar.helpCenter'), to: '/help', icon: QuestionMarkCircleIcon },
   ];
 
@@ -88,6 +89,13 @@ const Sidebar: React.FC = () => {
              {link.name}
            </NavLink>
         ))}
+         <button
+            onClick={logout}
+            className="flex items-center w-full px-4 py-2.5 text-sm font-medium rounded-lg text-gray-600 dark:text-gray-300 hover:bg-light dark:hover:bg-gray-700"
+        >
+            <ArrowLeftOnRectangleIcon className="h-5 w-5 mr-3" />
+            {t('sidebar.logout')}
+        </button>
       </div>
     </aside>
   );

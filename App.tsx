@@ -16,7 +16,7 @@ import CooperativesPage from './pages/CooperativesPage';
 import WalletPage from './pages/WalletPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import LearningPage from './pages/LearningPage';
-import ProfilePage from './pages/ProfilePage';
+import SettingsPage from './pages/SettingsPage';
 import NotFoundPage from './pages/NotFoundPage';
 import LandingPage from './pages/LandingPage';
 import MessagesPage from './pages/MessagesPage';
@@ -72,7 +72,7 @@ const AuthRoutes: React.FC = () => {
         <Route path="/learning" element={<LearningPage />} />
         <Route path="/learning/:moduleId" element={<LearningModulePage />} />
         <Route path="/messages" element={<MessagesPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/settings" element={<SettingsPage />} />
         <Route path="/help" element={<HelpCenterPage />} />
         
         {/* Employer/Admin only routes */}

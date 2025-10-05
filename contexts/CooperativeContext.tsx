@@ -5,6 +5,18 @@ import { useAuth } from './AuthContext';
 import { useToast } from './ToastContext';
 import { useTransactions } from './TransactionContext';
 
+type CooperativeSettingsPayload = {
+    name: string;
+    description: string;
+    contributionSettings: {
+        amount: number;
+        frequency: 'Weekly' | 'Monthly';
+    };
+    loanSettings: {
+        interestRate: number;
+    };
+};
+
 interface CooperativeContextType {
   cooperatives: Cooperative[];
   createCooperative: (details: Omit<Cooperative, 'id' | 'creatorId' | 'members' | 'totalSavings' | 'totalLoans' | 'joinRequests' | 'contributions' | 'loans' | 'loanSettings'>) => void;
@@ -16,6 +28,7 @@ interface CooperativeContextType {
   approveLoan: (cooperativeId: string, loanId: string) => void;
   rejectLoan: (cooperativeId: string, loanId: string) => void;
   makeLoanRepayment: (cooperativeId: string, loanId: string, installmentId: string) => void;
+  updateCooperativeSettings: (cooperativeId: string, settings: CooperativeSettingsPayload) => void;
 }
 
 const CooperativeContext = createContext<CooperativeContextType | undefined>(undefined);
@@ -248,9 +261,28 @@ export const CooperativeProvider: React.FC<{ children: ReactNode }> = ({ childre
     }));
   };
 
+  const updateCooperativeSettings = (cooperativeId: string, settings: CooperativeSettingsPayload) => {
+    setAllCooperatives(prev => prev.map(coop => {
+      if (coop.id === cooperativeId && coop.creatorId === user?.id) {
+        addToast("Cooperative settings updated successfully.", "success");
+        return {
+          ...coop,
+          name: settings.name,
+          description: settings.description,
+          contributionSettings: settings.contributionSettings,
+          loanSettings: {
+            ...coop.loanSettings,
+            interestRate: settings.loanSettings.interestRate,
+          }
+        };
+      }
+      return coop;
+    }));
+  };
+
 
   return (
-    <CooperativeContext.Provider value={{ cooperatives, createCooperative, requestToJoin, approveJoinRequest, denyJoinRequest, makeContribution, applyForLoan, approveLoan, rejectLoan, makeLoanRepayment }}>
+    <CooperativeContext.Provider value={{ cooperatives, createCooperative, requestToJoin, approveJoinRequest, denyJoinRequest, makeContribution, applyForLoan, approveLoan, rejectLoan, makeLoanRepayment, updateCooperativeSettings }}>
       {children}
     </CooperativeContext.Provider>
   );

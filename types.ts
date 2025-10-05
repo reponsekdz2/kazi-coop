@@ -106,7 +106,9 @@ export type TransactionCategory =
   | 'Marketing'
   | 'Operations'
   | 'Investments'
-  | 'Cooperative Contribution';
+  | 'Cooperative Contribution'
+  // FIX: Added 'Withdrawal' to support withdrawal transactions and resolve the type error in WithdrawModal.tsx.
+  | 'Withdrawal';
 
 export interface Transaction {
   id: string;

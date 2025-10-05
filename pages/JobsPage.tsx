@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { useJobs } from '../contexts/JobContext';
 import { Job, User, Application, UserRole, Interview } from '../types';
-import { MapPinIcon, BriefcaseIcon, MagnifyingGlassIcon, XMarkIcon, CalendarDaysIcon } from '@heroicons/react/24/outline';
+import { MapPinIcon, BriefcaseIcon, MagnifyingGlassIcon, XMarkIcon, CalendarDaysIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import Modal from '../components/ui/Modal';
 import { useAuth } from '../contexts/AuthContext';
 import { useApplications } from '../contexts/ApplicationContext';
 import { useAppContext } from '../contexts/AppContext';
 import { USERS } from '../constants';
 import { useInterviews } from '../contexts/InterviewContext';
+import { GoogleGenAI, Type } from '@google/genai';
+import RingProgress from '../components/ui/RingProgress';
+import SeekerProfileModal from '../components/ui/SeekerProfileModal';
 
 const JobsPage: React.FC = () => {
     const { user } = useAuth();
@@ -166,30 +169,104 @@ const JobManagementCard: React.FC<{ job: Job, onViewApplicants: () => void }> = 
     );
 };
 
+type MatchScore = { score: number | null; justification: string; isLoading: boolean };
+
 const ViewApplicantsModal: React.FC<{ isOpen: boolean; onClose: () => void; job: Job }> = ({ isOpen, onClose, job }) => {
     const { applications, updateApplicationStatus } = useApplications();
     const { t } = useAppContext();
     const [isSchedulingInterview, setIsSchedulingInterview] = useState<Application | null>(null);
+    const [viewingApplicant, setViewingApplicant] = useState<User | null>(null);
     const applicants = applications.filter(a => a.jobId === job.id);
     const applicationStatuses: Application['status'][] = ['Applied', 'Reviewed', 'Interviewing', 'Interview Scheduled', 'Offered', 'Rejected'];
+    const [matchScores, setMatchScores] = useState<Record<string, MatchScore>>({});
 
+    useEffect(() => {
+        if (isOpen) {
+            handleGenerateScores();
+        }
+    }, [isOpen]);
+
+    const handleGenerateScores = async () => {
+        const ai = new GoogleGenAI({apiKey: process.env.API_KEY as string});
+        
+        for (const app of applicants) {
+            const applicant = USERS.find(u => u.id === app.userId);
+            if (!applicant) continue;
+
+            setMatchScores(prev => ({ ...prev, [app.id]: { score: null, justification: '', isLoading: true } }));
+
+            const prompt = `
+                Act as an expert HR recruiter specializing in the Rwandan tech market. Analyze the following job requirements and candidate profile.
+                Provide a percentage match score from 0 to 100 representing how well the candidate fits the role.
+                Also provide a brief, one-sentence justification for your score, highlighting the strongest positive or negative factor.
+
+                Job Title: ${job.title}
+                Job Requirements: ${job.requirements.join(', ')}
+                Job Description: ${job.description}
+
+                Candidate Skills: ${applicant.skills?.join(', ') || 'Not specified'}
+
+                Respond ONLY with a valid JSON object.
+            `;
+            
+            try {
+                const response = await ai.models.generateContent({
+                    model: 'gemini-2.5-flash',
+                    contents: prompt,
+                    config: {
+                      responseMimeType: "application/json",
+                      responseSchema: {
+                         type: Type.OBJECT,
+                         properties: {
+                           score: { type: Type.INTEGER, description: 'The match score from 0 to 100.'},
+                           justification: { type: Type.STRING, description: 'A brief one-sentence justification.' },
+                         },
+                         required: ["score", "justification"]
+                       },
+                    },
+                });
+
+                const jsonStr = response.text.trim();
+                const result = JSON.parse(jsonStr);
+                setMatchScores(prev => ({ ...prev, [app.id]: { score: result.score, justification: result.justification, isLoading: false } }));
+
+            } catch (error) {
+                console.error("Error generating match score:", error);
+                setMatchScores(prev => ({ ...prev, [app.id]: { score: null, justification: 'Error', isLoading: false } }));
+            }
+        }
+    };
+    
     return (
         <Modal isOpen={isOpen} onClose={onClose} title={`Applicants for ${job.title}`}>
-            <div className="space-y-3 max-h-96 overflow-y-auto">
+            <div className="space-y-3 max-h-[60vh] overflow-y-auto">
                 {applicants.length > 0 ? applicants.map(app => {
                     const applicant = USERS.find(u => u.id === app.userId);
                     if (!applicant) return null;
+                    const match = matchScores[app.id];
 
                     return (
-                        <div key={app.id} className="flex flex-col md:flex-row justify-between md:items-center p-3 rounded-lg bg-light dark:bg-gray-700/50 gap-4">
-                           <div className="flex items-center">
+                        <div key={app.id} className="grid grid-cols-1 md:grid-cols-3 gap-4 p-3 rounded-lg bg-light dark:bg-gray-700/50 items-center">
+                           <div className="md:col-span-1 flex items-center">
                                 <img src={applicant.avatarUrl} alt={applicant.name} className="h-10 w-10 rounded-full mr-3"/>
                                 <div>
                                     <p className="font-bold text-dark dark:text-light">{applicant.name}</p>
                                     <p className="text-xs text-gray-500 dark:text-gray-400">Applied on: {new Date(app.submissionDate).toLocaleDateString()}</p>
                                 </div>
                            </div>
-                           <div className="flex items-center gap-2">
+                           <div className="md:col-span-1 flex justify-center items-center gap-3">
+                                {match?.isLoading ? (
+                                    <div className="text-center text-xs text-gray-500 animate-pulse">{t('jobs.generatingScore')}</div>
+                                ) : match?.score !== null ? (
+                                    <div className="text-center group relative">
+                                        <RingProgress percentage={match.score || 0} size={50} strokeWidth={5} />
+                                        <div className="absolute bottom-full mb-2 w-48 text-center left-1/2 -translate-x-1/2 hidden group-hover:block px-2 py-1 bg-dark text-white text-xs rounded-md z-10">
+                                            {match.justification}
+                                        </div>
+                                    </div>
+                                ) : <div className="text-xs text-red-500">Error</div>}
+                           </div>
+                           <div className="md:col-span-1 flex items-center justify-end gap-2">
                                 <select 
                                     value={app.status} 
                                     onChange={(e) => updateApplicationStatus(app.id, e.target.value as Application['status'])}
@@ -204,7 +281,7 @@ const ViewApplicantsModal: React.FC<{ isOpen: boolean; onClose: () => void; job:
                                         <CalendarDaysIcon className="h-5 w-5"/>
                                     </Button>
                                 )}
-                                <Button variant="secondary">Profile</Button>
+                                <Button variant="secondary" onClick={() => setViewingApplicant(applicant)}>{t('jobs.viewProfile')}</Button>
                            </div>
                         </div>
                     );
@@ -216,6 +293,13 @@ const ViewApplicantsModal: React.FC<{ isOpen: boolean; onClose: () => void; job:
                     isOpen={!!isSchedulingInterview}
                     onClose={() => setIsSchedulingInterview(null)}
                     application={isSchedulingInterview}
+                />
+            )}
+            {viewingApplicant && (
+                <SeekerProfileModal 
+                    isOpen={!!viewingApplicant}
+                    onClose={() => setViewingApplicant(null)}
+                    user={viewingApplicant}
                 />
             )}
         </Modal>

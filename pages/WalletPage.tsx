@@ -7,12 +7,14 @@ import { useSavingsGoals } from '../contexts/SavingsGoalContext';
 import { useLoan } from '../contexts/LoanContext';
 import { useBudget, BudgetWithSpending } from '../contexts/BudgetContext';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { ArrowDownIcon, ArrowUpIcon, BanknotesIcon, BuildingStorefrontIcon, CurrencyDollarIcon } from '@heroicons/react/24/solid';
+import { ArrowDownIcon, ArrowUpIcon, BanknotesIcon, BuildingStorefrontIcon, CurrencyDollarIcon, MagnifyingGlassIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../contexts/AuthContext';
-import { UserRole } from '../types';
+import { Transaction, TransactionCategory, UserRole } from '../types';
 import RingProgress from '../components/ui/RingProgress';
+import DepositModal from '../components/ui/DepositModal';
+import WithdrawModal from '../components/ui/WithdrawModal';
 
-type WalletTab = 'overview' | 'savings' | 'loans' | 'budgeting';
+type WalletTab = 'overview' | 'transactions' | 'savings' | 'loans' | 'budgeting';
 
 const COLORS = ['#005A9C', '#5E96C3', '#10B981', '#F59E0B', '#EF4444', '#6366F1'];
 
@@ -23,6 +25,8 @@ const SeekerWallet: React.FC = () => {
     const { goals } = useSavingsGoals();
     const { applications } = useLoan();
     const { budgetsWithSpending } = useBudget();
+    const [isDepositOpen, setIsDepositOpen] = useState(false);
+    const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
 
     const totalBalance = useMemo(() => transactions.reduce((sum, t) => sum + t.amount, 0), [transactions]);
     const spentThisMonth = useMemo(() => {
@@ -69,12 +73,12 @@ const SeekerWallet: React.FC = () => {
                                     </div>
                                 </div>
                             </Card>
-                            <Card title="Recent Transactions">
+                            <Card title={t('wallet.recentTransactions')}>
                                 <div className="space-y-3">
                                     {transactions.slice(0, 5).map(t => (
                                         <div key={t.id} className="flex justify-between items-center">
                                             <div className="flex items-center">
-                                                <div className={`p-2 rounded-full mr-3 ${t.amount > 0 ? 'bg-green-100' : 'bg-red-100'}`}>
+                                                <div className={`p-2 rounded-full mr-3 ${t.amount > 0 ? 'bg-green-100 dark:bg-green-900/50' : 'bg-red-100 dark:bg-red-900/50'}`}>
                                                     {t.amount > 0 ? <ArrowUpIcon className="h-5 w-5 text-green-600" /> : <ArrowDownIcon className="h-5 w-5 text-red-600" />}
                                                 </div>
                                                 <div>
@@ -98,13 +102,14 @@ const SeekerWallet: React.FC = () => {
                                             {spendingData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
                                         </Pie>
                                         <Tooltip formatter={(value) => `RWF ${Number(value).toLocaleString()}`} />
-                                        <Legend formatter={(value) => String(value).toLowerCase()} />
                                     </PieChart>
                                 </ResponsiveContainer>
                             </Card>
                         </div>
                     </div>
                 );
+            case 'transactions':
+                return <TransactionsTab transactions={transactions} />;
             case 'savings':
                 return <Card title={t('wallet.savingsGoals')}>Your savings goals here...</Card>;
             case 'loans':
@@ -118,6 +123,7 @@ const SeekerWallet: React.FC = () => {
 
     const tabs: {id: WalletTab, label: string}[] = [
         { id: 'overview', label: t('wallet.tabs.overview') },
+        { id: 'transactions', label: t('wallet.tabs.transactions') },
         { id: 'savings', label: t('wallet.tabs.savings') },
         { id: 'loans', label: t('wallet.tabs.loans') },
         { id: 'budgeting', label: t('wallet.tabs.budgeting') },
@@ -128,13 +134,13 @@ const SeekerWallet: React.FC = () => {
             <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
                 <h1 className="text-3xl font-bold text-dark dark:text-light">{t('wallet.title')}</h1>
                 <div className="flex gap-2">
-                    <Button variant="secondary">{t('wallet.sendMoney')}</Button>
-                    <Button>{t('wallet.addMoney')}</Button>
+                    <Button variant="secondary" onClick={() => setIsWithdrawOpen(true)}>{t('wallet.withdraw')}</Button>
+                    <Button onClick={() => setIsDepositOpen(true)}>{t('wallet.deposit')}</Button>
                 </div>
             </div>
             
             <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
-                <nav className="-mb-px flex space-x-6">
+                <nav className="-mb-px flex space-x-6 overflow-x-auto">
                     {tabs.map(tab => (
                         <button 
                             key={tab.id}
@@ -152,9 +158,91 @@ const SeekerWallet: React.FC = () => {
             </div>
             
             {renderTabContent()}
+
+            <DepositModal isOpen={isDepositOpen} onClose={() => setIsDepositOpen(false)} />
+            <WithdrawModal isOpen={isWithdrawOpen} onClose={() => setIsWithdrawOpen(false)} currentBalance={totalBalance} />
         </div>
     );
 }
+
+const TransactionsTab: React.FC<{ transactions: Transaction[] }> = ({ transactions }) => {
+    const { t } = useAppContext();
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filter, setFilter] = useState<{ type: 'all' | 'income' | 'expense', category: 'all' | TransactionCategory }>({ type: 'all', category: 'all' });
+
+    const categories = useMemo(() => {
+        const uniqueCategories = [...new Set(transactions.map(t => t.category))];
+        return ['all', ...uniqueCategories];
+    }, [transactions]);
+    
+    const filteredTransactions = useMemo(() => {
+        return transactions.filter(t => {
+            const matchesType = filter.type === 'all' || (filter.type === 'income' && t.amount > 0) || (filter.type === 'expense' && t.amount < 0);
+            const matchesCategory = filter.category === 'all' || t.category === filter.category;
+            const matchesSearch = t.description.toLowerCase().includes(searchTerm.toLowerCase());
+            return matchesType && matchesCategory && matchesSearch;
+        });
+    }, [transactions, searchTerm, filter]);
+
+    return (
+        <Card title={t('wallet.allTransactions')}>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4 p-4 bg-light dark:bg-gray-800/50 rounded-lg">
+                <div className="md:col-span-2 relative">
+                     <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 absolute top-1/2 left-3 -translate-y-1/2" />
+                    <input 
+                        type="text" 
+                        placeholder={t('wallet.searchTransactions')}
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-dark focus:ring-2 focus:ring-primary focus:outline-none"
+                    />
+                </div>
+                <div>
+                    <select 
+                        value={filter.type} 
+                        onChange={e => setFilter(prev => ({ ...prev, type: e.target.value as any }))}
+                        className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-dark focus:ring-2 focus:ring-primary focus:outline-none"
+                    >
+                        <option value="all">{t('wallet.filter.allTypes')}</option>
+                        <option value="income">{t('wallet.filter.income')}</option>
+                        <option value="expense">{t('wallet.filter.expenses')}</option>
+                    </select>
+                </div>
+                <div>
+                     <select 
+                        value={filter.category} 
+                        onChange={e => setFilter(prev => ({ ...prev, category: e.target.value as any }))}
+                        className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-dark focus:ring-2 focus:ring-primary focus:outline-none"
+                    >
+                        {categories.map(cat => <option key={cat} value={cat} className="capitalize">{cat === 'all' ? t('wallet.filter.allCategories') : cat}</option>)}
+                    </select>
+                </div>
+            </div>
+            <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+                {filteredTransactions.map(t => (
+                     <div key={t.id} className="flex justify-between items-center p-3 border-b dark:border-gray-700">
+                         <div className="flex items-center">
+                             <div className={`p-2 rounded-full mr-4 ${t.amount > 0 ? 'bg-green-100 dark:bg-green-900/50' : 'bg-red-100 dark:bg-red-900/50'}`}>
+                                 {t.amount > 0 ? <ArrowUpIcon className="h-5 w-5 text-green-600" /> : <ArrowDownIcon className="h-5 w-5 text-red-600" />}
+                             </div>
+                             <div>
+                                 <p className="font-semibold text-dark dark:text-light">{t.description}</p>
+                                 <div className="flex items-center gap-2">
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">{new Date(t.date).toLocaleDateString()}</p>
+                                    <span className="px-2 py-0.5 text-xs rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300">{t.category}</span>
+                                 </div>
+                             </div>
+                         </div>
+                         <p className={`font-bold text-lg ${t.amount > 0 ? 'text-green-600' : 'text-dark dark:text-light'}`}>
+                             {t.amount > 0 ? '+' : '-'}RWF {Math.abs(t.amount).toLocaleString()}
+                         </p>
+                     </div>
+                ))}
+            </div>
+        </Card>
+    );
+};
+
 
 const BudgetingTab: React.FC<{ budgets: BudgetWithSpending[] }> = ({ budgets }) => {
     const { t } = useAppContext();

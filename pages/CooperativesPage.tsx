@@ -3,13 +3,14 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { useCooperatives } from '../contexts/CooperativeContext';
 import { Cooperative, User, Contribution, CooperativeLoan, RepaymentInstallment } from '../types';
-import { UserGroupIcon, BanknotesIcon, ArrowUpRightIcon, CheckIcon, XMarkIcon, CalendarDaysIcon, CurrencyDollarIcon, ChevronDownIcon, InformationCircleIcon } from '@heroicons/react/24/solid';
+import { UserGroupIcon, Cog6ToothIcon, ArrowUpRightIcon, CheckIcon, XMarkIcon, CalendarDaysIcon, CurrencyDollarIcon, ChevronDownIcon, InformationCircleIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../contexts/AuthContext';
 import { UserRole } from '../types';
 import Modal from '../components/ui/Modal';
 import { useAppContext } from '../contexts/AppContext';
 import { USERS } from '../constants';
 import RingProgress from '../components/ui/RingProgress';
+import SeekerProfileModal from '../components/ui/SeekerProfileModal';
 
 type CooperativeTab = 'overview' | 'members' | 'management' | 'finance';
 
@@ -469,33 +470,40 @@ const ManagementTab: React.FC<{ cooperative: Cooperative }> = ({ cooperative }) 
     const pendingRequests = USERS.filter(u => cooperative.joinRequests.includes(u.id));
     const pendingLoans = cooperative.loans.filter(l => l.status === 'Pending');
     const availableForLoan = cooperative.totalSavings - cooperative.totalLoans;
+    const [viewingUser, setViewingUser] = useState<User | null>(null);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
 
     return (
         <div className="space-y-6">
             <Card>
-                <div>
-                    <h4 className="font-bold text-lg text-dark dark:text-light mb-4">{t('cooperatives.pendingRequests')} ({pendingRequests.length})</h4>
-                    <div className="space-y-3 max-h-96 overflow-y-auto">
-                        {pendingRequests.length > 0 ? pendingRequests.map(requestUser => (
-                            <div key={requestUser.id} className="flex items-center justify-between p-2 rounded-lg bg-light dark:bg-gray-700/50">
-                                <div className="flex items-center">
-                                    <img src={requestUser.avatarUrl} alt={requestUser.name} className="h-10 w-10 rounded-full mr-4" />
-                                    <p className="font-bold text-dark dark:text-light">{requestUser.name}</p>
-                                </div>
-                                <div className="flex gap-2">
-                                    <Button onClick={() => approveJoinRequest(cooperative.id, requestUser.id)} className="!p-2">
-                                        <CheckIcon className="h-5 w-5"/>
-                                    </Button>
-                                    <Button onClick={() => denyJoinRequest(cooperative.id, requestUser.id)} variant="danger" className="!p-2">
-                                        <XMarkIcon className="h-5 w-5"/>
-                                    </Button>
-                                </div>
+                <div className="flex justify-between items-center mb-4">
+                    <h4 className="font-bold text-lg text-dark dark:text-light">{t('cooperatives.pendingRequests')} ({pendingRequests.length})</h4>
+                    <Button variant="secondary" onClick={() => setIsSettingsOpen(true)}>
+                        <Cog6ToothIcon className="h-5 w-5 mr-2 inline"/>
+                        {t('cooperatives.settings')}
+                    </Button>
+                </div>
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {pendingRequests.length > 0 ? pendingRequests.map(requestUser => (
+                        <div key={requestUser.id} className="flex items-center justify-between p-2 rounded-lg bg-light dark:bg-gray-700/50">
+                            <div className="flex items-center">
+                                <img src={requestUser.avatarUrl} alt={requestUser.name} className="h-10 w-10 rounded-full mr-4" />
+                                <p className="font-bold text-dark dark:text-light">{requestUser.name}</p>
                             </div>
-                        )) : (
-                            <p className="text-gray-500 dark:text-gray-400 text-center py-4">{t('cooperatives.noPendingRequests')}</p>
-                        )}
-                    </div>
+                            <div className="flex gap-2">
+                                <Button variant="secondary" onClick={() => setViewingUser(requestUser)}>{t('jobs.viewProfile')}</Button>
+                                <Button onClick={() => approveJoinRequest(cooperative.id, requestUser.id)} className="!p-2">
+                                    <CheckIcon className="h-5 w-5"/>
+                                </Button>
+                                <Button onClick={() => denyJoinRequest(cooperative.id, requestUser.id)} variant="danger" className="!p-2">
+                                    <XMarkIcon className="h-5 w-5"/>
+                                </Button>
+                            </div>
+                        </div>
+                    )) : (
+                        <p className="text-gray-500 dark:text-gray-400 text-center py-4">{t('cooperatives.noPendingRequests')}</p>
+                    )}
                 </div>
             </Card>
              <Card>
@@ -532,6 +540,21 @@ const ManagementTab: React.FC<{ cooperative: Cooperative }> = ({ cooperative }) 
                     )}
                 </div>
             </Card>
+
+            {viewingUser && (
+                <SeekerProfileModal
+                    isOpen={!!viewingUser}
+                    onClose={() => setViewingUser(null)}
+                    user={viewingUser}
+                />
+            )}
+            {isSettingsOpen && (
+                <CooperativeSettingsModal
+                    isOpen={isSettingsOpen}
+                    onClose={() => setIsSettingsOpen(false)}
+                    cooperative={cooperative}
+                />
+            )}
         </div>
     );
 };
@@ -703,6 +726,86 @@ const RequestLoanModal: React.FC<{ isOpen: boolean, onClose: () => void, coopera
                 <div className="flex justify-end gap-2 pt-4">
                     <Button type="button" variant="secondary" onClick={onClose}>{t('common.cancel')}</Button>
                     <Button type="submit" disabled={amount <= 0 || amount > availableForLoan || !purpose}>{t('common.submit')}</Button>
+                </div>
+            </form>
+        </Modal>
+    );
+};
+
+const CooperativeSettingsModal: React.FC<{ isOpen: boolean, onClose: () => void, cooperative: Cooperative }> = ({ isOpen, onClose, cooperative }) => {
+    const { t } = useAppContext();
+    const { updateCooperativeSettings } = useCooperatives();
+    const [formData, setFormData] = useState({
+        name: cooperative.name,
+        description: cooperative.description,
+        contributionSettings: cooperative.contributionSettings,
+        loanSettings: cooperative.loanSettings,
+    });
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        const [section, field] = name.split('.');
+
+        if (section === 'contributionSettings' || section === 'loanSettings') {
+            setFormData(prev => ({
+                ...prev,
+                [section]: {
+                    ...prev[section],
+                    [field]: field === 'frequency' ? value : parseFloat(value) || 0
+                }
+            }));
+        } else {
+            setFormData(prev => ({ ...prev, [name]: value }));
+        }
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        updateCooperativeSettings(cooperative.id, formData);
+        onClose();
+    };
+
+    return (
+        <Modal isOpen={isOpen} onClose={onClose} title={t('cooperatives.settings')}>
+             <form onSubmit={handleSubmit} className="space-y-6">
+                <Card>
+                    <h4 className="font-bold text-lg mb-3">General</h4>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('cooperatives.name')}</label>
+                        <input type="text" name="name" value={formData.name} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"/>
+                    </div>
+                     <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('cooperatives.description')}</label>
+                        <textarea name="description" value={formData.description} onChange={handleChange} required rows={2} className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"></textarea>
+                    </div>
+                </Card>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Card>
+                        <h4 className="font-bold text-lg mb-3">Contributions</h4>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('cooperatives.contributionAmount')}</label>
+                            <input type="number" name="contributionSettings.amount" value={formData.contributionSettings.amount} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"/>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('cooperatives.contributionFrequency')}</label>
+                            <select name="contributionSettings.frequency" value={formData.contributionSettings.frequency} onChange={handleChange} className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                                <option value="Monthly">Monthly</option>
+                                <option value="Weekly">Weekly</option>
+                            </select>
+                        </div>
+                    </Card>
+                    <Card>
+                         <h4 className="font-bold text-lg mb-3">Loans</h4>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('cooperatives.interestRate')} (%)</label>
+                            <input type="number" name="loanSettings.interestRate" value={formData.loanSettings.interestRate} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"/>
+                        </div>
+                    </Card>
+                </div>
+                 <div className="flex justify-end gap-2 pt-4">
+                    <Button type="button" variant="secondary" onClick={onClose}>{t('common.cancel')}</Button>
+                    <Button type="submit">{t('common.save')}</Button>
                 </div>
             </form>
         </Modal>

@@ -7,16 +7,17 @@
         "wallet": "Wallet",
         "learningHub": "Learning Hub",
         "messages": "Messages",
-        "myProfile": "My Profile",
+        "settings": "Settings",
         "helpCenter": "Help Center",
         "jobManagement": "Job Management",
         "talentPool": "Talent Pool",
         "platformAnalytics": "Platform Analytics",
         "walletManagement": "Wallet Management",
-        "cooperativeManagement": "Cooperative Management"
+        "cooperativeManagement": "Cooperative Management",
+        "logout": "Logout"
     },
     "header": {
-        "profile": "My Profile",
+        "settings": "Settings",
         "logout": "Logout"
     },
     "login": {
@@ -62,10 +63,11 @@
     "wallet": {
         "title": "My Wallet",
         "employerTitle": "Company Wallet Management",
-        "sendMoney": "Send Money",
-        "addMoney": "Add Money",
+        "deposit": "Deposit",
+        "withdraw": "Withdraw",
         "tabs": {
             "overview": "Overview",
+            "transactions": "Transactions",
             "savings": "Savings",
             "loans": "Loans",
             "budgeting": "Budgeting"
@@ -89,7 +91,9 @@
             "payouts": "Payouts",
             "marketing": "Marketing",
             "operations": "Operations",
-            "investments": "Investments"
+            "investments": "Investments",
+            "deposit": "Deposit",
+            "withdrawal": "Withdrawal"
         },
         "budgeting": {
             "createNewBudget": "New Budget",
@@ -101,45 +105,35 @@
         },
         "loans": {
             "title": "My Loans",
-            "applyForLoan": "Apply for Loan",
-            "viewDetails": "View Details",
-            "status": {
-                "Pending": "Pending",
-                "Approved": "Approved",
-                "Rejected": "Rejected",
-                "FullyRepaid": "Fully Repaid"
-            },
-            "loanDetailsTitle": "Loan Details",
-            "remaining": "Remaining",
-            "makeRepayment": "Make Repayment",
-            "summary": "Summary",
-            "principal": "Principal Amount",
-            "interestRate": "Interest Rate",
-            "totalPaid": "Total Paid",
-            "repaymentHistory": "Repayment History",
-            "date": "Date",
-            "amount": "Amount",
-            "noRepayments": "No repayments made yet.",
-            "repaymentAmount": "Repayment Amount",
-            "newLoanApplication": "New Loan Application",
-            "loanAmount": "Loan Amount (RWF)",
-            "loanPurpose": "Purpose of Loan",
-            "repaymentPeriod": "Repayment Period (Months)",
-            "dueDate": "Due Date"
-        },
-        "upcomingPayments": {
-            "title": "Upcoming Payments",
-            "overdue": "Overdue",
-            "dueIn": "Due in",
-            "days": "days"
+            "amount": "Amount"
         },
         "companyBalance": "Company Balance",
         "totalPayouts": "Total Payouts (YTD)",
         "coopInvestments": "Co-op Investments",
-        "operationalBudget": "Operational Budget Allocation"
+        "operationalBudget": "Operational Budget Allocation",
+        "recentTransactions": "Recent Transactions",
+        "allTransactions": "All Transactions",
+        "searchTransactions": "Search transactions...",
+        "filter": {
+            "allTypes": "All Types",
+            "income": "Income",
+            "expenses": "Expenses",
+            "allCategories": "All Categories"
+        },
+        "depositTitle": "Deposit Funds",
+        "depositSubtitle": "Add money to your KaziCoop wallet via Mobile Money.",
+        "withdrawTitle": "Withdraw Funds",
+        "withdrawSubtitle": "Transfer money from your KaziCoop wallet to your Mobile Money account.",
+        "momoNumber": "Mobile Money Number",
+        "confirm": "Confirm"
     },
-    "profile": {
-        "title": "My Profile",
+    "settings": {
+        "title": "Settings",
+        "tabs": {
+            "profile": "Profile",
+            "account": "Account",
+            "preferences": "Preferences"
+        },
         "changePicture": "Change Picture",
         "skills": "My Skills",
         "profileStrength": "Profile Strength",
@@ -152,27 +146,43 @@
         "role": "Role",
         "password": "Password",
         "changePassword": "Change Password",
-        "activityTimeline": "Activity Timeline"
+        "activityTimeline": "Activity Timeline",
+        "applicantProfileTitle": "{name}'s Profile",
+        "viewFullProfile": "View Full Profile",
+        "theme": "Theme",
+        "themeLight": "Light",
+        "themeDark": "Dark",
+        "language": "Language",
+        "notifications": "Notifications",
+        "notificationEmail": "Email Notifications",
+        "notificationPush": "Push Notifications"
     },
     "helpCenter": {
         "title": "Help Center",
         "subtitle": "How can we help you today?",
         "searchPlaceholder": "Search for articles...",
+        "contactSupport": "Contact Support",
+        "contactSupportSubtitle": "Can't find an answer? Our team is here to help.",
         "categories": {
             "general": "General",
-            "jobs": "Jobs",
-            "cooperatives": "Cooperatives",
-            "wallet": "Wallet"
+            "jobs": "Jobs & Applications",
+            "cooperatives": "Cooperatives (Ikimina)",
+            "wallet": "Wallet & Payments",
+            "account": "Account & Profile"
         },
         "faqs": {
             "q1": "How do I apply for a job?",
-            "a1": "Navigate to the \"Find Jobs\" page, browse the listings, and click \"Apply\" on any job you are interested in.",
+            "a1": "Navigate to the \"Find Jobs\" page, browse the listings, and click \"Apply\" on any job you are interested in. Your profile information will be automatically submitted to the employer.",
             "q2": "What is a cooperative (Ikimina)?",
-            "a2": "A cooperative is a community savings group where members contribute money regularly and can take loans from the collective pool.",
+            "a2": "A cooperative is a community savings group where members contribute money regularly (e.g., weekly or monthly) and can take loans from the collective pool. It's a modern, digital way to manage a traditional Ikimina.",
             "q3": "How do I join a cooperative?",
-            "a3": "You can browse existing cooperatives on the \"Cooperatives\" page and request to join. Employer accounts can also create their own.",
+            "a3": "You can browse existing cooperatives on the \"Cooperatives\" page and send a request to join. The cooperative's creator will review your request. Employer accounts can also create their own cooperatives for their staff.",
             "q4": "How do I add money to my wallet?",
-            "a4": "Click the \"Add Money\" button on the Wallet page and follow the instructions to deposit funds via Mobile Money or bank transfer."
+            "a4": "Click the \"Deposit\" button on the Wallet page and follow the instructions to deposit funds via Mobile Money. The transaction is usually instant.",
+            "q5": "Is my money safe in the KaziCoop wallet?",
+            "a5": "Yes, your funds are held securely with our regulated financial partners. We use industry-standard encryption and security protocols to protect your account.",
+            "q6": "How can I update my profile information?",
+            "a6": "Go to the 'Settings' page from the sidebar menu. You can update your personal information, skills, and profile picture in the 'Profile' tab."
         }
     },
     "cooperatives": {
@@ -237,7 +247,9 @@
         "overdue": "Overdue",
         "contributionDueTitle": "Contribution Due",
         "contributionDueText": "Your regular contribution of RWF {amount} is due. Please make a payment to stay on track.",
-        "contributeNow": "Contribute Now"
+        "contributeNow": "Contribute Now",
+        "settings": "Settings",
+        "saveSettings": "Save Settings"
     },
     "jobs": {
         "apply": "Apply Now",
@@ -252,7 +264,10 @@
         "newInterviewTitle": "Schedule Interview",
         "interviewDate": "Interview Date & Time",
         "interviewType": "Interview Type",
-        "interviewDetails": "Details (e.g., location, video link)"
+        "interviewDetails": "Details (e.g., location, video link)",
+        "viewProfile": "Profile",
+        "matchScore": "Match Score",
+        "generatingScore": "Generating score..."
     },
     "common": {
         "cancel": "Cancel",
@@ -262,5 +277,10 @@
         "deny": "Deny",
         "close": "Close",
         "save": "Save"
+    },
+    "notifications": {
+        "title": "Notifications",
+        "markAllRead": "Mark all as read",
+        "noNotifications": "You have no new notifications."
     }
 }
