@@ -26,13 +26,11 @@ const LandingPage: React.FC = () => {
           <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-8">
             KaziCoop connects talented job seekers with Rwanda's top employers and fosters financial growth through community cooperatives.
           </p>
-          <div className="flex justify-center gap-4">
-            <Link to="/jobs">
-              <Button className="!px-8 !py-3 !text-lg">Find a Job</Button>
-            </Link>
-            <Link to="/register">
-              <Button variant="secondary" className="!px-8 !py-3 !text-lg">Post a Job</Button>
-            </Link>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link to="/jobs"><Button className="!px-6 !py-3 !text-base">Find a Job</Button></Link>
+            <Link to="/register"><Button variant="secondary" className="!px-6 !py-3 !text-base">Post a Job</Button></Link>
+            <Link to="/wallet"><Button variant="secondary" className="!px-6 !py-3 !text-base">Save Your Money</Button></Link>
+            <Link to="/cooperatives"><Button variant="secondary" className="!px-6 !py-3 !text-base">Join Ikimina</Button></Link>
           </div>
         </div>
       </section>

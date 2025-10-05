@@ -1,4 +1,3 @@
-// FIX: Populated the empty ToggleSwitch.tsx file.
 import React from 'react';
 
 interface ToggleSwitchProps {

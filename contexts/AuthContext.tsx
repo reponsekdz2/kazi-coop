@@ -1,6 +1,4 @@
-
 import React, { createContext, useState, useContext, ReactNode } from 'react';
-// FIX: Corrected import paths
 import { User, UserRole } from '../types';
 import { USERS } from '../constants';
 

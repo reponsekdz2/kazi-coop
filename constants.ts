@@ -1,103 +1,67 @@
-// FIX: Populated the empty constants.ts file with mock data.
-import { User, UserRole, Job, Application, Message, Notification, ActivityLog, Cooperative, Punishment, LoanInvestment, LoanApplication } from './types';
+import { User, UserRole, Job, Application, Message, Notification, Transaction, Cooperative, Loan, ActivityLog } from './types';
 
 export const USERS: User[] = [
-  { id: 'user1', name: 'Aline Umutoni', email: 'aline@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user1', skills: ['Financial Analysis', 'Microsoft Excel', 'Accounting', 'Team Leadership'], savingsBalance: 85000, cooperativeShare: 125000 },
-  { id: 'user2', name: 'Jean-Claude D.', email: 'jean@example.com', role: UserRole.EMPLOYER, avatarUrl: 'https://i.pravatar.cc/150?u=user2', savingsBalance: 500000 },
-  { id: 'user3', name: 'Admin Kazi', email: 'admin@kazicoop.com', role: UserRole.COOP_ADMIN, avatarUrl: 'https://i.pravatar.cc/150?u=user3' },
-  { id: 'user4', name: 'Kwame Nkrumah', email: 'kwame@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user4', skills: ['Graphic Design', 'Adobe Creative Suite', 'Branding'], savingsBalance: 42000, cooperativeShare: 50000 },
-  { id: 'user5', name: 'Samuel M.', email: 'samuel@example.com', role: UserRole.COOP_ADMIN, avatarUrl: 'https://i.pravatar.cc/150?u=user5' },
+  { id: 'user1', name: 'Aline Umutoni', email: 'aline@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user1', savingsBalance: 150000, cooperativeShare: 250000, careerProgress: 3, skills: ['React', 'TypeScript', 'Node.js', 'GraphQL'] },
+  { id: 'user2', name: 'Jean-Claude D.', email: 'jean@example.com', role: UserRole.EMPLOYER, avatarUrl: 'https://i.pravatar.cc/150?u=user2' },
+  { id: 'user3', name: 'Fatima N.', email: 'fatima@example.com', role: UserRole.COOP_ADMIN, avatarUrl: 'https://i.pravatar.cc/150?u=user3' },
+  { id: 'user4', name: 'David K.', email: 'david@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user4', savingsBalance: 80000, cooperativeShare: 120000, careerProgress: 2 },
+  { id: 'user5', name: 'Samuel M.', email: 'samuel@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user5', savingsBalance: 220000, cooperativeShare: 350000, careerProgress: 5 },
 ];
 
 export const JOBS: Job[] = [
-    {
-        id: 'job1',
-        title: 'Frontend Developer',
-        company: 'TechSolutions Ltd.',
-        location: 'Kigali, Rwanda',
-        type: 'Full-time',
-        salary: 'RWF 1,500,000 - 2,000,000',
-        salaryMin: 1500000,
-        salaryMax: 2000000,
-        description: 'We are looking for an experienced Frontend Developer to join our team. You will be responsible for building the ‘client-side’ of our web applications. You should be able to translate our company and customer needs into functional and appealing interactive applications.',
-        skills: ['React', 'TypeScript', 'Tailwind CSS', 'Redux'],
-    },
-    {
-        id: 'job2',
-        title: 'Accountant',
-        company: 'Kigali Financials',
-        location: 'Kigali, Rwanda',
-        type: 'Full-time',
-        salary: 'RWF 800,000 - 1,200,000',
-        salaryMin: 800000,
-        salaryMax: 1200000,
-        description: 'Seeking a detail-oriented Accountant to manage financial transactions, from fixed payments and variable expenses to bank deposits and budgets. If you have an Accounting degree and are familiar with procedures like tax management and cost accounting, we’d like to meet you.',
-        skills: ['QuickBooks', 'Financial Reporting', 'Tax Preparation', 'Auditing'],
-    },
-    {
-        id: 'job3',
-        title: 'Marketing Manager',
-        company: 'Creative Minds Inc.',
-        location: 'Remote',
-        type: 'Contract',
-        salary: 'RWF 1,000,000',
-        salaryMin: 1000000,
-        salaryMax: 1000000,
-        description: 'We are looking for a Marketing Manager to take ownership of our marketing strategy. This includes social media management, content creation, and campaign analysis.',
-        skills: ['SEO', 'Content Marketing', 'Social Media', 'Google Analytics'],
-    },
+  { id: 1, title: 'Senior Accountant', company: 'Kigali Financials', location: 'Kigali, Rwanda', type: 'Full-time', description: 'Detailed job description for a Senior Accountant...', skills: ['CPA', 'QuickBooks', 'Financial Reporting'], salary: 'RWF 1,200,000 - 1,500,000', salaryMin: 1200000, salaryMax: 1500000 },
+  { id: 2, title: 'React Native Developer', company: 'Mobile Innovations', location: 'Remote', type: 'Contract', description: 'We are looking for an experienced React Native developer...', skills: ['React Native', 'TypeScript', 'Firebase', 'GraphQL'], salary: 'RWF 1,800,000 - 2,200,000', salaryMin: 1800000, salaryMax: 2200000 },
+  { id: 3, title: 'Marketing Manager', company: 'Go! Rwanda', location: 'Kigali, Rwanda', type: 'Full-time', description: 'Lead our marketing team to new heights...', skills: ['SEO', 'Content Marketing', 'Social Media'], salary: 'RWF 900,000 - 1,100,000', salaryMin: 900000, salaryMax: 1100000 },
+  { id: 4, title: 'Data Analyst', company: 'Insight Analytics', location: 'Kigali, Rwanda', type: 'Full-time', description: 'Analyze large datasets to provide actionable insights...', skills: ['SQL', 'Python', 'Tableau', 'Power BI'], salary: 'RWF 1,000,000 - 1,300,000', salaryMin: 1000000, salaryMax: 1300000 },
 ];
 
 export const APPLICATIONS: Application[] = [
-    { id: 'app1', jobId: 'job1', userId: 'user1', status: 'Interviewing', matchScore: 92 },
-    { id: 'app2', jobId: 'job1', userId: 'user4', status: 'Pending', matchScore: 78 },
-    { id: 'app3', jobId: 'job2', userId: 'user1', status: 'Offered', matchScore: 85 },
+  { id: 1, jobId: 2, userId: 'user1', status: 'Interviewing', matchScore: 92 },
+  { id: 2, jobId: 2, userId: 'user4', status: 'Pending', matchScore: 78 },
+  { id: 3, jobId: 1, userId: 'user5', status: 'Reviewed', matchScore: 85 },
 ];
 
 export const MESSAGES: Message[] = [
-    { id: 'msg1', senderId: 'user1', receiverId: 'user2', text: 'Hello! I am interested in the Frontend Developer position.', timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() },
-    { id: 'msg2', senderId: 'user2', receiverId: 'user1', text: 'Hi Aline, thanks for reaching out. We are reviewing applications and will get back to you soon.', timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString() },
-    { id: 'msg3', senderId: 'user4', receiverId: 'user2', text: 'Good day, is the Marketing Manager role still open?', timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString() },
+  { id: 1, senderId: 'user2', receiverId: 'user1', text: 'Hi Aline, we were very impressed with your profile for the React Native position. Are you available for a quick chat tomorrow?', timestamp: new Date(Date.now() - 86400000).toISOString() },
+  { id: 2, senderId: 'user1', receiverId: 'user2', text: 'Hello Jean-Claude! Thank you. Yes, I am available tomorrow. What time works best for you?', timestamp: new Date(Date.now() - 86000000).toISOString() },
+  { id: 3, senderId: 'user4', receiverId: 'user5', text: 'Hey Samuel, did you see the new Data Analyst role at Insight Analytics?', timestamp: new Date(Date.now() - 172800000).toISOString() },
 ];
 
 export const NOTIFICATIONS: Notification[] = [
-    { id: 1, message: 'Your application for Frontend Developer was viewed.', date: '2 hours ago', read: false },
-    { id: 2, message: 'New job matched: Accountant at Kigali Financials.', date: '1 day ago', read: false },
-    { id: 3, message: 'Welcome to KaziCoop!', date: '3 days ago', read: true },
+  { id: 1, message: 'Your application for React Native Developer was viewed by Mobile Innovations.', date: '2 hours ago', read: false },
+  { id: 2, message: 'You have a new message from Jean-Claude D.', date: '1 day ago', read: false },
+  { id: 3, message: 'Welcome to KaziCoop! Complete your profile to get started.', date: '3 days ago', read: true },
 ];
 
-export const ACTIVITY_LOG: ActivityLog[] = [
-    { id: 'log1', type: 'NEW_MEMBER', description: 'Kwame Nkrumah joined KaziCoop.', timestamp: new Date().toISOString() },
-    { id: 'log2', type: 'NEW_JOB', description: 'Creative Minds Inc. posted a new job for Marketing Manager.', timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
-    { id: 'log3', type: 'SAVINGS_GOAL', description: 'TechSolutions Innovators Circle reached their savings goal.', timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
-    { id: 'log4', type: 'LARGE_DEPOSIT', description: 'Aline Umutoni made a large deposit of RWF 50,000.', timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() },
+export const TRANSACTIONS: Transaction[] = [
+    { id: 1, type: 'deposit', amount: 25000, date: '2024-08-14', description: 'Co-op Contribution' },
+    { id: 2, type: 'withdrawal', amount: 10000, date: '2024-08-12', description: 'Mobile Airtime' },
+    { id: 3, type: 'deposit', amount: 500000, date: '2024-08-01', description: 'Salary - July' },
+    { id: 4, type: 'transfer', amount: 20000, date: '2024-07-28', description: 'Sent to Samuel M.' },
 ];
 
 export const COOPERATIVES: Cooperative[] = [
-    { id: 'coop1', name: 'TechSolutions Innovators Circle', type: 'Corporate', creatorId: 'user2', members: ['user1', 'user4', 'user5'], totalSavings: 5250000, goal: "Purchase new laptops for all members", goalProgress: 68},
-    { id: 'coop2', name: 'Kigali Artisans Guild', type: 'Community', members: ['user1', 'user3', 'user4'], totalSavings: 1200000, goal: "Open a shared workshop", goalProgress: 45},
+    { id: 'coop1', name: 'TechSolutions Innovators Circle', members: 15, totalSavings: 12500000, loanPool: 5000000, logoUrl: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' },
+    { id: 'coop2', name: 'Kigali Creatives Fund', members: 25, totalSavings: 28000000, loanPool: 12000000, logoUrl: 'https://cdn-icons-png.flaticon.com/512/993/993739.png' },
 ];
 
-export const PUNISHMENTS: Punishment[] = [
-    { id: 'pun1', userId: 'user1', cooperativeId: 'coop1', reason: 'Late Contribution (July)', amount: 5000, dueDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(), status: 'Pending' }
+export const LOANS: Loan[] = [
+    { id: 1, userId: 'user1', amount: 500000, interestRate: 5, status: 'Approved', repaymentProgress: 25, dueDate: '2024-12-31' },
 ];
 
-export const LOAN_INVESTMENTS: LoanInvestment[] = [
-    { id: 'li1', lenderId: 'user1', borrowerId: 'user4', amount: 50000, interestRate: 8, term: 6, status: 'Active', nextPaymentDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString()}
-];
-
-export const LOAN_APPLICATIONS: LoanApplication[] = [
-    { id: 'la1', userId: 'user1', cooperativeId: 'coop1', amount: 250000, purpose: 'Small Business Startup', repaymentPeriod: 12, status: 'Pending', requestDate: new Date().toISOString() },
-    { id: 'la2', userId: 'user1', cooperativeId: 'coop1', amount: 50000, purpose: 'Emergency Medical Bills', repaymentPeriod: 6, status: 'Approved', requestDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() },
-    { id: 'la3', userId: 'user1', cooperativeId: 'coop1', amount: 100000, purpose: 'Home Improvement', repaymentPeriod: 12, status: 'Rejected', requestDate: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString() },
+export const ACTIVITY_LOG: ActivityLog[] = [
+    { id: 1, type: 'NEW_MEMBER', description: 'David K. joined the platform.', timestamp: new Date(Date.now() - 3600000).toISOString() },
+    { id: 2, type: 'NEW_JOB', description: 'Go! Rwanda posted a new job: Marketing Manager.', timestamp: new Date(Date.now() - 7200000).toISOString() },
+    { id: 3, type: 'SAVINGS_GOAL', description: 'Aline U. is 68% towards their savings goal.', timestamp: new Date(Date.now() - 86400000).toISOString() },
+    { id: 4, type: 'LARGE_DEPOSIT', description: 'Samuel M. deposited RWF 100,000 into their co-op share.', timestamp: new Date(Date.now() - 172800000).toISOString() },
 ];
 
 export const cooperativeFinancialsData = [
-  { name: 'Jan', "Total Savings": 40.1, "Loans Disbursed": 24.0 },
-  { name: 'Feb', "Total Savings": 45.3, "Loans Disbursed": 28.9 },
-  { name: 'Mar', "Total Savings": 52.5, "Loans Disbursed": 35.2 },
-  { name: 'Apr', "Total Savings": 58.8, "Loans Disbursed": 40.1 },
-  { name: 'May', "Total Savings": 65.2, "Loans Disbursed": 42.6 },
-  { name: 'Jun', "Total Savings": 71.9, "Loans Disbursed": 48.3 },
-  { name: 'Jul', "Total Savings": 78.4, "Loans Disbursed": 55.7 },
+  { name: 'Jan', "Total Savings": 40.1, "Loans Disbursed": 10.5 },
+  { name: 'Feb', "Total Savings": 45.3, "Loans Disbursed": 12.2 },
+  { name: 'Mar', "Total Savings": 52.5, "Loans Disbursed": 15.8 },
+  { name: 'Apr', "Total Savings": 58.8, "Loans Disbursed": 18.1 },
+  { name: 'May', "Total Savings": 65.2, "Loans Disbursed": 20.3 },
+  { name: 'Jun', "Total Savings": 71.9, "Loans Disbursed": 22.9 },
+  { name: 'Jul', "Total Savings": 78.4, "Loans Disbursed": 25.0 },
 ];

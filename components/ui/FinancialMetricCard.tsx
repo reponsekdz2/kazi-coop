@@ -1,4 +1,3 @@
-// FIX: Populated the empty FinancialMetricCard.tsx file.
 import React from 'react';
 import Card from './Card';
 

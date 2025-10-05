@@ -8,10 +8,8 @@ import { PaperAirplaneIcon, EllipsisVerticalIcon } from '@heroicons/react/24/sol
 const MessagesPage: React.FC = () => {
     const { user } = useAuth();
     
-    // FIX: Memoize conversation partners to avoid recalculation on every render and ensure type safety.
     const conversationPartners = React.useMemo(() => {
         if (!user) return [];
-        // FIX: Explicitly type the mapped array to ensure conversationPartners is string[]
         const partnerIds: string[] = MESSAGES
             .filter(m => m.senderId === user.id || m.receiverId === user.id)
             .map(m => m.senderId === user.id ? m.receiverId : m.senderId);
@@ -20,7 +18,6 @@ const MessagesPage: React.FC = () => {
 
     const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
 
-    // FIX: Use useEffect to set the initial conversation to prevent issues with render timing.
     useEffect(() => {
         if (!selectedConversation && conversationPartners.length > 0) {
             setSelectedConversation(conversationPartners[0]);
