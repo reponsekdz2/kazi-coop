@@ -60,6 +60,13 @@ export interface Transaction {
   description: string;
 }
 
+export interface Contributor {
+  id: string;
+  name: string;
+  amount: number;
+  avatarUrl: string;
+}
+
 export interface Cooperative {
     id: string;
     name: string;
@@ -67,6 +74,10 @@ export interface Cooperative {
     totalSavings: number;
     loanPool: number;
     logoUrl: string;
+    communityGoal?: string;
+    goalAmount?: number;
+    goalProgress?: number;
+    topContributors?: Contributor[];
 }
 
 export interface Loan {

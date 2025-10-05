@@ -1,4 +1,4 @@
-import { User, UserRole, Job, Application, Message, Notification, Transaction, Cooperative, Loan, ActivityLog } from './types';
+import { User, UserRole, Job, Application, Message, Notification, Transaction, Cooperative, Loan, ActivityLog, Contributor } from './types';
 
 export const USERS: User[] = [
   { id: 'user1', name: 'Aline Umutoni', email: 'aline@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user1', savingsBalance: 150000, cooperativeShare: 250000, careerProgress: 3, skills: ['React', 'TypeScript', 'Node.js', 'GraphQL'] },
@@ -6,6 +6,12 @@ export const USERS: User[] = [
   { id: 'user3', name: 'Fatima N.', email: 'fatima@example.com', role: UserRole.COOP_ADMIN, avatarUrl: 'https://i.pravatar.cc/150?u=user3' },
   { id: 'user4', name: 'David K.', email: 'david@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user4', savingsBalance: 80000, cooperativeShare: 120000, careerProgress: 2 },
   { id: 'user5', name: 'Samuel M.', email: 'samuel@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user5', savingsBalance: 220000, cooperativeShare: 350000, careerProgress: 5 },
+];
+
+const TOP_CONTRIBUTORS: Contributor[] = [
+  { id: 'user5', name: 'Samuel M.', amount: 55000, avatarUrl: 'https://i.pravatar.cc/150?u=user5' },
+  { id: 'user1', name: 'Aline Umutoni', amount: 48000, avatarUrl: 'https://i.pravatar.cc/150?u=user1' },
+  { id: 'user4', name: 'David K.', amount: 42000, avatarUrl: 'https://i.pravatar.cc/150?u=user4' },
 ];
 
 export const JOBS: Job[] = [
@@ -41,7 +47,12 @@ export const TRANSACTIONS: Transaction[] = [
 ];
 
 export const COOPERATIVES: Cooperative[] = [
-    { id: 'coop1', name: 'TechSolutions Innovators Circle', members: 15, totalSavings: 12500000, loanPool: 5000000, logoUrl: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' },
+    { id: 'coop1', name: 'TechSolutions Innovators Circle', members: 15, totalSavings: 12500000, loanPool: 5000000, logoUrl: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
+      communityGoal: 'New Community Center Fund',
+      goalAmount: 2000000,
+      goalProgress: 1350000,
+      topContributors: TOP_CONTRIBUTORS
+    },
     { id: 'coop2', name: 'Kigali Creatives Fund', members: 25, totalSavings: 28000000, loanPool: 12000000, logoUrl: 'https://cdn-icons-png.flaticon.com/512/993/993739.png' },
 ];
 

@@ -62,6 +62,44 @@ const MemberCooperativeView: React.FC = () => {
                      )) : <p className="text-gray-500">You have no active loans.</p>}
                  </Card>
             </div>
+
+            {myCooperative.communityGoal && myCooperative.goalAmount && myCooperative.goalProgress && (
+                <Card title="Community Goal" className="mt-6">
+                    <div>
+                        <div className="flex justify-between items-center mb-2">
+                            <p className="font-semibold text-dark">{myCooperative.communityGoal}</p>
+                            <p className="text-sm font-bold text-primary">
+                                {Math.round((myCooperative.goalProgress / myCooperative.goalAmount) * 100)}%
+                            </p>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-4">
+                            <div 
+                                className="bg-primary h-4 rounded-full transition-all duration-500" 
+                                style={{ width: `${(myCooperative.goalProgress / myCooperative.goalAmount) * 100}%` }}
+                            ></div>
+                        </div>
+                        <p className="text-xs text-gray-500 text-right mt-1">
+                            RWF {myCooperative.goalProgress.toLocaleString()} / RWF {myCooperative.goalAmount.toLocaleString()}
+                        </p>
+                    </div>
+                    <div className="mt-6">
+                        <h4 className="font-bold text-dark mb-3">Top Contributors</h4>
+                        <div className="space-y-3">
+                            {myCooperative.topContributors?.map((contributor) => (
+                                <div key={contributor.id} className="flex items-center justify-between p-2 rounded-md hover:bg-light">
+                                    <div className="flex items-center">
+                                        <img src={contributor.avatarUrl} alt={contributor.name} className="h-10 w-10 rounded-full mr-3" />
+                                        <div>
+                                            <p className="font-semibold text-dark">{contributor.name}</p>
+                                        </div>
+                                    </div>
+                                    <p className="font-bold text-green-600">+ RWF {contributor.amount.toLocaleString()}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </Card>
+            )}
             
             <Modal isOpen={isLoanModalOpen} onClose={() => setIsLoanModalOpen(false)} title="Apply for a New Loan">
                 <form onSubmit={handleApplyForLoan} className="space-y-4">
