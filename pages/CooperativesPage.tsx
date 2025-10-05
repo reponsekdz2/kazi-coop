@@ -174,45 +174,68 @@ const OverviewTab: React.FC<{ cooperative: Cooperative }> = ({ cooperative }) =>
     const { t } = useAppContext();
     const loanPoolPercentage = cooperative.totalSavings > 0 ? Math.round((cooperative.totalLoans / cooperative.totalSavings) * 100) : 0;
     const communityGoal = 20000000; // Example goal
-    const goalProgressPercentage = Math.round((cooperative.totalSavings / communityGoal) * 100);
+    const goalProgressPercentage = Math.min(Math.round((cooperative.totalSavings / communityGoal) * 100), 100);
+    const availableForLoan = cooperative.totalSavings - cooperative.totalLoans;
 
     return (
         <div>
-             <p className="text-gray-600 dark:text-gray-300 mb-6">{cooperative.description}</p>
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="text-center">
-                    <h4 className="font-semibold text-gray-500 dark:text-gray-400">{t('dashboard.totalSavings')}</h4>
-                    <p className="text-3xl font-bold text-dark dark:text-light mt-2">RWF {cooperative.totalSavings.toLocaleString()}</p>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">{cooperative.description}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Modern Card for Total Savings & Goal */}
+                <Card className="flex flex-col justify-between">
+                    <div>
+                        <h4 className="font-semibold text-gray-500 dark:text-gray-400">{t('dashboard.totalSavings')}</h4>
+                        <p className="text-4xl font-bold text-dark dark:text-light mt-2">RWF {cooperative.totalSavings.toLocaleString()}</p>
+                    </div>
+                    <div className="mt-4">
+                        <div className="flex justify-between text-sm font-medium text-gray-600 dark:text-gray-300">
+                           <span>{t('cooperatives.goalProgress')}</span>
+                           <span>{goalProgressPercentage}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 mt-1">
+                            <div className="bg-primary h-2.5 rounded-full" style={{ width: `${goalProgressPercentage}%` }}></div>
+                        </div>
+                        <p className="text-xs text-gray-400 text-right mt-1">Target: RWF {communityGoal.toLocaleString()}</p>
+                    </div>
                 </Card>
-                <Card className="text-center flex flex-col items-center">
-                    <h4 className="font-semibold text-gray-500 dark:text-gray-400">Loan Pool Health</h4>
-                    <RingProgress percentage={loanPoolPercentage} size={90} strokeWidth={8} className="my-2" />
-                    <p className="text-xs text-gray-500 dark:text-gray-400">RWF {cooperative.totalLoans.toLocaleString()} in use</p>
+
+                {/* Modern Card for Loan Pool */}
+                <Card className="flex flex-col justify-between">
+                     <div>
+                        <h4 className="font-semibold text-gray-500 dark:text-gray-400">{t('cooperatives.loanPool')}</h4>
+                        <p className="text-4xl font-bold text-dark dark:text-light mt-2">RWF {cooperative.totalLoans.toLocaleString()}</p>
+                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('cooperatives.disbursed')}</p>
+                    </div>
+                    <div className="mt-4 flex items-center justify-between gap-4">
+                        <div className="flex-1">
+                             <h5 className="text-sm font-semibold text-dark dark:text-light">RWF {availableForLoan.toLocaleString()}</h5>
+                             <p className="text-xs text-gray-400">{t('cooperatives.availableForLoan')}</p>
+                        </div>
+                        <RingProgress percentage={loanPoolPercentage} size={70} strokeWidth={7} />
+                    </div>
                 </Card>
-                <Card className="text-center flex flex-col items-center">
-                    <h4 className="font-semibold text-gray-500 dark:text-gray-400">{t('cooperatives.goalProgress')}</h4>
-                    <RingProgress percentage={goalProgressPercentage} size={90} strokeWidth={8} className="my-2" />
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Target: RWF {communityGoal.toLocaleString()}</p>
-                </Card>
-             </div>
+            </div>
         </div>
     );
-}
+};
+
 
 const MembersTab: React.FC<{ cooperative: Cooperative }> = ({ cooperative }) => {
     const cooperativeMembers = USERS.filter(u => cooperative.members.includes(u.id));
     return (
-        <div className="space-y-3 max-h-96 overflow-y-auto">
-            {cooperativeMembers.map(member => (
-                <div key={member.id} className="flex items-center p-2 rounded-lg bg-light dark:bg-gray-700/50">
-                    <img src={member.avatarUrl} alt={member.name} className="h-10 w-10 rounded-full mr-4" />
-                    <div>
-                        <p className="font-bold text-dark dark:text-light">{member.name}</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{member.role}</p>
+        <Card>
+            <div className="space-y-3 max-h-96 overflow-y-auto">
+                {cooperativeMembers.map(member => (
+                    <div key={member.id} className="flex items-center p-2 rounded-lg bg-light dark:bg-gray-700/50">
+                        <img src={member.avatarUrl} alt={member.name} className="h-10 w-10 rounded-full mr-4" />
+                        <div>
+                            <p className="font-bold text-dark dark:text-light">{member.name}</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{member.role}</p>
+                        </div>
                     </div>
-                </div>
-            ))}
-        </div>
+                ))}
+            </div>
+        </Card>
     );
 }
 
@@ -286,29 +309,31 @@ const ManagementTab: React.FC<{ cooperative: Cooperative }> = ({ cooperative }) 
     const pendingRequests = USERS.filter(u => cooperative.joinRequests.includes(u.id));
 
     return (
-        <div>
-            <h4 className="font-bold text-lg text-dark dark:text-light mb-4">{t('cooperatives.pendingRequests')} ({pendingRequests.length})</h4>
-            <div className="space-y-3 max-h-96 overflow-y-auto">
-                {pendingRequests.length > 0 ? pendingRequests.map(requestUser => (
-                    <div key={requestUser.id} className="flex items-center justify-between p-2 rounded-lg bg-light dark:bg-gray-700/50">
-                        <div className="flex items-center">
-                            <img src={requestUser.avatarUrl} alt={requestUser.name} className="h-10 w-10 rounded-full mr-4" />
-                            <p className="font-bold text-dark dark:text-light">{requestUser.name}</p>
+        <Card>
+            <div>
+                <h4 className="font-bold text-lg text-dark dark:text-light mb-4">{t('cooperatives.pendingRequests')} ({pendingRequests.length})</h4>
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {pendingRequests.length > 0 ? pendingRequests.map(requestUser => (
+                        <div key={requestUser.id} className="flex items-center justify-between p-2 rounded-lg bg-light dark:bg-gray-700/50">
+                            <div className="flex items-center">
+                                <img src={requestUser.avatarUrl} alt={requestUser.name} className="h-10 w-10 rounded-full mr-4" />
+                                <p className="font-bold text-dark dark:text-light">{requestUser.name}</p>
+                            </div>
+                            <div className="flex gap-2">
+                                <Button onClick={() => approveJoinRequest(cooperative.id, requestUser.id)} className="!p-2">
+                                    <CheckIcon className="h-5 w-5"/>
+                                </Button>
+                                <Button onClick={() => denyJoinRequest(cooperative.id, requestUser.id)} variant="danger" className="!p-2">
+                                    <XMarkIcon className="h-5 w-5"/>
+                                </Button>
+                            </div>
                         </div>
-                        <div className="flex gap-2">
-                            <Button onClick={() => approveJoinRequest(cooperative.id, requestUser.id)} className="!p-2">
-                                <CheckIcon className="h-5 w-5"/>
-                            </Button>
-                            <Button onClick={() => denyJoinRequest(cooperative.id, requestUser.id)} variant="danger" className="!p-2">
-                                <XMarkIcon className="h-5 w-5"/>
-                            </Button>
-                        </div>
-                    </div>
-                )) : (
-                    <p className="text-gray-500 dark:text-gray-400 text-center py-4">{t('cooperatives.noPendingRequests')}</p>
-                )}
+                    )) : (
+                        <p className="text-gray-500 dark:text-gray-400 text-center py-4">{t('cooperatives.noPendingRequests')}</p>
+                    )}
+                </div>
             </div>
-        </div>
+        </Card>
     );
 };
 

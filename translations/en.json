@@ -201,7 +201,10 @@
         "nextContribution": "Next Contribution Due",
         "makeContribution": "Make Contribution",
         "contributionHistory": "Contribution History",
-        "noContributions": "No contributions have been made yet."
+        "noContributions": "No contributions have been made yet.",
+        "loanPool": "Loan Pool",
+        "disbursed": "Disbursed",
+        "availableForLoan": "Available for Loan"
     },
     "jobs": {
         "apply": "Apply Now",

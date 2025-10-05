@@ -201,7 +201,10 @@
         "nextContribution": "Umusanzu utaha",
         "makeContribution": "Tanga umusanzu",
         "contributionHistory": "Amateka y'imisanzu",
-        "noContributions": "Nta misanzu iratangwa."
+        "noContributions": "Nta misanzu iratangwa.",
+        "loanPool": "Inguzanyo zihari",
+        "disbursed": "Zatanzwe",
+        "availableForLoan": "Zishobora gutangwa"
     },
     "jobs": {
         "apply": "Saba Akazi",

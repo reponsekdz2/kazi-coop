@@ -201,7 +201,10 @@
         "nextContribution": "Prochaine contribution due",
         "makeContribution": "Effectuer une contribution",
         "contributionHistory": "Historique des contributions",
-        "noContributions": "Aucune contribution n'a encore été effectuée."
+        "noContributions": "Aucune contribution n'a encore été effectuée.",
+        "loanPool": "Fonds de prêt",
+        "disbursed": "Décaissé",
+        "availableForLoan": "Disponible pour prêt"
     },
     "jobs": {
         "apply": "Postuler",
