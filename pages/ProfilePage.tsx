@@ -1,63 +1,91 @@
+
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import { PencilIcon, EnvelopeIcon, BriefcaseIcon } from '@heroicons/react/24/solid';
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
 
   if (!user) {
-    return <p>Loading profile...</p>;
+    return <div>Loading profile...</div>;
   }
-  
-  const completeness = user.profile.completeness || 60;
+
+  const { name, email, role, avatarUrl, profile } = user;
 
   return (
     <div>
       <h1 className="text-3xl font-bold text-dark mb-6">My Profile</h1>
-      <Card>
-        <div className="mb-8">
-            <div className="flex justify-between items-center mb-1">
-                <h3 className="font-bold text-dark">Profile Completeness</h3>
-                <span className="text-primary font-semibold">{completeness}%</span>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column: Profile Card */}
+        <div className="lg:col-span-1">
+          <Card className="text-center">
+            <div className="relative inline-block mb-4">
+              <img src={avatarUrl} alt={name} className="h-32 w-32 rounded-full mx-auto" />
+              <button className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full hover:bg-secondary transition-colors">
+                <PencilIcon className="h-5 w-5" />
+              </button>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2.5">
-                <div className="bg-primary h-2.5 rounded-full" style={{ width: `${completeness}%` }}></div>
+            <h2 className="text-2xl font-bold text-dark">{name}</h2>
+            <p className="text-gray-500">{profile.title || role}</p>
+            {profile.company && <p className="text-gray-600 font-semibold">{profile.company}</p>}
+            <div className="mt-4 flex flex-col items-center space-y-2 text-sm text-gray-600">
+              <div className="flex items-center">
+                <EnvelopeIcon className="h-4 w-4 mr-2" />
+                <span>{email}</span>
+              </div>
+              <div className="flex items-center">
+                <BriefcaseIcon className="h-4 w-4 mr-2" />
+                <span>{role}</span>
+              </div>
             </div>
+          </Card>
         </div>
 
-        <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-            <div className="text-center">
-                <img src={user.avatarUrl} alt="User Avatar" className="h-32 w-32 rounded-full mx-auto" />
-                <Button variant="secondary" className="mt-4 text-sm">Change Photo</Button>
+        {/* Right Column: Details */}
+        <div className="lg:col-span-2 space-y-6">
+          <Card>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-dark">About Me</h3>
+              <Button variant="secondary">Edit Bio</Button>
             </div>
-            <div className="flex-1 w-full">
-                <form className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Full Name</label>
-                        <input type="text" defaultValue={user.name} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm" />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Email Address</label>
-                        <input type="email" defaultValue={user.email} disabled className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 sm:text-sm" />
-                    </div>
-                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Bio</label>
-                        <textarea rows={4} defaultValue={user.profile.bio} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm" />
-                    </div>
-                    {user.profile.skills && (
-                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Skills (comma separated)</label>
-                            <input type="text" defaultValue={user.profile.skills.join(', ')} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm" />
-                        </div>
-                    )}
-                    <div className="text-right">
-                        <Button>Save Changes</Button>
-                    </div>
-                </form>
+            <p className="text-gray-700">{profile.bio}</p>
+          </Card>
+          
+          <Card>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-dark">Skills</h3>
+              <Button variant="secondary">Edit Skills</Button>
             </div>
+            {profile.skills && profile.skills.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {profile.skills.map((skill, index) => (
+                  <span key={index} className="bg-blue-100 text-primary text-sm font-medium px-3 py-1 rounded-full">
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500">No skills added yet.</p>
+            )}
+          </Card>
+          
+          {profile.completeness !== undefined && (
+            <Card>
+                <h3 className="text-xl font-bold text-dark mb-4">Profile Completeness</h3>
+                <div className="flex items-center">
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                        <div className="bg-accent h-2.5 rounded-full" style={{ width: `${profile.completeness}%` }}></div>
+                    </div>
+                    <span className="text-sm font-semibold text-dark ml-4">{profile.completeness}%</span>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">Complete your profile to get better job recommendations.</p>
+            </Card>
+          )}
+
         </div>
-      </Card>
+      </div>
     </div>
   );
 };
