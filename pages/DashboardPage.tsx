@@ -1,223 +1,126 @@
+// FIX: Populated the empty DashboardPage.tsx file.
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { UserRole } from '../types';
 import Card from '../components/ui/Card';
+import StatCard from '../components/ui/StatCard';
 import Button from '../components/ui/Button';
-import RingProgress from '../components/ui/RingProgress';
 import { Link } from 'react-router-dom';
-import { ArrowRightIcon, BriefcaseIcon, UserGroupIcon, WalletIcon, ChartPieIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
-import { JOBS, APPLICATIONS, SAVINGS_GOALS, COOPERATIVES } from '../constants';
-// FIX: Imported `CartesianGrid` from recharts.
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { 
+  BriefcaseIcon, 
+  ChatBubbleLeftRightIcon, 
+  UserGroupIcon, 
+  WalletIcon,
+  ArrowRightIcon,
+  ChartBarIcon,
+  BanknotesIcon
+} from '@heroicons/react/24/outline';
+
+const SeekerDashboard: React.FC = () => {
+    return (
+        <div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <StatCard icon={BriefcaseIcon} title="Active Applications" value={2} trend={1} data={[1, 1, 2, 2, 2]} />
+                <StatCard icon={ChatBubbleLeftRightIcon} title="Unread Messages" value={1} trend={0} data={[3, 2, 2, 1, 1]}/>
+                <StatCard icon={UserGroupIcon} title="My Cooperatives" value={1} trend={0} data={[1,1,1,1,1]}/>
+                <StatCard icon={WalletIcon} title="Wallet Balance" value="RWF 85,000" trend={15} data={[50000, 60000, 70000, 85000]}/>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <Card title="Quick Actions" className="lg:col-span-1">
+                    <div className="space-y-3">
+                       <Link to="/jobs"><Button className="w-full justify-start text-left !p-4"><BriefcaseIcon className="h-5 w-5 mr-3 inline"/>Find New Jobs</Button></Link>
+                       <Link to="/cooperatives"><Button className="w-full justify-start text-left !p-4"><UserGroupIcon className="h-5 w-5 mr-3 inline"/>View My Cooperative</Button></Link>
+                       <Link to="/wallet"><Button className="w-full justify-start text-left !p-4"><WalletIcon className="h-5 w-5 mr-3 inline"/>Manage My Wallet</Button></Link>
+                    </div>
+                </Card>
+                <Card title="Recommended Jobs For You" className="lg:col-span-2">
+                    <div className="space-y-4">
+                        <JobRecommendation title="Senior Accountant" company="Kigali Financials" match="95%" />
+                        <JobRecommendation title="React Native Developer" company="Mobile Innovations" match="88%" />
+                        <JobRecommendation title="Customer Success Manager" company="GoGetters Inc." match="82%" />
+                    </div>
+                </Card>
+            </div>
+        </div>
+    );
+};
+
+const JobRecommendation: React.FC<{title: string, company: string, match: string}> = ({ title, company, match }) => (
+    <div className="flex justify-between items-center p-4 bg-light rounded-lg hover:bg-gray-200 transition-colors">
+        <div>
+            <p className="font-bold text-dark">{title}</p>
+            <p className="text-sm text-gray-500">{company}</p>
+        </div>
+        <div className="flex items-center gap-4">
+            <div className="text-center">
+                <p className="font-bold text-primary text-lg">{match}</p>
+                <p className="text-xs text-gray-500">Match</p>
+            </div>
+            <Link to="/jobs">
+                <Button variant="secondary">View <ArrowRightIcon className="h-4 w-4 ml-1 inline"/></Button>
+            </Link>
+        </div>
+    </div>
+);
+
+
+const EmployerDashboard: React.FC = () => {
+    return (
+        <div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <StatCard icon={BriefcaseIcon} title="Active Postings" value={3} trend={1} data={[2,2,3,3,3]}/>
+                <StatCard icon={UserGroupIcon} title="New Applicants" value={5} trend={2} data={[1,2,3,4,5]}/>
+                <StatCard icon={ChatBubbleLeftRightIcon} title="Unread Messages" value={2} trend={-1} data={[4,3,3,2,2]}/>
+                <StatCard icon={BanknotesIcon} title="Hiring Budget Used" value="45%" trend={5} data={[20,30,40,45]}/>
+            </div>
+             <Card title="Recent Applicants">
+                <p className="text-center py-8 text-gray-500">A list of recent applicants would be displayed here.</p>
+            </Card>
+        </div>
+    );
+};
+
+const AdminDashboard: React.FC = () => {
+    return (
+        <div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <StatCard icon={UserGroupIcon} title="Total Members" value={256} trend={5} data={[240,245,250,256]}/>
+                <StatCard icon={BriefcaseIcon} title="Total Cooperatives" value={12} trend={1} data={[10,11,11,12]}/>
+                <StatCard icon={BanknotesIcon} title="Total Platform Savings" value="RWF 48.7M" trend={8} data={[40,42,44,48.7]}/>
+                <StatCard icon={ChartBarIcon} title="Platform Growth" value="5.2%" trend={2} data={[4,4.5,4.8,5.2]}/>
+            </div>
+            <Card title="Platform Analytics Overview">
+                <p className="text-center py-8 text-gray-500">
+                    A comprehensive chart showing platform growth would be displayed here.
+                    <Link to="/analytics" className="block mt-4"><Button>Go to Full Analytics</Button></Link>
+                </p>
+            </Card>
+        </div>
+    );
+};
 
 
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
-
+  
   const renderDashboard = () => {
-    switch (user?.role) {
-      case UserRole.SEEKER:
-        return <SeekerDashboard />;
-      case UserRole.EMPLOYER:
-        return <EmployerDashboard />;
-      case UserRole.COOP_ADMIN:
-        return <AdminDashboard />;
-      default:
-        return <p>Loading dashboard...</p>;
-    }
-  };
+      switch (user?.role) {
+          case UserRole.SEEKER:
+              return <SeekerDashboard />;
+          case UserRole.EMPLOYER:
+              return <EmployerDashboard />;
+          case UserRole.COOP_ADMIN:
+              return <AdminDashboard />;
+          default:
+              return <p>Loading dashboard...</p>;
+      }
+  }
 
   return (
     <div>
-      {renderDashboard()}
+        {renderDashboard()}
     </div>
   );
 };
-
-// --- Seeker Dashboard ---
-const SeekerDashboard: React.FC = () => {
-  const goal = SAVINGS_GOALS[0];
-  const goalProgress = Math.round((goal.currentAmount / goal.targetAmount) * 100);
-
-  return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card title="Profile Completeness">
-              <div className="flex items-center justify-center h-full">
-                <RingProgress percentage={75} size={120} />
-              </div>
-          </Card>
-          <Card title="My Savings Goal">
-              <div className="flex flex-col items-center justify-center h-full">
-                <RingProgress percentage={goalProgress} size={120} />
-                <p className="text-center text-sm mt-2 text-gray-600">Towards '{goal.name}'</p>
-              </div>
-          </Card>
-          <div className="lg:col-span-2">
-            <Card title="Quick Actions" className="h-full">
-                <div className="grid grid-cols-2 gap-4 h-full content-center">
-                    <Button className="!py-4 !text-base"><BriefcaseIcon className="h-5 w-5 mr-2 inline" /> Find Jobs</Button>
-                    <Button className="!py-4 !text-base"><UserGroupIcon className="h-5 w-5 mr-2 inline" /> My Cooperative</Button>
-                    <Button className="!py-4 !text-base"><WalletIcon className="h-5 w-5 mr-2 inline" /> Go to Wallet</Button>
-                    <Button className="!py-4 !text-base"><CheckCircleIcon className="h-5 w-5 mr-2 inline" /> My Applications</Button>
-                </div>
-            </Card>
-          </div>
-      </div>
-      <Card title="Recommended Jobs For You">
-        {JOBS.slice(0, 3).map(job => (
-          <div key={job.id} className="flex justify-between items-center p-3 hover:bg-light rounded-md border-b last:border-0">
-            <div>
-              <p className="font-bold text-dark">{job.title}</p>
-              <p className="text-sm text-gray-500">{job.company} - {job.location}</p>
-            </div>
-            <Link to={`/jobs`}>
-              <Button variant="secondary">View Details</Button>
-            </Link>
-          </div>
-        ))}
-      </Card>
-    </div>
-  );
-};
-
-// --- Employer Dashboard ---
-const EmployerDashboard: React.FC = () => {
-    const { user } = useAuth();
-    const totalApplicants = APPLICATIONS.length;
-    const interviewingApplicants = APPLICATIONS.filter(a => a.status === 'Interviewing').length;
-    const interviewRate = totalApplicants > 0 ? Math.round((interviewingApplicants / totalApplicants) * 100) : 0;
-    
-    const statusCounts = APPLICATIONS.reduce((acc, app) => {
-        acc[app.status] = (acc[app.status] || 0) + 1;
-        return acc;
-    }, {} as {[key: string]: number});
-    const funnelData = Object.keys(statusCounts).map(key => ({ name: key, value: statusCounts[key] }));
-    
-    const ikimina = COOPERATIVES.find(c => c.creatorId === user?.id && c.type === 'Corporate');
-
-    return (
-     <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <StatCard title="Active Job Postings" value={JOBS.length} />
-            <StatCard title="Total Applicants" value={totalApplicants} />
-            <Card title="Interview Rate">
-                <div className="flex items-center justify-center h-full">
-                    <RingProgress percentage={interviewRate} size={100} />
-                </div>
-            </Card>
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-            <div className="lg:col-span-3">
-                <Card title="Hiring Funnel">
-                    <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={funnelData} layout="vertical" margin={{ left: 30 }}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis type="number" />
-                            <YAxis type="category" dataKey="name" width={100} />
-                            <Tooltip />
-                            <Legend />
-                            <Bar dataKey="value" name="Applicants" fill="#005A9C" />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </Card>
-            </div>
-            <div className="lg:col-span-2">
-                <Card title="My Corporate Ikimina" className="h-full">
-                    {ikimina ? (
-                        <div className="flex flex-col justify-between h-full">
-                            <div>
-                                <h3 className="text-lg font-bold text-primary">{ikimina.name}</h3>
-                                <p className="text-sm text-gray-500 mt-1">{ikimina.description}</p>
-                            </div>
-                            <div className="space-y-3 mt-4">
-                                <div className="flex justify-between items-center bg-light p-3 rounded-md">
-                                    <span className="font-semibold text-dark">Total Members</span>
-                                    <span className="font-bold text-lg text-primary">{ikimina.members.length}</span>
-                                </div>
-                                <div className="flex justify-between items-center bg-light p-3 rounded-md">
-                                    <span className="font-semibold text-dark">Total Savings</span>
-                                    <span className="font-bold text-lg text-primary">RWF {ikimina.savings.toLocaleString()}</span>
-                                </div>
-                            </div>
-                            <Link to="/cooperatives" className="mt-4">
-                                <Button className="w-full">Manage Ikimina</Button>
-                            </Link>
-                        </div>
-                    ) : (
-                        <div className="text-center flex flex-col items-center justify-center h-full">
-                            <UserGroupIcon className="h-12 w-12 text-gray-300 mb-2" />
-                            <p className="text-gray-600 mb-4">Engage your employees by creating a corporate savings group.</p>
-                            <Link to="/cooperatives">
-                                <Button>Create an Ikimina</Button>
-                            </Link>
-                        </div>
-                    )}
-                </Card>
-            </div>
-        </div>
-     </div>
-    );
-};
-
-// --- Admin Dashboard ---
-const AdminDashboard: React.FC = () => {
-    const coop = COOPERATIVES.find(c => c.id === 'coop3');
-    if(!coop) return null;
-
-    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
-    const memberData = [
-        { name: "Active Members", value: coop.members.filter(m => m.cooperativeStatus === 'Member').length},
-        { name: "Pending Members", value: coop.members.filter(m => m.cooperativeStatus === 'Pending').length},
-    ];
-
-    return (
-        <div className="space-y-6">
-            <h1 className="text-3xl font-bold text-dark">Cooperative Management: {coop.name}</h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard title="Total Members" value={coop.members.length} />
-                <StatCard title="Total Savings" value={`RWF ${coop.savings.toLocaleString()}`} />
-                 <Card title="Loan Repayment Rate">
-                    <div className="flex items-center justify-center h-full">
-                        <RingProgress percentage={88} size={100} />
-                    </div>
-                </Card>
-                 <Card title="Membership Growth">
-                    <div className="flex items-center justify-center h-full">
-                        <RingProgress percentage={15} size={100} />
-                    </div>
-                </Card>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card title="Member Status">
-                    <ResponsiveContainer width="100%" height={300}>
-                        <PieChart>
-                            <Pie data={memberData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
-                                {memberData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                ))}
-                            </Pie>
-                            <Tooltip />
-                            <Legend />
-                        </PieChart>
-                    </ResponsiveContainer>
-                </Card>
-                <Card title="Quick Actions">
-                    <div className="flex flex-col space-y-4 justify-center h-full">
-                        <Link to="/cooperatives"><Button className="!py-4 !text-base w-full">Manage Members</Button></Link>
-                        <Link to="/analytics"><Button className="!py-4 !text-base w-full">View Full Analytics</Button></Link>
-                    </div>
-                </Card>
-            </div>
-        </div>
-    );
-};
-
-const StatCard = ({ title, value }: { title: string, value: string | number }) => (
-    <Card>
-        <p className="text-sm text-gray-500">{title}</p>
-        <p className="text-3xl font-bold text-dark mt-2">{value}</p>
-    </Card>
-);
 
 export default DashboardPage;

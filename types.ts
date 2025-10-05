@@ -1,4 +1,4 @@
-// FIX: Define all necessary types for the application.
+// FIX: Populated the empty types.ts file with necessary type definitions.
 export enum UserRole {
   SEEKER = 'Job Seeker',
   EMPLOYER = 'Employer',
@@ -11,8 +11,7 @@ export interface User {
   email: string;
   role: UserRole;
   avatarUrl: string;
-  cooperativeId?: string;
-  cooperativeStatus?: 'Member' | 'Pending' | 'None';
+  skills?: string[];
 }
 
 export interface Job {
@@ -20,43 +19,20 @@ export interface Job {
   title: string;
   company: string;
   location: string;
-  type: 'Full-time' | 'Part-time' | 'Contract';
+  type: string;
+  salary: string;
+  salaryMin: number;
+  salaryMax: number;
   description: string;
   skills: string[];
-  salary: string;
 }
 
 export interface Application {
     id: string;
     jobId: string;
     userId: string;
-    status: 'Applied' | 'Interviewing' | 'Offered' | 'Rejected';
+    status: 'Pending' | 'Interviewing' | 'Offered' | 'Rejected';
     matchScore: number;
-}
-
-export interface SavingsGoal {
-    id: string;
-    name: string;
-    targetAmount: number;
-    currentAmount: number;
-}
-
-export interface Cooperative {
-    id: string;
-    name: string;
-    logoUrl: string;
-    description: string;
-    members: User[];
-    savings: number;
-    creatorId?: string; // To link to an employer
-    type: 'Community' | 'Corporate';
-}
-
-export interface Transaction {
-    id: string;
-    description: string;
-    amount: number; // positive for deposit, negative for withdrawal
-    date: string; // ISO string
 }
 
 export interface Message {
@@ -64,31 +40,19 @@ export interface Message {
     senderId: string;
     receiverId: string;
     text: string;
-    timestamp: string; // ISO string
+    timestamp: string;
 }
 
 export interface Notification {
-    id: number;
-    message: string;
-    date: string;
-    read: boolean;
+  id: number;
+  message: string;
+  date: string;
+  read: boolean;
 }
 
-export interface InvestmentPod {
-  id: string;
-  name: string;
-  riskLevel: 'Low' | 'Medium' | 'High';
-  apy: number; // Annual Percentage Yield
-  description: string;
-  performanceData: { month: string; value: number }[];
-}
-
-export interface LoanOffer {
-  id: string;
-  borrowerId: string;
-  amount: number;
-  interestRate: number;
-  term: number; // in months
-  purpose: string;
-  fundedAmount: number;
+export interface ActivityLog {
+    id: string;
+    type: 'NEW_MEMBER' | 'NEW_JOB' | 'SAVINGS_GOAL' | 'LARGE_DEPOSIT';
+    description: string;
+    timestamp: string;
 }

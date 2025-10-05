@@ -2,7 +2,8 @@ import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { PencilIcon } from '@heroicons/react/24/solid';
+import { PencilIcon, CheckBadgeIcon } from '@heroicons/react/24/solid';
+import { BriefcaseIcon, UserGroupIcon, WalletIcon } from '@heroicons/react/24/outline';
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
@@ -10,23 +11,41 @@ const ProfilePage: React.FC = () => {
   if (!user) {
     return <p>Loading profile...</p>;
   }
+  
+  const userSkills = user.skills || ['React', 'TypeScript', 'Project Management', 'Agile'];
+
+  const activityTimeline = [
+      {icon: BriefcaseIcon, text: "Applied for Frontend Developer", date: "2 days ago"},
+      {icon: WalletIcon, text: "Contributed RWF 50,000 to Ikimina", date: "5 days ago"},
+      {icon: UserGroupIcon, text: "Joined TechSolutions Innovators Circle", date: "1 week ago"},
+  ];
 
   return (
     <div>
       <h1 className="text-3xl font-bold text-dark mb-6">My Profile</h1>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Profile Card */}
-        <div className="lg:col-span-1">
+        {/* Left Column */}
+        <div className="lg:col-span-1 space-y-6">
           <Card className="text-center">
             <img src={user.avatarUrl} alt={user.name} className="h-32 w-32 rounded-full mx-auto mb-4 border-4 border-primary" />
             <h2 className="text-2xl font-bold text-dark">{user.name}</h2>
             <p className="text-gray-500">{user.role}</p>
             <Button variant="secondary" className="mt-4 w-full">Change Picture</Button>
           </Card>
+          <Card title="Skills & Endorsements">
+            <div className="flex flex-wrap gap-2">
+                {userSkills.map(skill => (
+                    <div key={skill} className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
+                        {skill}
+                        <CheckBadgeIcon className="h-4 w-4 ml-1 text-primary" title="Endorsed by TechSolutions Ltd."/>
+                    </div>
+                ))}
+            </div>
+          </Card>
         </div>
 
-        {/* Profile Details */}
-        <div className="lg:col-span-2">
+        {/* Right Column */}
+        <div className="lg:col-span-2 space-y-6">
           <Card>
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold text-dark">Personal Information</h3>
@@ -54,6 +73,21 @@ const ProfilePage: React.FC = () => {
               </div>
             </div>
           </Card>
+           <Card title="Activity Timeline">
+            <div className="space-y-4">
+                {activityTimeline.map((item, index) => (
+                    <div key={index} className="flex items-center">
+                        <div className="bg-light p-2 rounded-full mr-4">
+                            <item.icon className="h-5 w-5 text-primary"/>
+                        </div>
+                        <div>
+                            <p className="text-dark font-medium">{item.text}</p>
+                            <p className="text-xs text-gray-500">{item.date}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+           </Card>
         </div>
       </div>
     </div>

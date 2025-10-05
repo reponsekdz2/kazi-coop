@@ -6,7 +6,7 @@ import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
 import RingProgress from '../components/ui/RingProgress';
 import { JOBS, APPLICATIONS, USERS } from '../constants';
-import { MagnifyingGlassIcon, MapPinIcon, BriefcaseIcon, UserGroupIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, MapPinIcon, BriefcaseIcon, UserGroupIcon, BuildingOffice2Icon } from '@heroicons/react/24/outline';
 
 const SeekerJobsView: React.FC = () => {
   const [selectedJob, setSelectedJob] = useState<Job | null>(JOBS[0]);
@@ -17,6 +17,8 @@ const SeekerJobsView: React.FC = () => {
     job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
     job.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+  
+  const marketAvg = (selectedJob?.salaryMin || 0 + (selectedJob?.salaryMax || 0)) * 0.9; // Mock average
 
   return (
     <div>
@@ -51,7 +53,7 @@ const SeekerJobsView: React.FC = () => {
 
         <div className="lg:col-span-2">
           {selectedJob ? (
-            <Card className="h-full">
+            <Card className="h-full overflow-y-auto">
               <h2 className="text-2xl font-bold text-dark">{selectedJob.title}</h2>
               <p className="text-lg text-primary font-semibold mb-4">{selectedJob.company}</p>
               
@@ -68,13 +70,45 @@ const SeekerJobsView: React.FC = () => {
                       <span key={skill} className="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm">{skill}</span>
                   ))}
               </div>
-              
-              <div className="flex justify-between items-center bg-light p-4 rounded-md">
-                <div>
-                    <p className="text-sm text-gray-600">Salary</p>
-                    <p className="font-bold text-lg text-dark">{selectedJob.salary}</p>
+
+              <Card title="Salary & Benchmarking" className="!bg-light !shadow-inner mb-6">
+                <div className="flex justify-between items-center">
+                    <div>
+                        <p className="text-sm text-gray-600">Offered Salary</p>
+                        <p className="font-bold text-2xl text-dark">{selectedJob.salary}</p>
+                    </div>
+                    <div className="w-1/2">
+                        <p className="text-xs text-gray-500 text-center mb-1">Comparison to Market Average</p>
+                        <div className="relative h-6 bg-gray-200 rounded-full">
+                            <div className="absolute h-6 bg-gradient-to-r from-green-300 to-green-500 rounded-full" style={{ width: `90%` }} title={`Market Average: RWF ${marketAvg.toLocaleString()}`}></div>
+                            <div className="absolute h-6 bg-gradient-to-r from-blue-400 to-primary rounded-full" style={{ width: `100%` }} title={`This Job's Range: ${selectedJob.salary}`}></div>
+                        </div>
+                    </div>
                 </div>
-                <Button>Apply Now</Button>
+              </Card>
+
+               <Card title="Company Insights" className="!bg-light !shadow-inner">
+                 <div className="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                        <BuildingOffice2Icon className="h-8 w-8 mx-auto text-primary mb-1"/>
+                        <p className="font-bold text-dark">50-100</p>
+                        <p className="text-xs text-gray-500">Employees</p>
+                    </div>
+                     <div>
+                        <UserGroupIcon className="h-8 w-8 mx-auto text-primary mb-1"/>
+                        <p className="font-bold text-dark">5</p>
+                        <p className="text-xs text-gray-500">KaziCoop Members</p>
+                    </div>
+                     <div>
+                        <BriefcaseIcon className="h-8 w-8 mx-auto text-primary mb-1"/>
+                        <p className="font-bold text-dark">3 years</p>
+                        <p className="text-xs text-gray-500">Avg. Tenure</p>
+                    </div>
+                 </div>
+               </Card>
+
+              <div className="mt-6">
+                <Button className="w-full !py-3 !text-base">Apply Now</Button>
               </div>
             </Card>
           ) : (
