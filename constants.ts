@@ -1,5 +1,5 @@
 // FIX: Provide mock data for the application constants.
-import { User, UserRole, Job, Application, SavingsGoal, Cooperative, Transaction, Message, Notification } from './types';
+import { User, UserRole, Job, Application, SavingsGoal, Cooperative, Transaction, Message, Notification, InvestmentPod, LoanOffer } from './types';
 
 export const USERS: User[] = [
   { id: 'user1', name: 'Aline Umutoni', email: 'aline@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user1', cooperativeId: 'coop3', cooperativeStatus: 'Member' },
@@ -57,4 +57,15 @@ export const NOTIFICATIONS: Notification[] = [
     { id: 2, message: 'New message from Jean-Claude Dusabe.', date: '3 hours ago', read: false },
     { id: 3, message: 'Welcome to KaziCoop! Complete your profile to get started.', date: '1 day ago', read: true },
     { id: 4, message: 'Your savings goal "New Laptop" is 68% complete.', date: '2 days ago', read: true },
+];
+
+export const INVESTMENT_PODS: InvestmentPod[] = [
+  { id: 'pod1', name: 'Rwanda Agri-Growth Fund', riskLevel: 'Low', apy: 8.5, description: 'Invest in a diversified portfolio of local agriculture businesses.', performanceData: [{month: 'Jan', value: 100}, {month: 'Feb', value: 101}, {month: 'Mar', value: 102}, {month: 'Apr', value: 103}, {month: 'May', value: 104}, {month: 'Jun', value: 105}] },
+  { id: 'pod2', name: 'Kigali Tech Innovators', riskLevel: 'Medium', apy: 15.2, description: 'Support promising tech startups in the Kigali Innovation City.', performanceData: [{month: 'Jan', value: 100}, {month: 'Feb', value: 105}, {month: 'Mar', value: 103}, {month: 'Apr', value: 110}, {month: 'May', value: 112}, {month: 'Jun', value: 115}] },
+  { id: 'pod3', name: 'Sustainable Tourism Ventures', riskLevel: 'High', apy: 22.0, description: 'High-risk, high-reward investments in eco-lodges and sustainable tourism projects.', performanceData: [{month: 'Jan', value: 100}, {month: 'Feb', value: 98}, {month: 'Mar', value: 110}, {month: 'Apr', value: 115}, {month: 'May', value: 125}, {month: 'Jun', value: 130}] },
+];
+
+export const LOAN_OFFERS: LoanOffer[] = [
+    { id: 'loan1', borrowerId: 'user5', amount: 500000, interestRate: 12, term: 12, purpose: 'Purchase new equipment for my artisan business.', fundedAmount: 150000 },
+    { id: 'loan2', borrowerId: 'user6', amount: 1000000, interestRate: 10, term: 24, purpose: 'Capital for a small grocery store startup.', fundedAmount: 950000 },
 ];

@@ -71,3 +71,22 @@ export interface Notification {
     date: string;
     read: boolean;
 }
+
+export interface InvestmentPod {
+  id: string;
+  name: string;
+  riskLevel: 'Low' | 'Medium' | 'High';
+  apy: number; // Annual Percentage Yield
+  description: string;
+  performanceData: { month: string; value: number }[];
+}
+
+export interface LoanOffer {
+  id: string;
+  borrowerId: string;
+  amount: number;
+  interestRate: number;
+  term: number; // in months
+  purpose: string;
+  fundedAmount: number;
+}

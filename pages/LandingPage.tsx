@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import RingProgress from '../components/ui/RingProgress';
 import Typewriter from '../components/ui/Typewriter'; // New component
-import { BriefcaseIcon, UserGroupIcon, WalletIcon, ArrowRightIcon, AcademicCapIcon, ShieldCheckIcon, PresentationChartLineIcon, LightBulbIcon } from '@heroicons/react/24/outline';
+import { BriefcaseIcon, UserGroupIcon, WalletIcon, ArrowRightIcon, AcademicCapIcon, ShieldCheckIcon, PresentationChartLineIcon, LightBulbIcon, CurrencyDollarIcon, ScaleIcon, SparklesIcon } from '@heroicons/react/24/outline';
 
 const LandingPage: React.FC = () => {
   return (
@@ -154,8 +154,38 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Testimonials Section */}
+      {/* NEW: Wealth Acceleration Section */}
       <section className="py-20 bg-light">
+        <div className="container mx-auto px-4 lg:px-6">
+            <div className="text-center mb-16">
+                <h2 className="text-3xl md:text-4xl font-bold text-dark">Accelerate Your Wealth</h2>
+                <p className="text-gray-600 mt-2 max-w-2xl mx-auto">Go beyond saving. Actively grow your money with our suite of modern financial tools, designed for accessibility and community growth.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <WealthCard
+                    icon={CurrencyDollarIcon}
+                    title="Investment Pods"
+                    description="Invest in diversified, AI-recommended portfolios with your cooperative. Start small and grow steadily, from low-risk agriculture bonds to high-growth tech startups."
+                    gradient="from-yellow-500 to-amber-600"
+                />
+                <WealthCard
+                    icon={ScaleIcon}
+                    title="P2P Loan Marketplace"
+                    description="Access fair, community-funded loans for your next big idea. Or, become a lender and earn interest by supporting fellow members. Transparent, secure, and better than traditional banks."
+                    gradient="from-teal-500 to-cyan-600"
+                />
+                <WealthCard
+                    icon={SparklesIcon}
+                    title="Smart Savings Automations"
+                    description="Put your savings on autopilot. Set rules like 'Round up purchases' or 'Save 10% of every deposit'. Our smart system does the work, so you reach your goals faster."
+                    gradient="from-purple-600 to-indigo-700"
+                />
+            </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4 lg:px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-dark">What Our Users Say</h2>
@@ -186,7 +216,7 @@ const LandingPage: React.FC = () => {
 
 
       {/* CTA Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-light">
         <div className="container mx-auto px-4 lg:px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-dark mb-4">Ready to Start Your Journey?</h2>
           <p className="text-gray-600 max-w-2xl mx-auto mb-8">
@@ -213,6 +243,15 @@ const AdvancedFeatureCard: React.FC<{icon: React.ElementType, title: string, des
         <p className="text-sm text-gray-600">{description}</p>
     </div>
 );
+
+const WealthCard: React.FC<{icon: React.ElementType, title: string, description: string, gradient: string}> = ({icon: Icon, title, description, gradient}) => (
+    <div className={`p-8 rounded-xl shadow-2xl text-white bg-gradient-to-br ${gradient} transform hover:-translate-y-2 transition-transform duration-300`}>
+        <Icon className="h-10 w-10 mb-4" />
+        <h3 className="text-2xl font-bold mb-3">{title}</h3>
+        <p className="opacity-90">{description}</p>
+    </div>
+);
+
 
 const TestimonialCard: React.FC<{quote: string, name: string, role: string, avatar: string}> = ({quote, name, role, avatar}) => (
     <div className="bg-white p-8 rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300">
