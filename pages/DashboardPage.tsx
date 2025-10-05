@@ -1,89 +1,18 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { UserRole, Message, User } from '../types';
+import { UserRole } from '../types';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { JOBS, APPLICATIONS, COOPERATIVES, TRANSACTIONS, INTERVIEWS, MESSAGES, USERS } from '../constants';
-import { ArrowTrendingUpIcon, BriefcaseIcon, BanknotesIcon, UsersIcon, CreditCardIcon, CalendarDaysIcon, VideoCameraIcon, ChatBubbleLeftEllipsisIcon } from '@heroicons/react/24/outline';
+import RingProgress from '../components/ui/RingProgress';
 import { Link } from 'react-router-dom';
+import { ArrowRightIcon, BriefcaseIcon, UserGroupIcon, WalletIcon, ChartPieIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import { JOBS, APPLICATIONS, SAVINGS_GOALS, COOPERATIVES } from '../constants';
+// FIX: Imported `CartesianGrid` from recharts.
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+
 
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
-  const myMessages = MESSAGES.filter(m => m.receiverId === user?.id || m.senderId === user?.id)
-        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-        .slice(0, 3);
-
-  const SeekerDashboard = () => {
-      const myInterviews = INTERVIEWS.filter(i => i.seekerId === user?.id && i.status === 'Scheduled');
-      return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <StatCard title="Recommended Jobs" value={JOBS.length} icon={<BriefcaseIcon className="h-8 w-8 text-primary" />} />
-                    <StatCard title="Active Applications" value={APPLICATIONS.filter(a => a.seekerId === user?.id).length} icon={<ArrowTrendingUpIcon className="h-8 w-8 text-accent" />} />
-                    <StatCard title="Wallet Balance" value={`RWF ${TRANSACTIONS.reduce((acc, t) => acc + t.amount, 0).toLocaleString()}`} icon={<BanknotesIcon className="h-8 w-8 text-yellow-500" />} />
-                    <StatCard title="My Cooperatives" value={1} icon={<UsersIcon className="h-8 w-8 text-red-500" />} />
-                </div>
-                 {myInterviews.length > 0 && (
-                    <div className="mt-6">
-                        <Card title="Upcoming Interviews">
-                            {myInterviews.map(interview => {
-                                const job = JOBS.find(j => j.id === interview.jobId);
-                                return (
-                                    <div key={interview.id} className="flex flex-col sm:flex-row items-center justify-between p-4 rounded-md bg-light mb-2">
-                                        <div>
-                                            <p className="font-bold text-dark">Interview for {job?.title}</p>
-                                            <p className="text-sm text-gray-600 flex items-center mt-1">
-                                                <CalendarDaysIcon className="h-4 w-4 mr-2" />
-                                                {interview.date} at {interview.time} with {job?.company}
-                                            </p>
-                                        </div>
-                                        <Button className="mt-2 sm:mt-0 flex items-center">
-                                            <VideoCameraIcon className="h-5 w-5 mr-2" />
-                                            Join Online Interview
-                                        </Button>
-                                    </div>
-                                )
-                            })}
-                        </Card>
-                    </div>
-                )}
-            </div>
-            <div className="lg:col-span-1">
-                <MessageCard messages={myMessages} currentUser={user} />
-            </div>
-        </div>
-      )
-  };
-
-  const EmployerDashboard = () => {
-      const myJobs = JOBS.filter(j => j.employerId === user?.id);
-      const totalApplicants = APPLICATIONS.filter(a => myJobs.some(j => j.id === a.jobId)).length;
-      return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <StatCard title="Active Job Postings" value={myJobs.length} icon={<BriefcaseIcon className="h-8 w-8 text-primary" />} />
-                    <StatCard title="Total Applicants" value={totalApplicants} icon={<UsersIcon className="h-8 w-8 text-accent" />} />
-                </div>
-            </div>
-             <div className="lg:col-span-1">
-                <MessageCard messages={myMessages} currentUser={user} />
-            </div>
-        </div>
-      );
-  };
-  
-  const CoopAdminDashboard = () => {
-      const coop = COOPERATIVES[0];
-      return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <StatCard title="Total Members" value={coop.membersCount} icon={<UsersIcon className="h-8 w-8 text-primary" />} />
-            <StatCard title="Total Savings" value={`RWF ${coop.totalSavings.toLocaleString()}`} icon={<BanknotesIcon className="h-8 w-8 text-accent" />} />
-            <StatCard title="Total Loans" value={`RWF ${coop.totalLoans.toLocaleString()}`} icon={<CreditCardIcon className="h-8 w-8 text-yellow-500" />} />
-        </div>
-      );
-  };
 
   const renderDashboard = () => {
     switch (user?.role) {
@@ -92,72 +21,163 @@ const DashboardPage: React.FC = () => {
       case UserRole.EMPLOYER:
         return <EmployerDashboard />;
       case UserRole.COOP_ADMIN:
-        return <CoopAdminDashboard />;
+        return <AdminDashboard />;
       default:
-        return <p>No dashboard available for this role.</p>;
+        return <p>Loading dashboard...</p>;
     }
   };
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-dark mb-6">Dashboard</h1>
       {renderDashboard()}
     </div>
   );
 };
 
-interface StatCardProps {
-    title: string;
-    value: string | number;
-    icon: React.ReactNode;
-}
+// --- Seeker Dashboard ---
+const SeekerDashboard: React.FC = () => {
+  const goal = SAVINGS_GOALS[0];
+  const goalProgress = Math.round((goal.currentAmount / goal.targetAmount) * 100);
 
-const StatCard: React.FC<StatCardProps> = ({ title, value, icon }) => (
-    <Card className="flex items-center justify-between">
-        <div>
-            <p className="text-sm text-gray-500">{title}</p>
-            <p className="text-2xl font-bold text-dark">{value}</p>
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card title="Profile Completeness">
+              <div className="flex items-center justify-center h-full">
+                <RingProgress percentage={75} size={120} />
+              </div>
+          </Card>
+          <Card title="My Savings Goal">
+              <div className="flex flex-col items-center justify-center h-full">
+                <RingProgress percentage={goalProgress} size={120} />
+                <p className="text-center text-sm mt-2 text-gray-600">Towards '{goal.name}'</p>
+              </div>
+          </Card>
+          <div className="lg:col-span-2">
+            <Card title="Quick Actions" className="h-full">
+                <div className="grid grid-cols-2 gap-4 h-full content-center">
+                    <Button className="!py-4 !text-base"><BriefcaseIcon className="h-5 w-5 mr-2 inline" /> Find Jobs</Button>
+                    <Button className="!py-4 !text-base"><UserGroupIcon className="h-5 w-5 mr-2 inline" /> My Cooperative</Button>
+                    <Button className="!py-4 !text-base"><WalletIcon className="h-5 w-5 mr-2 inline" /> Go to Wallet</Button>
+                    <Button className="!py-4 !text-base"><CheckCircleIcon className="h-5 w-5 mr-2 inline" /> My Applications</Button>
+                </div>
+            </Card>
+          </div>
+      </div>
+      <Card title="Recommended Jobs For You">
+        {JOBS.slice(0, 3).map(job => (
+          <div key={job.id} className="flex justify-between items-center p-3 hover:bg-light rounded-md border-b last:border-0">
+            <div>
+              <p className="font-bold text-dark">{job.title}</p>
+              <p className="text-sm text-gray-500">{job.company} - {job.location}</p>
+            </div>
+            <Link to={`/jobs`}>
+              <Button variant="secondary">View Details</Button>
+            </Link>
+          </div>
+        ))}
+      </Card>
+    </div>
+  );
+};
+
+// --- Employer Dashboard ---
+const EmployerDashboard: React.FC = () => {
+    const totalApplicants = APPLICATIONS.length;
+    const interviewingApplicants = APPLICATIONS.filter(a => a.status === 'Interviewing').length;
+    const interviewRate = totalApplicants > 0 ? Math.round((interviewingApplicants / totalApplicants) * 100) : 0;
+    
+    const statusCounts = APPLICATIONS.reduce((acc, app) => {
+        acc[app.status] = (acc[app.status] || 0) + 1;
+        return acc;
+    }, {} as {[key: string]: number});
+    const funnelData = Object.keys(statusCounts).map(key => ({ name: key, value: statusCounts[key] }));
+
+    return (
+     <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <StatCard title="Active Job Postings" value={JOBS.length} />
+            <StatCard title="Total Applicants" value={totalApplicants} />
+            <Card title="Interview Rate">
+                <div className="flex items-center justify-center h-full">
+                    <RingProgress percentage={interviewRate} size={100} />
+                </div>
+            </Card>
         </div>
-        <div className="bg-light p-3 rounded-full">
-            {icon}
+        <Card title="Hiring Funnel">
+            <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={funnelData} layout="vertical" margin={{ left: 30 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" />
+                    <YAxis type="category" dataKey="name" width={100} />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="value" name="Applicants" fill="#005A9C" />
+                </BarChart>
+            </ResponsiveContainer>
+        </Card>
+     </div>
+    );
+};
+
+// --- Admin Dashboard ---
+const AdminDashboard: React.FC = () => {
+    const coop = COOPERATIVES.find(c => c.id === 'coop3');
+    if(!coop) return null;
+
+    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+    const memberData = [
+        { name: "Active Members", value: coop.members.filter(m => m.cooperativeStatus === 'Member').length},
+        { name: "Pending Members", value: coop.members.filter(m => m.cooperativeStatus === 'Pending').length},
+    ];
+
+    return (
+        <div className="space-y-6">
+            <h1 className="text-3xl font-bold text-dark">Cooperative Management: {coop.name}</h1>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <StatCard title="Total Members" value={coop.members.length} />
+                <StatCard title="Total Savings" value={`RWF ${coop.savings.toLocaleString()}`} />
+                 <Card title="Loan Repayment Rate">
+                    <div className="flex items-center justify-center h-full">
+                        <RingProgress percentage={88} size={100} />
+                    </div>
+                </Card>
+                 <Card title="Membership Growth">
+                    <div className="flex items-center justify-center h-full">
+                        <RingProgress percentage={15} size={100} />
+                    </div>
+                </Card>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card title="Member Status">
+                    <ResponsiveContainer width="100%" height={300}>
+                        <PieChart>
+                            <Pie data={memberData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
+                                {memberData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                ))}
+                            </Pie>
+                            <Tooltip />
+                            <Legend />
+                        </PieChart>
+                    </ResponsiveContainer>
+                </Card>
+                <Card title="Quick Actions">
+                    <div className="flex flex-col space-y-4 justify-center h-full">
+                        <Link to="/cooperatives"><Button className="!py-4 !text-base w-full">Manage Members</Button></Link>
+                        <Link to="/analytics"><Button className="!py-4 !text-base w-full">View Full Analytics</Button></Link>
+                    </div>
+                </Card>
+            </div>
         </div>
+    );
+};
+
+const StatCard = ({ title, value }: { title: string, value: string | number }) => (
+    <Card>
+        <p className="text-sm text-gray-500">{title}</p>
+        <p className="text-3xl font-bold text-dark mt-2">{value}</p>
     </Card>
 );
-
-const MessageCard: React.FC<{ messages: Message[], currentUser: User | null }> = ({ messages, currentUser }) => {
-    const getOtherUser = (msg: Message) => {
-        const otherId = msg.senderId === currentUser?.id ? msg.receiverId : msg.senderId;
-        return USERS.find(u => u.id === otherId);
-    }
-    return (
-        <Card>
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-dark">Recent Messages</h2>
-                <Link to="/messages" className="text-sm text-primary hover:underline">View All</Link>
-            </div>
-            <div className="space-y-4">
-            {messages.length > 0 ? messages.map(msg => (
-                <Link to="/messages" key={msg.id} className="flex items-start space-x-3 p-2 rounded-md hover:bg-light">
-                    <img src={getOtherUser(msg)?.avatarUrl} alt="avatar" className="h-10 w-10 rounded-full" />
-                    <div className="flex-1">
-                        <div className="flex justify-between">
-                            <p className="font-semibold text-sm text-dark">{getOtherUser(msg)?.name}</p>
-                            {!msg.read && msg.receiverId === currentUser?.id && (
-                                <span className="h-2 w-2 rounded-full bg-primary mt-1"></span>
-                            )}
-                        </div>
-                        <p className="text-sm text-gray-500 truncate">{msg.text}</p>
-                    </div>
-                </Link>
-            )) : (
-                <div className="text-center py-8 text-gray-500">
-                    <ChatBubbleLeftEllipsisIcon className="h-12 w-12 mx-auto text-gray-300" />
-                    <p className="mt-2 text-sm">No recent messages.</p>
-                </div>
-            )}
-            </div>
-        </Card>
-    )
-}
 
 export default DashboardPage;

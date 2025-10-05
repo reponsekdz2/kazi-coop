@@ -1,113 +1,60 @@
-import { User, UserRole, Job, Application, Cooperative, MemberContribution, Transaction, LearningResource, Badge, Notification, Interview, Message } from './types';
+// FIX: Provide mock data for the application constants.
+import { User, UserRole, Job, Application, SavingsGoal, Cooperative, Transaction, Message, Notification } from './types';
 
 export const USERS: User[] = [
-  {
-    id: 'user-1',
-    name: 'Aline Umutoni',
-    email: 'aline@example.com',
-    role: UserRole.SEEKER,
-    avatarUrl: 'https://picsum.photos/seed/user1/100/100',
-    profile: {
-      title: 'Software Developer',
-      bio: 'Passionate frontend developer with 3 years of experience in React and TypeScript. Eager to join a mission-driven company.',
-      skills: ['React', 'TypeScript', 'Node.js', 'Tailwind CSS', 'GraphQL'],
-      completeness: 80,
-    },
-  },
-  {
-    id: 'user-2',
-    name: 'Jean Bosco Mugisha',
-    email: 'jean@example.com',
-    role: UserRole.EMPLOYER,
-    avatarUrl: 'https://picsum.photos/seed/user2/100/100',
-    profile: {
-      company: 'Innovate Rwanda Ltd.',
-      bio: 'Hiring manager at a leading tech company in Kigali. Looking for talented individuals to help us build the future of tech in Africa.',
-      completeness: 100,
-    },
-  },
-  {
-    id: 'user-3',
-    name: 'Chantal Ingabire',
-    email: 'chantal@example.com',
-    role: UserRole.COOP_ADMIN,
-    avatarUrl: 'https://picsum.photos/seed/user3/100/100',
-    profile: {
-      company: 'Turemerane Cooperative',
-      bio: 'Administrator for Turemerane Cooperative, focused on empowering our members financially.',
-      completeness: 100,
-    },
-  },
-  {
-    id: 'user-4',
-    name: 'David Nsenga',
-    email: 'david@example.com',
-    role: UserRole.SEEKER,
-    avatarUrl: 'https://picsum.photos/seed/user4/100/100',
-    profile: {
-      title: 'UX/UI Designer',
-      bio: 'Creative designer focused on user-centric and beautiful interfaces. Proficient in Figma, Sketch, and Adobe XD.',
-      skills: ['Figma', 'User Research', 'Prototyping', 'Wireframing'],
-      completeness: 90,
-    }
-  }
+  { id: 'user1', name: 'Aline Umutoni', email: 'aline@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user1', cooperativeId: 'coop3', cooperativeStatus: 'Member' },
+  { id: 'user2', name: 'Jean-Claude Dusabe', email: 'jean@example.com', role: UserRole.EMPLOYER, avatarUrl: 'https://i.pravatar.cc/150?u=user2' },
+  { id: 'user3', name: 'Admin Kazi', email: 'admin@example.com', role: UserRole.COOP_ADMIN, avatarUrl: 'https://i.pravatar.cc/150?u=user3', cooperativeId: 'coop3' },
+  { id: 'user4', name: 'Fatima Zahra', email: 'fatima@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user4', cooperativeId: 'coop3', cooperativeStatus: 'Pending' },
+  { id: 'user5', name: 'Samuel Mwangi', email: 'samuel@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user5', cooperativeId: 'coop1', cooperativeStatus: 'Member' },
+  { id: 'user6', name: 'Maria Oliveira', email: 'maria@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user6' }
 ];
 
 export const JOBS: Job[] = [
-  { id: 'job-1', title: 'Frontend Developer', company: 'Innovate Rwanda Ltd.', location: 'Kigali, Rwanda', type: 'Full-time', postedDate: '2024-07-20', description: 'Seeking a skilled React developer to join our dynamic team.', employerId: 'user-2' },
-  { id: 'job-2', title: 'UX/UI Designer', company: 'Innovate Rwanda Ltd.', location: 'Remote', type: 'Contract', postedDate: '2024-07-18', description: 'Design beautiful and intuitive user interfaces for mobile and web applications.', employerId: 'user-2' },
-  { id: 'job-3', title: 'Backend Engineer (Node.js)', company: 'Africa Tech Solutions', location: 'Kigali, Rwanda', type: 'Full-time', postedDate: '2024-07-15', description: 'Build and maintain scalable server-side applications and APIs.', employerId: 'another-employer' },
+  { id: 'job1', title: 'Frontend Developer', company: 'TechSolutions Ltd.', location: 'Kigali, Rwanda', type: 'Full-time', description: 'Developing and maintaining user-facing features...', skills: ['React', 'TypeScript', 'CSS'], salary: 'RWF 1,500,000 / month' },
+  { id: 'job2', title: 'UX/UI Designer', company: 'Creative Minds Inc.', location: 'Remote', type: 'Contract', description: 'Designing user interfaces for web and mobile applications...', skills: ['Figma', 'Adobe XD', 'User Research'], salary: 'RWF 1,200,000 / month' },
+  { id: 'job3', title: 'Project Manager', company: 'BuildIt Rwanda', location: 'Kigali, Rwanda', type: 'Full-time', description: 'Leading project planning sessions and managing project progress...', skills: ['Agile', 'Scrum', 'JIRA'], salary: 'RWF 2,000,000 / month' },
+  { id: 'job4', title: 'Data Analyst', company: 'Data Insights Co.', location: 'Kigali, Rwanda', type: 'Full-time', description: 'Interpreting data, analyzing results using statistical techniques...', skills: ['SQL', 'Python', 'Tableau'], salary: 'RWF 1,800,000 / month' },
 ];
 
 export const APPLICATIONS: Application[] = [
-  { id: 'app-1', jobId: 'job-1', seekerId: 'user-1', status: 'Interviewing', appliedDate: '2024-07-21' },
-  { id: 'app-2', jobId: 'job-2', seekerId: 'user-4', status: 'Under Review', appliedDate: '2024-07-22' },
-  { id: 'app-3', jobId: 'job-1', seekerId: 'user-4', status: 'Rejected', appliedDate: '2024-07-19' },
+  { id: 'app1', jobId: 'job1', userId: 'user1', status: 'Interviewing', matchScore: 92 },
+  { id: 'app2', jobId: 'job1', userId: 'user4', status: 'Applied', matchScore: 85 },
+  { id: 'app3', jobId: 'job2', userId: 'user5', status: 'Offered', matchScore: 95 },
+  { id: 'app4', jobId: 'job3', userId: 'user1', status: 'Rejected', matchScore: 78 },
+  { id: 'app5', jobId: 'job1', userId: 'user6', status: 'Interviewing', matchScore: 88 },
 ];
 
-export const INTERVIEWS: Interview[] = [
-    { id: 'int-1', jobId: 'job-1', seekerId: 'user-1', date: '2024-08-05', time: '10:00 AM', type: 'Online', status: 'Scheduled' },
+export const SAVINGS_GOALS: SavingsGoal[] = [
+    { id: 'sg1', name: 'New Laptop', targetAmount: 800000, currentAmount: 550000 }
 ];
 
 export const COOPERATIVES: Cooperative[] = [
-  { id: 'coop-1', name: 'Turemerane Cooperative', description: 'A savings and credit cooperative for local entrepreneurs.', totalSavings: 15000000, totalLoans: 8500000, membersCount: 45 },
-];
-
-export const CONTRIBUTIONS: MemberContribution[] = [
-  { id: 'c-1', memberId: 'user-1', amount: 50000, date: '2024-07-01', type: 'Contribution' },
-  { id: 'c-2', memberId: 'user-1', amount: 50000, date: '2024-06-01', type: 'Contribution' },
-  { id: 'c-3', memberId: 'user-1', amount: 20000, date: '2024-05-15', type: 'Loan Repayment' },
+  { id: 'coop1', name: 'Agri-Tech Innovators', logoUrl: 'https://via.placeholder.com/150/92c950/ffffff?Text=Agri', description: 'A cooperative for technology enthusiasts in the agricultural sector.', members: USERS.filter(u => u.cooperativeId === 'coop1'), savings: 15000000 },
+  { id: 'coop2', name: 'Kigali Artisans United', logoUrl: 'https://via.placeholder.com/150/f9a8d4/ffffff?Text=Art', description: 'Empowering local artisans through shared resources and market access.', members: [], savings: 8500000 },
+  { id: 'coop3', name: 'Future Leaders Savings', logoUrl: 'https://via.placeholder.com/150/60a5fa/ffffff?Text=Future', description: 'A savings and credit cooperative for young professionals.', members: USERS.filter(u => u.cooperativeId === 'coop3'), savings: 25000000 },
 ];
 
 export const TRANSACTIONS: Transaction[] = [
-  { id: 't-4', type: 'Withdrawal', amount: -75000, date: '2024-06-10', description: 'Bank Transfer', status: 'Completed' },
-  { id: 't-3', type: 'Loan', amount: 500000, date: '2024-06-20', description: 'Small Business Loan', status: 'Completed' },
-  { id: 't-2', type: 'Payment', amount: -50000, date: '2024-07-01', description: 'Cooperative Contribution', status: 'Completed' },
-  { id: 't-1', type: 'Deposit', amount: 100000, date: '2024-07-15', description: 'Mobile Money Top-up', status: 'Completed' },
-];
-
-export const LEARNING_RESOURCES: LearningResource[] = [
-    { id: 'learn-1', title: 'Introduction to Financial Literacy', type: 'video', duration: '15 min', thumbnailUrl: 'https://picsum.photos/seed/learn1/300/170' },
-    { id: 'learn-2', title: 'How to Build a Winning CV', type: 'article', duration: '10 min read', thumbnailUrl: 'https://picsum.photos/seed/learn2/300/170' },
-    { id: 'learn-3', title: 'Entrepreneurship 101: Starting Your Business', type: 'guide', duration: '45 min', thumbnailUrl: 'https://picsum.photos/seed/learn3/300/170' },
-];
-
-export const BADGES: Badge[] = [
-    { id: 'badge-1', name: 'Early Bird', description: 'Completed your first saving.', icon: '☀️', unlocked: true },
-    { id: 'badge-2', name: 'Job Hunter', description: 'Applied for 5 jobs.', icon: '🎯', unlocked: true },
-    { id: 'badge-3', name: 'Avid Learner', description: 'Completed 3 learning modules.', icon: '🎓', unlocked: false },
-    { id: 'badge-4', name: 'Super Saver', description: 'Saved consistently for 3 months.', icon: '💰', unlocked: true },
-];
-
-export const NOTIFICATIONS: Notification[] = [
-    {id: 'n-1', message: 'Your interview for Frontend Developer is scheduled for tomorrow.', date: '2024-07-24', read: false},
-    {id: 'n-2', message: 'Your monthly cooperative contribution is due in 3 days.', date: '2024-07-23', read: false},
-    {id: 'n-3', message: 'A new job matching your skills has been posted.', date: '2024-07-22', read: true},
+    { id: 'txn1', description: 'Salary Deposit - TechSolutions', amount: 750000, date: '2024-07-30T10:00:00Z' },
+    { id: 'txn2', description: 'Cooperative Savings Contribution', amount: -50000, date: '2024-08-01T11:00:00Z' },
+    { id: 'txn3', description: 'Groceries', amount: -25000, date: '2024-08-02T15:00:00Z' },
+    { id: 'txn4', description: 'Freelance Project Payment', amount: 150000, date: '2024-08-05T09:00:00Z' },
+    { id: 'txn5', description: 'Rent', amount: -200000, date: '2024-08-05T12:00:00Z' },
 ];
 
 export const MESSAGES: Message[] = [
-    { id: 'msg-1', conversationId: 'conv-1', senderId: 'user-2', receiverId: 'user-1', text: 'Hi Aline, thanks for applying! We were impressed with your profile. Are you available for a quick chat tomorrow?', timestamp: '2024-07-22 14:30', read: false },
-    { id: 'msg-2', conversationId: 'conv-1', senderId: 'user-1', receiverId: 'user-2', text: 'Hi Jean Bosco, thank you! Yes, I am. How about 10:00 AM?', timestamp: '2024-07-22 14:35', read: true },
-    { id: 'msg-3', conversationId: 'conv-1', senderId: 'user-2', receiverId: 'user-1', text: 'Perfect. I will send you a calendar invite shortly.', timestamp: '2024-07-22 14:36', read: true },
-    { id: 'msg-4', conversationId: 'conv-2', senderId: 'user-2', receiverId: 'user-4', text: 'Hello David, we\'d like to move forward with an initial design review. Please let me know your availability.', timestamp: '2024-07-23 11:00', read: true },
+  { id: 'msg1', senderId: 'user2', receiverId: 'user1', text: 'Hi Aline, your profile looks great. Are you available for a quick chat about the Frontend role?', timestamp: '2024-08-05T14:00:00Z' },
+  { id: 'msg2', senderId: 'user1', receiverId: 'user2', text: 'Hi Jean-Claude, thank you! Yes, I am. When works for you?', timestamp: '2024-08-05T14:02:00Z' },
+  { id: 'msg3', senderId: 'user2', receiverId: 'user1', text: 'How about 3 PM today?', timestamp: '2024-08-05T14:03:00Z' },
+  { id: 'msg4', senderId: 'user1', receiverId: 'user2', text: 'Perfect, see you then!', timestamp: '2024-08-05T14:05:00Z' },
+  { id: 'msg5', senderId: 'user4', receiverId: 'user1', text: 'Hey, did you hear back from TechSolutions?', timestamp: '2024-08-06T09:00:00Z' },
+  { id: 'msg6', senderId: 'user1', receiverId: 'user4', text: 'Yes! I have an interview today. Wish me luck!', timestamp: '2024-08-06T09:01:00Z' },
+];
+
+export const NOTIFICATIONS: Notification[] = [
+    { id: 1, message: 'Your application for Frontend Developer was viewed.', date: '2 hours ago', read: false },
+    { id: 2, message: 'New message from Jean-Claude Dusabe.', date: '3 hours ago', read: false },
+    { id: 3, message: 'Welcome to KaziCoop! Complete your profile to get started.', date: '1 day ago', read: true },
+    { id: 4, message: 'Your savings goal "New Laptop" is 68% complete.', date: '2 days ago', read: true },
 ];

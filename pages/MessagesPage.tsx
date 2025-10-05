@@ -8,35 +8,52 @@ import { PaperAirplaneIcon, EllipsisVerticalIcon } from '@heroicons/react/24/sol
 const MessagesPage: React.FC = () => {
     const { user } = useAuth();
     
-    // Create a set of conversation partners
-    const conversationPartners = [...new Set(
-        MESSAGES
-            .filter(m => m.senderId === user?.id || m.receiverId === user?.id)
-            .map(m => m.senderId === user?.id ? m.receiverId : m.senderId)
-    )];
+    // FIX: Memoize conversation partners to avoid recalculation on every render and ensure type safety.
+    const conversationPartners = React.useMemo(() => {
+        if (!user) return [];
+        // FIX: Explicitly type the mapped array to ensure conversationPartners is string[]
+        const partnerIds: string[] = MESSAGES
+            .filter(m => m.senderId === user.id || m.receiverId === user.id)
+            .map(m => m.senderId === user.id ? m.receiverId : m.senderId);
+        return [...new Set(partnerIds)];
+    }, [user]);
 
-    const [selectedConversation, setSelectedConversation] = useState<string | null>(conversationPartners[0] || null);
+    const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
 
-    const getOtherUser = (otherUserId: string) => {
+    // FIX: Use useEffect to set the initial conversation to prevent issues with render timing.
+    useEffect(() => {
+        if (!selectedConversation && conversationPartners.length > 0) {
+            setSelectedConversation(conversationPartners[0]);
+        }
+    }, [conversationPartners, selectedConversation]);
+
+    const getOtherUser = (otherUserId: string | null): User | undefined => {
+        if (!otherUserId) return undefined;
         return USERS.find(u => u.id === otherUserId);
     };
 
     const getConversationMessages = () => {
+        if (!user || !selectedConversation) return [];
         return MESSAGES
             .filter(m => 
-                (m.senderId === user?.id && m.receiverId === selectedConversation) ||
-                (m.senderId === selectedConversation && m.receiverId === user?.id)
+                (m.senderId === user.id && m.receiverId === selectedConversation) ||
+                (m.senderId === selectedConversation && m.receiverId === user.id)
             )
             .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
     };
     
-    const getLastMessage = (otherUserId: string) => {
+    const getLastMessage = (otherUserId: string): Message | undefined => {
+        if (!user) return undefined;
         return MESSAGES
             .filter(m => 
-                (m.senderId === user?.id && m.receiverId === otherUserId) ||
-                (m.senderId === otherUserId && m.receiverId === user?.id)
+                (m.senderId === user.id && m.receiverId === otherUserId) ||
+                (m.senderId === otherUserId && m.receiverId === user.id)
             )
             .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0];
+    }
+
+    if (!user) {
+        return <div>Loading...</div>; // Should not happen in PrivateRoute but good for TS
     }
 
     return (

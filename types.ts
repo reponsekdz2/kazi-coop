@@ -1,10 +1,8 @@
-
-
+// FIX: Define all necessary types for the application.
 export enum UserRole {
-  SEEKER = 'Seeker',
+  SEEKER = 'Job Seeker',
   EMPLOYER = 'Employer',
-  COOP_ADMIN = 'Cooperative Admin',
-  APP_ADMIN = 'App Admin',
+  COOP_ADMIN = 'Co-op Admin',
 }
 
 export interface User {
@@ -13,13 +11,8 @@ export interface User {
   email: string;
   role: UserRole;
   avatarUrl: string;
-  profile: {
-    title?: string;
-    company?: string;
-    bio: string;
-    skills?: string[];
-    completeness?: number;
-  };
+  cooperativeId?: string;
+  cooperativeStatus?: 'Member' | 'Pending' | 'None';
 }
 
 export interface Job {
@@ -27,87 +20,54 @@ export interface Job {
   title: string;
   company: string;
   location: string;
-  description: string;
   type: 'Full-time' | 'Part-time' | 'Contract';
-  postedDate: string;
-  employerId: string;
+  description: string;
+  skills: string[];
+  salary: string;
 }
 
-export type ApplicationStatus = 'Applied' | 'Under Review' | 'Interviewing' | 'Offered' | 'Rejected';
-
 export interface Application {
-  id: string;
-  jobId: string;
-  seekerId: string;
-  status: ApplicationStatus;
-  appliedDate: string;
+    id: string;
+    jobId: string;
+    userId: string;
+    status: 'Applied' | 'Interviewing' | 'Offered' | 'Rejected';
+    matchScore: number;
+}
+
+export interface SavingsGoal {
+    id: string;
+    name: string;
+    targetAmount: number;
+    currentAmount: number;
 }
 
 export interface Cooperative {
-  id: string;
-  name: string;
-  description: string;
-  totalSavings: number;
-  totalLoans: number;
-  membersCount: number;
-}
-
-export interface MemberContribution {
-  id: string;
-  memberId: string;
-  amount: number;
-  date: string;
-  type: 'Contribution' | 'Loan Repayment' | 'Penalty';
+    id: string;
+    name: string;
+    logoUrl: string;
+    description: string;
+    members: User[];
+    savings: number;
 }
 
 export interface Transaction {
-  id: string;
-  type: 'Deposit' | 'Withdrawal' | 'Payment' | 'Loan';
-  amount: number;
-  date: string;
-  description: string;
-  status: 'Completed' | 'Pending' | 'Failed';
-}
-
-export interface LearningResource {
-  id: string;
-  title: string;
-  type: 'video' | 'article' | 'guide';
-  duration: string;
-  thumbnailUrl: string;
-}
-
-export interface Badge {
     id: string;
-    name: string;
     description: string;
-    icon: string;
-    unlocked: boolean;
-}
-
-export interface Notification {
-  id: string;
-  message: string;
-  date: string;
-  read: boolean;
-}
-
-export interface Interview {
-  id: string;
-  jobId: string;
-  seekerId: string;
-  date: string;
-  time: string;
-  type: 'Online' | 'In-Person';
-  status: 'Scheduled' | 'Completed' | 'Canceled';
+    amount: number; // positive for deposit, negative for withdrawal
+    date: string; // ISO string
 }
 
 export interface Message {
-  id: string;
-  conversationId: string;
-  senderId: string;
-  receiverId: string;
-  text: string;
-  timestamp: string;
-  read: boolean;
+    id: string;
+    senderId: string;
+    receiverId: string;
+    text: string;
+    timestamp: string; // ISO string
+}
+
+export interface Notification {
+    id: number;
+    message: string;
+    date: string;
+    read: boolean;
 }

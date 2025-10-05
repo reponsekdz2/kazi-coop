@@ -1,97 +1,90 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { UserRole } from '../../types';
-import { MESSAGES } from '../../constants';
-import {
+import { 
   ChartBarIcon,
   BriefcaseIcon,
+  ChatBubbleLeftRightIcon,
   UserGroupIcon,
-  CreditCardIcon,
+  WalletIcon,
   AcademicCapIcon,
   Cog6ToothIcon,
-  HomeIcon,
-  ChatBubbleLeftRightIcon,
-} from '@heroicons/react/24/solid';
+  ArrowRightOnRectangleIcon,
+  Squares2X2Icon,
+  TicketIcon
+} from '@heroicons/react/24/outline';
+
+const seekerLinks = [
+  { name: 'Dashboard', path: '/dashboard', icon: Squares2X2Icon },
+  { name: 'Jobs', path: '/jobs', icon: BriefcaseIcon },
+  { name: 'Messages', path: '/messages', icon: ChatBubbleLeftRightIcon },
+  { name: 'Interviews', path: '/interviews', icon: TicketIcon },
+  { name: 'Cooperatives', path: '/cooperatives', icon: UserGroupIcon },
+  { name: 'My Wallet', path: '/wallet', icon: WalletIcon },
+  { name: 'Learning', path: '/learning', icon: AcademicCapIcon },
+];
+
+const employerLinks = [
+    { name: 'Dashboard', path: '/dashboard', icon: Squares2X2Icon },
+    { name: 'Jobs', path: '/jobs', icon: BriefcaseIcon },
+    { name: 'Messages', path: '/messages', icon: ChatBubbleLeftRightIcon },
+    { name: 'Interviews', path: '/interviews', icon: TicketIcon },
+];
+
+const adminLinks = [
+    { name: 'Dashboard', path: '/dashboard', icon: Squares2X2Icon },
+    { name: 'Cooperatives', path: '/cooperatives', icon: UserGroupIcon },
+    { name: 'Analytics', path: '/analytics', icon: ChartBarIcon },
+];
 
 const Sidebar: React.FC = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
-  const unreadMessagesCount = MESSAGES.filter(m => m.receiverId === user?.id && !m.read).length;
-
-  const baseNav = [
-    { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-    { name: 'Profile', href: '/profile', icon: Cog6ToothIcon },
-  ];
-  
-  const messagesNav = { 
-    name: 'Messages', 
-    href: '/messages', 
-    icon: ChatBubbleLeftRightIcon,
-    badge: unreadMessagesCount > 0 ? unreadMessagesCount : null
-  };
-
-  const seekerNav = [
-    { name: 'Jobs', href: '/jobs', icon: BriefcaseIcon },
-    messagesNav,
-    { name: 'Cooperatives', href: '/cooperatives', icon: UserGroupIcon },
-    { name: 'Wallet', href: '/wallet', icon: CreditCardIcon },
-    { name: 'Learning', href: '/learning', icon: AcademicCapIcon },
-  ];
-
-  const employerNav = [
-    { name: 'Jobs', href: '/jobs', icon: BriefcaseIcon },
-    messagesNav,
-  ];
-  
-  const coopAdminNav = [
-    { name: 'Cooperatives', href: '/cooperatives', icon: UserGroupIcon },
-    { name: 'Analytics', href: '/analytics', icon: ChartBarIcon },
-  ];
-
-  let navLinks: (typeof baseNav[0] & { badge?: number | null })[] = baseNav;
-
-  if (user?.role === UserRole.SEEKER) {
-    navLinks = [...baseNav.slice(0, 1), ...seekerNav, ...baseNav.slice(1)];
-  } else if (user?.role === UserRole.EMPLOYER) {
-    navLinks = [...baseNav.slice(0, 1), ...employerNav, ...baseNav.slice(1)];
+  let navLinks = seekerLinks;
+  if (user?.role === UserRole.EMPLOYER) {
+    navLinks = employerLinks;
   } else if (user?.role === UserRole.COOP_ADMIN) {
-    navLinks = [...baseNav.slice(0, 1), ...coopAdminNav, ...baseNav.slice(1)];
+    navLinks = adminLinks;
   }
 
+  const activeLinkClass = "bg-primary text-white";
+  const inactiveLinkClass = "text-gray-600 hover:bg-blue-100 hover:text-primary";
+  
   return (
-    <aside className="w-64 bg-primary text-white flex flex-col">
-      <div className="h-20 flex items-center justify-center text-2xl font-bold">
-        KaziCoop
+    <aside className="w-64 bg-white flex-shrink-0 border-r flex flex-col">
+      <div className="h-16 flex items-center justify-center border-b">
+        <Link to="/dashboard" className="text-2xl font-bold text-primary">KaziCoop</Link>
       </div>
-      <nav className="flex-1 px-4 py-4">
-        <ul>
-          {navLinks.map((item) => (
-            <li key={item.name}>
-              <NavLink
-                to={item.href}
-                className={({ isActive }) =>
-                  `flex items-center justify-between px-4 py-3 my-1 rounded-md text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-secondary text-white'
-                      : 'text-blue-100 hover:bg-blue-700 hover:text-white'
-                  }`
-                }
-              >
-                <div className="flex items-center">
-                  <item.icon className="h-6 w-6 mr-3" />
-                  {item.name}
-                </div>
-                {item.badge && (
-                  <span className="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                    {item.badge}
-                  </span>
-                )}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
+      <nav className="flex-1 px-4 py-6 space-y-2">
+        {navLinks.map((link) => (
+          <NavLink
+            key={link.name}
+            to={link.path}
+            className={({ isActive }) =>
+              `flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors ${isActive ? activeLinkClass : inactiveLinkClass}`
+            }
+          >
+            <link.icon className="h-5 w-5 mr-3" />
+            {link.name}
+          </NavLink>
+        ))}
       </nav>
+      <div className="px-4 py-6 border-t">
+         <NavLink
+            to="/profile"
+            className={({ isActive }) =>
+              `flex items-center px-4 py-2 text-sm font-medium rounded-md mb-2 ${isActive ? activeLinkClass : inactiveLinkClass}`
+            }
+          >
+            <Cog6ToothIcon className="h-5 w-5 mr-3" />
+            My Profile
+          </NavLink>
+        <button onClick={logout} className={`w-full flex items-center px-4 py-2 text-sm font-medium rounded-md ${inactiveLinkClass}`}>
+          <ArrowRightOnRectangleIcon className="h-5 w-5 mr-3" />
+          Logout
+        </button>
+      </div>
     </aside>
   );
 };
