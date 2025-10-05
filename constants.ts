@@ -1,4 +1,3 @@
-
 import { User, UserRole, Job, Application, Interview, Cooperative, Transaction, LoanApplication, SavingsGoal, Budget, Message, LearningModule, ActivityLog } from './types';
 
 // Mock Users
@@ -18,6 +17,16 @@ export const USERS: User[] = [
     email: 'jean@example.com',
     role: UserRole.EMPLOYER,
     avatarUrl: 'https://randomuser.me/api/portraits/men/1.jpg',
+    companyDetails: {
+        balance: 25000000,
+        totalPayouts: 15750000,
+        cooperativeInvestments: 3000000,
+        operationalBudget: [
+            { category: 'Payouts', amount: 16000000 },
+            { category: 'Marketing', amount: 4000000 },
+            { category: 'Operations', amount: 5000000 },
+        ]
+    }
   },
    {
     id: 'user-3',
@@ -47,6 +56,7 @@ export const JOBS: Job[] = [
     description: 'We are looking for a skilled Frontend Developer to join our team. You will be responsible for building the client-side of our web applications.',
     type: 'Full-time',
     requirements: ['2+ years of experience with React', 'Strong proficiency in TypeScript', 'Experience with state management libraries like Redux or Zustand'],
+    employerId: 'user-2',
   },
   {
     id: 'job-2',
@@ -56,6 +66,7 @@ export const JOBS: Job[] = [
     description: 'Join our creative team to design intuitive and engaging user interfaces for our mobile and web products.',
     type: 'Contract',
     requirements: ['Portfolio of design projects', 'Proficiency in Figma, Sketch, or Adobe XD', 'Understanding of user-centered design principles'],
+    employerId: 'user-2',
   },
   {
     id: 'job-3',
@@ -65,6 +76,7 @@ export const JOBS: Job[] = [
     description: 'We need an organized and experienced Project Manager to lead our software development projects from conception to launch.',
     type: 'Full-time',
     requirements: ['PMP certification is a plus', 'Experience with Agile methodologies', 'Excellent communication skills'],
+    employerId: 'user-2',
   },
    {
     id: 'job-4',
@@ -74,6 +86,7 @@ export const JOBS: Job[] = [
     description: 'Analyze large datasets to identify trends, develop charts and reports, and provide actionable insights for our clients.',
     type: 'Part-time',
     requirements: ['Proficiency in SQL and Python (Pandas)', 'Experience with data visualization tools like Tableau or Power BI', 'Strong analytical skills'],
+    employerId: 'another-employer-id',
   },
 ];
 
@@ -91,8 +104,8 @@ export const INTERVIEWS: Interview[] = [
 
 // Mock Cooperatives
 export const COOPERATIVES: Cooperative[] = [
-  { id: 'coop-1', name: 'TechSolutions Innovators Circle', description: 'A savings group for employees of TechSolutions Ltd. focused on technology and innovation investments.', members: ['user-1', 'user-2'], totalSavings: 12500000, totalLoans: 3000000, contributionAmount: 50000, contributionFrequency: 'Monthly' },
-  { id: 'coop-2', name: 'Kigali Freelancers Fund', description: 'A cooperative for freelance designers, developers, and writers in Kigali to support each other financially.', members: ['user-3'], totalSavings: 4800000, totalLoans: 1200000, contributionAmount: 15000, contributionFrequency: 'Weekly' },
+  { id: 'coop-1', name: 'TechSolutions Innovators Circle', description: 'A savings group for employees of TechSolutions Ltd. focused on technology and innovation investments.', creatorId: 'user-2', members: ['user-1', 'user-2'], totalSavings: 12500000, totalLoans: 3000000, contributionAmount: 50000, contributionFrequency: 'Monthly' },
+  { id: 'coop-2', name: 'Kigali Freelancers Fund', description: 'A cooperative for freelance designers, developers, and writers in Kigali to support each other financially.', creatorId: 'another-employer-id', members: ['user-3'], totalSavings: 4800000, totalLoans: 1200000, contributionAmount: 15000, contributionFrequency: 'Weekly' },
 ];
 
 // Mock Transactions
@@ -118,6 +131,7 @@ export const SAVINGS_GOALS: SavingsGoal[] = [
 export const BUDGETS: Budget[] = [
   { id: 'b-1', userId: 'user-1', category: 'Groceries', budgetAmount: 100000 },
   { id: 'b-2', userId: 'user-1', category: 'Transport', budgetAmount: 40000 },
+  { id: 'b-3', userId: 'user-1', category: 'Entertainment', budgetAmount: 50000 },
 ];
 
 // Mock Messages

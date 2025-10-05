@@ -1,7 +1,7 @@
-
-import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { Job } from '../types';
+import React, { createContext, useState, useContext, ReactNode, useMemo } from 'react';
+import { Job, UserRole } from '../types';
 import { JOBS } from '../constants';
+import { useAuth } from './AuthContext';
 
 interface JobContextType {
   jobs: Job[];
@@ -10,7 +10,14 @@ interface JobContextType {
 const JobContext = createContext<JobContextType | undefined>(undefined);
 
 export const JobProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [jobs] = useState<Job[]>(JOBS);
+  const { user } = useAuth();
+
+  const jobs = useMemo(() => {
+      if (user?.role === UserRole.EMPLOYER) {
+          return JOBS.filter(job => job.employerId === user.id);
+      }
+      return JOBS;
+  }, [user]);
 
   return (
     <JobContext.Provider value={{ jobs }}>

@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, ReactNode, useMemo } from 'react';
 import { AuthProvider } from './AuthContext';
 import { CooperativeProvider } from './CooperativeContext';
@@ -27,9 +26,11 @@ const translations: Record<Language, Record<string, any>> = {
         messages: 'Messages',
         myProfile: 'My Profile',
         helpCenter: 'Help Center',
-        jobPostings: 'Job Postings',
+        jobManagement: 'Job Management',
         talentPool: 'Talent Pool',
         platformAnalytics: 'Platform Analytics',
+        walletManagement: 'Wallet Management',
+        cooperativeManagement: 'Cooperative Management',
     },
     header: {
         profile: 'My Profile',
@@ -76,6 +77,7 @@ const translations: Record<Language, Record<string, any>> = {
     },
     wallet: {
         title: 'My Wallet',
+        employerTitle: 'Company Wallet Management',
         sendMoney: 'Send Money',
         addMoney: 'Add Money',
         tabs: {
@@ -142,7 +144,11 @@ const translations: Record<Language, Record<string, any>> = {
             overdue: 'Overdue',
             dueIn: 'Due in',
             days: 'days'
-        }
+        },
+        companyBalance: 'Company Balance',
+        totalPayouts: 'Total Payouts (YTD)',
+        coopInvestments: 'Co-op Investments',
+        operationalBudget: 'Operational Budget Allocation'
     },
     profile: {
         title: 'My Profile',
@@ -180,6 +186,22 @@ const translations: Record<Language, Record<string, any>> = {
             q4: 'How do I add money to my wallet?',
             a4: 'Click the "Add Money" button on the Wallet page and follow the instructions to deposit funds via Mobile Money or bank transfer.',
         }
+    },
+    cooperatives: {
+        pageTitle: 'Community Cooperatives (Ikimina)',
+        pageSubtitle: 'Join a savings group to build your financial future with the community. Save, borrow, and grow together.',
+        manageTitle: 'Cooperative Management',
+        manageSubtitle: 'Manage your existing cooperatives or create a new one to empower your community.',
+        create: 'Create Cooperative',
+        manageBtn: 'Manage',
+        viewDetails: 'View Details',
+        requestJoin: 'Request to Join',
+        noCooperatives: 'You have not created any cooperatives yet.',
+        createModalTitle: 'Create New Cooperative',
+        name: 'Cooperative Name',
+        description: 'Description',
+        contributionAmount: 'Contribution Amount (RWF)',
+        contributionFrequency: 'Contribution Frequency',
     },
     common: {
         cancel: 'Cancel',

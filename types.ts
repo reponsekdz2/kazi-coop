@@ -1,4 +1,3 @@
-
 export enum UserRole {
   SEEKER = 'Job Seeker',
   EMPLOYER = 'Employer',
@@ -13,6 +12,12 @@ export interface User {
   avatarUrl: string;
   skills?: string[];
   careerProgress?: number; // A number from 0-5
+  companyDetails?: {
+    balance: number;
+    totalPayouts: number;
+    cooperativeInvestments: number;
+    operationalBudget: { category: string; amount: number }[];
+  }
 }
 
 export interface Job {
@@ -23,6 +28,7 @@ export interface Job {
   description: string;
   type: 'Full-time' | 'Part-time' | 'Contract';
   requirements: string[];
+  employerId: string;
 }
 
 export interface Application {
@@ -46,6 +52,7 @@ export interface Cooperative {
   id: string;
   name: string;
   description: string;
+  creatorId: string;
   members: string[]; // array of user IDs
   totalSavings: number;
   totalLoans: number;
@@ -61,7 +68,11 @@ export type TransactionCategory =
   | 'Entertainment'
   | 'Loan Repayment'
   | 'Savings Contribution'
-  | 'Business';
+  | 'Business'
+  | 'Payouts'
+  | 'Marketing'
+  | 'Operations'
+  | 'Investments';
 
 export interface Transaction {
   id: string;

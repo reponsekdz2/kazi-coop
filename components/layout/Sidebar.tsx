@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
@@ -33,7 +32,9 @@ const Sidebar: React.FC = () => {
 
   const employerLinks = [
     { name: t('sidebar.dashboard'), to: '/dashboard', icon: ChartPieIcon },
-    { name: t('sidebar.jobPostings'), to: '/jobs', icon: BriefcaseIcon },
+    { name: t('sidebar.jobManagement'), to: '/jobs', icon: BriefcaseIcon },
+    { name: t('sidebar.cooperativeManagement'), to: '/cooperatives', icon: UserGroupIcon },
+    { name: t('sidebar.walletManagement'), to: '/wallet', icon: WalletIcon },
     { name: t('sidebar.talentPool'), to: '/user-analytics', icon: UsersIcon },
     { name: t('sidebar.platformAnalytics'), to: '/analytics', icon: BuildingOffice2Icon },
     { name: t('sidebar.messages'), to: '/messages', icon: ChatBubbleLeftRightIcon },

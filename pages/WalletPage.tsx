@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
@@ -6,16 +5,18 @@ import { useAppContext } from '../contexts/AppContext';
 import { useTransactions } from '../contexts/TransactionContext';
 import { useSavingsGoals } from '../contexts/SavingsGoalContext';
 import { useLoan } from '../contexts/LoanContext';
-import { useBudget } from '../contexts/BudgetContext';
+import { useBudget, BudgetWithSpending } from '../contexts/BudgetContext';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/24/solid';
+import { ArrowDownIcon, ArrowUpIcon, BanknotesIcon, BuildingStorefrontIcon, CurrencyDollarIcon } from '@heroicons/react/24/solid';
+import { useAuth } from '../contexts/AuthContext';
+import { UserRole } from '../types';
+import RingProgress from '../components/ui/RingProgress';
 
 type WalletTab = 'overview' | 'savings' | 'loans' | 'budgeting';
 
 const COLORS = ['#005A9C', '#5E96C3', '#10B981', '#F59E0B', '#EF4444', '#6366F1'];
 
-
-const WalletPage: React.FC = () => {
+const SeekerWallet: React.FC = () => {
     const { t } = useAppContext();
     const [activeTab, setActiveTab] = useState<WalletTab>('overview');
     const { transactions } = useTransactions();
@@ -109,7 +110,7 @@ const WalletPage: React.FC = () => {
             case 'loans':
                  return <Card title={t('wallet.loans.title')}>Your loans here...</Card>;
             case 'budgeting':
-                 return <Card title={t('wallet.budgets')}>Your budgets here...</Card>;
+                 return <BudgetingTab budgets={budgetsWithSpending} />;
             default:
                 return null;
         }
@@ -153,6 +154,108 @@ const WalletPage: React.FC = () => {
             {renderTabContent()}
         </div>
     );
+}
+
+const BudgetingTab: React.FC<{ budgets: BudgetWithSpending[] }> = ({ budgets }) => {
+    const { t } = useAppContext();
+    return (
+        <Card title={t('wallet.budgets')}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {budgets.map(budget => (
+                    <Card key={budget.id} className="text-center">
+                        <h4 className="font-bold text-lg text-dark dark:text-light">{budget.category}</h4>
+                        <RingProgress
+                            percentage={budget.progress}
+                            size={120}
+                            strokeWidth={10}
+                            className="my-4 mx-auto"
+                            progressColorClassName={budget.remainingAmount < 0 ? 'text-red-500' : 'text-primary'}
+                        />
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {budget.remainingAmount >= 0 
+                                ? `RWF ${budget.remainingAmount.toLocaleString()} ${t('wallet.budgeting.remainingLabel')}`
+                                : `RWF ${Math.abs(budget.remainingAmount).toLocaleString()} ${t('wallet.budgeting.overbudgetLabel')}`
+                            }
+                        </p>
+                        <p className="text-xs text-gray-400">
+                           Spent RWF {budget.spentAmount.toLocaleString()} of RWF {budget.budgetAmount.toLocaleString()}
+                        </p>
+                    </Card>
+                ))}
+                 <div className="flex items-center justify-center min-h-[200px] border-2 border-dashed rounded-lg">
+                    <Button variant="secondary">{t('wallet.budgeting.createNewBudget')}</Button>
+                </div>
+            </div>
+        </Card>
+    );
 };
+
+
+const EmployerWallet: React.FC = () => {
+    const { user } = useAuth();
+    const { t } = useAppContext();
+    
+    const companyDetails = user?.companyDetails;
+    if (!companyDetails) return null;
+
+    const budgetData = companyDetails.operationalBudget.map(b => ({ name: b.category, value: b.amount }));
+
+    return (
+        <div>
+            <h1 className="text-3xl font-bold text-dark dark:text-light mb-6">{t('wallet.employerTitle')}</h1>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <Card>
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-blue-100 rounded-full">
+                            <BanknotesIcon className="h-6 w-6 text-primary" />
+                        </div>
+                        <div>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{t('wallet.companyBalance')}</p>
+                            <p className="text-2xl font-bold text-dark dark:text-light">RWF {companyDetails.balance.toLocaleString()}</p>
+                        </div>
+                    </div>
+                </Card>
+                 <Card>
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-green-100 rounded-full">
+                            <CurrencyDollarIcon className="h-6 w-6 text-green-600" />
+                        </div>
+                        <div>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{t('wallet.totalPayouts')}</p>
+                            <p className="text-2xl font-bold text-dark dark:text-light">RWF {companyDetails.totalPayouts.toLocaleString()}</p>
+                        </div>
+                    </div>
+                </Card>
+                 <Card>
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-indigo-100 rounded-full">
+                            <BuildingStorefrontIcon className="h-6 w-6 text-indigo-600" />
+                        </div>
+                        <div>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{t('wallet.coopInvestments')}</p>
+                            <p className="text-2xl font-bold text-dark dark:text-light">RWF {companyDetails.cooperativeInvestments.toLocaleString()}</p>
+                        </div>
+                    </div>
+                </Card>
+            </div>
+            <Card title={t('wallet.operationalBudget')}>
+                <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                        <Pie data={budgetData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={70} outerRadius={100} paddingAngle={5} label>
+                             {budgetData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                        </Pie>
+                         <Tooltip formatter={(value: number) => `RWF ${value.toLocaleString()}`} />
+                        <Legend />
+                    </PieChart>
+                </ResponsiveContainer>
+            </Card>
+        </div>
+    )
+}
+
+const WalletPage: React.FC = () => {
+    const { user } = useAuth();
+    return user?.role === UserRole.EMPLOYER ? <EmployerWallet /> : <SeekerWallet />;
+}
 
 export default WalletPage;
