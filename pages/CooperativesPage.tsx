@@ -32,10 +32,15 @@ const CooperativesPage: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {cooperatives.map(coop => (
-                    <Card key={coop.id} className="!p-0 flex flex-col overflow-hidden">
-                        <img src={coop.coverImageUrl} alt={coop.name} className="h-48 w-full object-cover"/>
+                    <div key={coop.id} className="bg-white dark:bg-dark rounded-lg shadow-md overflow-hidden group transform hover:-translate-y-1 transition-transform duration-300">
+                        <div className="relative h-48 overflow-hidden">
+                            <img src={coop.coverImageUrl} alt={coop.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                            <div className="absolute bottom-4 left-4">
+                                <h2 className="text-xl font-bold text-white drop-shadow-lg">{coop.name}</h2>
+                            </div>
+                        </div>
                         <div className="p-6 flex-grow flex flex-col">
-                            <h2 className="text-xl font-bold text-dark dark:text-light">{coop.name}</h2>
                             <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 flex-grow">{coop.description}</p>
                             
                             <div className="my-4">
@@ -43,14 +48,14 @@ const CooperativesPage: React.FC = () => {
                                     <span className="font-medium text-dark dark:text-light">{t('cooperatives.goal')}</span>
                                     <span className="text-gray-500 dark:text-gray-400">{coop.goalProgress}%</span>
                                 </div>
-                                <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                    <div className="bg-accent h-2.5 rounded-full" style={{ width: `${coop.goalProgress}%` }}></div>
+                                <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+                                    <div className="bg-accent h-2 rounded-full" style={{ width: `${coop.goalProgress}%` }}></div>
                                 </div>
                             </div>
                             
-                            <div className="flex justify-between items-center mt-4">
+                            <div className="flex justify-between items-center mt-4 pt-4 border-t dark:border-gray-700">
                                 <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                                    <UserGroupIcon className="h-5 w-5 mr-2"/>
+                                    <UserGroupIcon className="h-5 w-5 mr-2 text-primary"/>
                                     {coop.memberIds.length} {t('cooperatives.members')}
                                 </div>
                                 <Button 
@@ -61,7 +66,7 @@ const CooperativesPage: React.FC = () => {
                                 </Button>
                             </div>
                         </div>
-                    </Card>
+                    </div>
                 ))}
             </div>
 

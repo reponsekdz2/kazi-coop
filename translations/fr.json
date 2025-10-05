@@ -153,7 +153,7 @@
     "spentThisMonth": "Dépensé ce mois-ci",
     "totalSavings": "Épargne totale",
     "activeLoans": "Prêts actifs",
-    "recentTransactions": "Transactions récentes",
+    "recentTransactions": "Transactions recentes",
     "savingsGoals": "Objectifs d'épargne",
     "budgets": "Mes budgets",
     "spendingBreakdown": "Répartition des dépenses",
@@ -182,6 +182,8 @@
       "repaymentHistory": "Historique des remboursements",
       "noRepayments": "Aucun remboursement effectué pour le moment.",
       "dueDate": "Date d'échéance",
+      "date": "Date",
+      "amount": "Montant",
       "status": {
         "Pending": "En attente",
         "Approved": "Approuvé",
@@ -195,7 +197,9 @@
       "category": "Catégorie",
       "budgetAmount": "Montant du budget (RWF)",
       "remaining": "{amount} Restant",
-      "overbudget": "{amount} de Dépassement"
+      "overbudget": "{amount} de Dépassement",
+      "remainingLabel": "Restant",
+      "overbudgetLabel": "Dépassement"
     },
     "categories": {
       "income": "Revenu",

@@ -182,6 +182,8 @@
       "repaymentHistory": "Amateka yo kwishyura",
       "noRepayments": "Nta kwishyura kurakorwa.",
       "dueDate": "Itariki ntarengwa",
+      "date": "Itariki",
+      "amount": "Umubare",
       "status": {
         "Pending": "Tegereje",
         "Approved": "Byemejwe",
@@ -195,7 +197,9 @@
       "category": "Icyiciro",
       "budgetAmount": "Umubare w'ingengo (RWF)",
       "remaining": "{amount} Hasigaye",
-      "overbudget": "{amount} Byarenze"
+      "overbudget": "{amount} Byarenze",
+      "remainingLabel": "Hasigaye",
+      "overbudgetLabel": "Byarenze"
     },
     "categories": {
       "income": "Inyungu",

@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState, Fragment, useMemo } from 'react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { useTransactions } from '../contexts/TransactionContext';
@@ -8,7 +8,7 @@ import { useLoan } from '../contexts/LoanContext';
 import { LoanApplication, TransactionCategory } from '../types';
 import { ArrowDownLeftIcon, ArrowUpRightIcon, BanknotesIcon, PlusIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import FinancialMetricCard from '../components/ui/FinancialMetricCard';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useAppContext } from '../contexts/AppContext';
 import { Tab } from '@headlessui/react';
 import Modal from '../components/ui/Modal';
@@ -69,7 +69,7 @@ const WalletPage: React.FC = () => {
 // Tabs Components
 
 const OverviewTab: React.FC = () => {
-    const { t } = useAppContext();
+    const { t, theme } = useAppContext();
     const { transactions } = useTransactions();
     const { goals } = useSavingsGoals();
     const { applications: loans } = useLoan();
@@ -79,6 +79,19 @@ const OverviewTab: React.FC = () => {
     const totalExpenses = transactions.filter(t => t.amount < 0).reduce((acc, t) => acc + t.amount, 0);
     const totalSavings = goals.reduce((acc, g) => acc + g.currentAmount, 0);
     
+    const spendingData = useMemo(() => {
+        const spendingByCategory = transactions
+            .filter(t => t.amount < 0)
+            .reduce((acc, t) => {
+                acc[t.category] = (acc[t.category] || 0) + Math.abs(t.amount);
+                return acc;
+            }, {} as Record<TransactionCategory, number>);
+
+        return Object.entries(spendingByCategory).map(([name, value]) => ({ name, value }));
+    }, [transactions]);
+    
+    const COLORS = ['#005A9C', '#5E96C3', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
+
     return (
         <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -87,25 +100,43 @@ const OverviewTab: React.FC = () => {
                 <FinancialMetricCard title={t('wallet.totalSavings')} value={`RWF ${totalSavings.toLocaleString()}`} change="" isPositive={true} icon={ArrowDownLeftIcon}/>
                 <FinancialMetricCard title={t('wallet.activeLoans')} value={`RWF ${loans.filter(l=>l.status === 'Approved').reduce((s, l) => s + l.remainingAmount, 0).toLocaleString()}`} change="" isPositive={false} icon={ArrowPathIcon}/>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                <div className="lg:col-span-3">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
                     <UpcomingPayments />
                 </div>
-                <div className="lg:col-span-2">
-                    <Card title={t('wallet.recentTransactions')}>
-                        <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
-                            {transactions.slice(0, 5).map(tx => (
-                                <div key={tx.id} className="flex justify-between items-center">
-                                    <div>
-                                        <p className="font-semibold text-dark dark:text-light">{tx.description}</p>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">{new Date(tx.date).toLocaleDateString()}</p>
-                                    </div>
-                                    <p className={`font-bold ${tx.amount > 0 ? 'text-green-500' : 'text-dark dark:text-light'}`}>
-                                        {tx.amount > 0 ? '+' : ''} RWF {tx.amount.toLocaleString()}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
+                <div className="lg:col-span-1">
+                    <Card title={t('wallet.spendingBreakdown')}>
+                        <ResponsiveContainer width="100%" height={300}>
+                            <PieChart>
+                                <Pie
+                                    data={spendingData}
+                                    cx="50%"
+                                    cy="50%"
+                                    innerRadius={60}
+                                    outerRadius={80}
+                                    fill="#8884d8"
+                                    paddingAngle={5}
+                                    dataKey="value"
+                                    nameKey="name"
+                                >
+                                    {spendingData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip
+                                    // Fix: The 'name' argument's type can include number, so coerce to string before calling .toLowerCase().
+                                    formatter={(value: number, name) => [ `RWF ${value.toLocaleString()}`, t(`wallet.categories.${String(name).toLowerCase().replace(' ', '')}`) ]}
+                                    contentStyle={{ 
+                                      backgroundColor: theme === 'dark' ? '#2D3748' : '#FFFFFF', 
+                                      border: `1px solid ${theme === 'dark' ? '#4A5568' : '#E5E7EB'}` 
+                                    }}
+                                />
+                                <Legend 
+                                  // FIX: The `value` from the formatter can be a number. Coerce to string before calling .toLowerCase().
+                                  formatter={(value) => <span className="text-gray-600 dark:text-gray-300">{t(`wallet.categories.${String(value).toLowerCase().replace(' ', '')}`)}</span>}
+                                />
+                            </PieChart>
+                        </ResponsiveContainer>
                     </Card>
                 </div>
             </div>
@@ -123,37 +154,24 @@ const SavingsGoalsTab: React.FC = () => {
                     const progress = (goal.currentAmount / goal.targetAmount) * 100;
                     return (
                          <div key={goal.id}>
-                            <div className="flex justify-between mb-2 text-sm">
+                            <div className="flex justify-between mb-1 text-sm">
                                 <span className="font-medium text-dark dark:text-light">{goal.name}</span>
-                                <span className="text-gray-500 dark:text-gray-400">
-                                    RWF {goal.currentAmount.toLocaleString()} / RWF {goal.targetAmount.toLocaleString()}
-                                </span>
+                                <span className="font-semibold text-primary">{Math.round(progress)}%</span>
                             </div>
-                            <div className="w-full bg-gray-200 rounded-full h-4 dark:bg-gray-700">
-                                <div 
-                                  className="bg-accent h-4 rounded-full flex items-center justify-center text-white text-xs font-bold" 
-                                  style={{ width: `${progress}%` }}
-                                >
-                                    {Math.round(progress)}%
-                                </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                                <div
+                                    className="bg-accent h-2.5 rounded-full transition-all duration-500 ease-out"
+                                    style={{ width: `${progress}%` }}
+                                ></div>
+                            </div>
+                            <div className="text-right text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                RWF {goal.currentAmount.toLocaleString()} / {goal.targetAmount.toLocaleString()}
                             </div>
                         </div>
                     )
                 })}
             </div>
         </Card>
-    );
-};
-
-const BudgetProgressBar: React.FC<{ progress: number; isOverBudget: boolean }> = ({ progress, isOverBudget }) => {
-    const displayProgress = Math.min(progress, 100);
-    return (
-        <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-            <div 
-                className={`h-2.5 rounded-full ${isOverBudget ? 'bg-red-500' : 'bg-primary'}`} 
-                style={{ width: `${displayProgress}%` }}
-            ></div>
-        </div>
     );
 };
 
@@ -172,24 +190,31 @@ const BudgetingTab: React.FC = () => {
                     </Button>
                 </div>
             } className="lg:col-span-1">
-                 <div className="space-y-6">
+                 <div className="space-y-4">
                     {budgetsWithSpending.map(budget => {
                        const isOverBudget = budget.spentAmount > budget.budgetAmount;
                        return (
-                           <div key={budget.id}>
-                               <div className="flex justify-between mb-1">
-                                   <p className="font-bold text-dark dark:text-light text-sm">{t(`wallet.categories.${budget.category.toLowerCase().replace(' ', '')}`)}</p>
-                                   <p className="text-sm text-gray-500 dark:text-gray-400">
+                           <div key={budget.id} className="flex items-center gap-4 p-3 bg-light dark:bg-gray-700/50 rounded-lg">
+                               <RingProgress
+                                   percentage={budget.progress}
+                                   size={60}
+                                   strokeWidth={6}
+                                   progressColorClassName={isOverBudget ? 'text-red-500' : 'text-primary'}
+                               />
+                               <div className="flex-grow">
+                                   <p className="font-bold text-dark dark:text-light">{t(`wallet.categories.${budget.category.toLowerCase().replace(' ', '')}`)}</p>
+                                   <p className="text-xs text-gray-500 dark:text-gray-400">
                                        <span className="font-semibold text-dark dark:text-light">RWF {budget.spentAmount.toLocaleString()}</span> / {budget.budgetAmount.toLocaleString()}
                                    </p>
                                </div>
-                               <BudgetProgressBar progress={budget.progress} isOverBudget={isOverBudget} />
-                               <p className={`mt-1 text-right text-xs font-bold ${isOverBudget ? 'text-red-500' : 'text-green-600'}`}>
-                                   {isOverBudget
-                                       ? t('wallet.budgeting.overbudget').replace('{amount}', `RWF ${Math.abs(budget.remainingAmount).toLocaleString()}`)
-                                       : t('wallet.budgeting.remaining').replace('{amount}', `RWF ${budget.remainingAmount.toLocaleString()}`)
-                                   }
-                               </p>
+                               <div className="text-right flex-shrink-0">
+                                   <p className={`font-bold text-lg ${isOverBudget ? 'text-red-500' : 'text-dark dark:text-light'}`}>
+                                       RWF {Math.abs(budget.remainingAmount).toLocaleString()}
+                                   </p>
+                                   <p className={`text-xs font-medium ${isOverBudget ? 'text-red-500' : 'text-gray-500 dark:text-gray-400'}`}>
+                                       {isOverBudget ? t('wallet.budgeting.overbudgetLabel') : t('wallet.budgeting.remainingLabel')}
+                                   </p>
+                               </div>
                            </div>
                        )
                     })}
@@ -305,13 +330,25 @@ const LoanDetailsModal: React.FC<LoanDetailsModalProps> = ({ isOpen, onClose, lo
                         {/* Repayment History */}
                         <div>
                             <h4 className="font-semibold text-dark dark:text-light mb-2">{t('wallet.loans.repaymentHistory')}</h4>
-                            <div className="space-y-2 max-h-[150px] overflow-y-auto pr-2">
-                                {loan.repayments.length > 0 ? loan.repayments.map((p, i) => (
-                                    <div key={i} className="flex justify-between text-sm bg-light dark:bg-gray-700 p-2 rounded">
-                                        <span>{new Date(p.date).toLocaleString()}</span>
-                                        <span className="font-semibold text-green-600 dark:text-green-400">RWF {p.amount.toLocaleString()}</span>
+                            <div className="max-h-[150px] overflow-y-auto pr-2">
+                                {loan.repayments.length > 0 ? (
+                                    <div className="text-sm">
+                                        <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 font-bold mb-1 px-2">
+                                            <span>{t('wallet.loans.date')}</span>
+                                            <span>{t('wallet.loans.amount')}</span>
+                                        </div>
+                                        <div className="space-y-1">
+                                            {loan.repayments.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((p, i) => (
+                                                <div key={i} className="flex justify-between bg-light dark:bg-gray-700 p-2 rounded">
+                                                    <span>{new Date(p.date).toLocaleDateString()}</span>
+                                                    <span className="font-semibold text-green-600 dark:text-green-400">RWF {p.amount.toLocaleString()}</span>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
-                                )) : <p className="text-sm text-gray-500">{t('wallet.loans.noRepayments')}</p>}
+                                ) : (
+                                    <p className="text-sm text-gray-500">{t('wallet.loans.noRepayments')}</p>
+                                )}
                             </div>
                         </div>
                     </div>
