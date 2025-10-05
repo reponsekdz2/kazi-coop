@@ -6,7 +6,10 @@ import { useToast } from './ToastContext';
 
 interface CooperativeContextType {
   cooperatives: Cooperative[];
-  createCooperative: (details: Omit<Cooperative, 'id' | 'creatorId' | 'members' | 'totalSavings' | 'totalLoans'>) => void;
+  createCooperative: (details: Omit<Cooperative, 'id' | 'creatorId' | 'members' | 'totalSavings' | 'totalLoans' | 'joinRequests'>) => void;
+  requestToJoin: (cooperativeId: string) => void;
+  approveJoinRequest: (cooperativeId: string, userId: string) => void;
+  denyJoinRequest: (cooperativeId: string, userId: string) => void;
 }
 
 const CooperativeContext = createContext<CooperativeContextType | undefined>(undefined);
@@ -23,7 +26,7 @@ export const CooperativeProvider: React.FC<{ children: ReactNode }> = ({ childre
       return allCooperatives;
   }, [user, allCooperatives]);
   
-  const createCooperative = (details: Omit<Cooperative, 'id' | 'creatorId' | 'members' | 'totalSavings' | 'totalLoans'>) => {
+  const createCooperative = (details: Omit<Cooperative, 'id' | 'creatorId' | 'members' | 'totalSavings' | 'totalLoans' | 'joinRequests'>) => {
       if (!user || user.role !== UserRole.EMPLOYER) {
           addToast("Only employers can create cooperatives.", "error");
           return;
@@ -32,6 +35,7 @@ export const CooperativeProvider: React.FC<{ children: ReactNode }> = ({ childre
           id: `coop-${new Date().getTime()}`,
           creatorId: user.id,
           members: [user.id],
+          joinRequests: [],
           totalSavings: 0,
           totalLoans: 0,
           ...details,
@@ -39,9 +43,52 @@ export const CooperativeProvider: React.FC<{ children: ReactNode }> = ({ childre
       setAllCooperatives(prev => [...prev, newCooperative]);
       addToast("Cooperative created successfully!", "success");
   };
+  
+  const requestToJoin = (cooperativeId: string) => {
+    if (!user) return;
+    setAllCooperatives(prev => prev.map(coop => {
+      if (coop.id === cooperativeId) {
+        if (coop.joinRequests.includes(user.id) || coop.members.includes(user.id)) {
+          addToast("You have already sent a request or are a member.", "info");
+          return coop;
+        }
+        addToast("Your request to join has been sent.", "success");
+        return { ...coop, joinRequests: [...coop.joinRequests, user.id] };
+      }
+      return coop;
+    }));
+  };
+  
+  const approveJoinRequest = (cooperativeId: string, userId: string) => {
+    setAllCooperatives(prev => prev.map(coop => {
+      if (coop.id === cooperativeId && coop.creatorId === user?.id) {
+        addToast("Member approved successfully.", "success");
+        return {
+          ...coop,
+          members: [...coop.members, userId],
+          joinRequests: coop.joinRequests.filter(id => id !== userId),
+        };
+      }
+      return coop;
+    }));
+  };
+
+  const denyJoinRequest = (cooperativeId: string, userId: string) => {
+    setAllCooperatives(prev => prev.map(coop => {
+      if (coop.id === cooperativeId && coop.creatorId === user?.id) {
+        addToast("Member request denied.", "info");
+        return {
+          ...coop,
+          joinRequests: coop.joinRequests.filter(id => id !== userId),
+        };
+      }
+      return coop;
+    }));
+  };
+
 
   return (
-    <CooperativeContext.Provider value={{ cooperatives, createCooperative }}>
+    <CooperativeContext.Provider value={{ cooperatives, createCooperative, requestToJoin, approveJoinRequest, denyJoinRequest }}>
       {children}
     </CooperativeContext.Provider>
   );

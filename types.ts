@@ -1,3 +1,5 @@
+
+
 export enum UserRole {
   SEEKER = 'Job Seeker',
   EMPLOYER = 'Employer',
@@ -54,6 +56,7 @@ export interface Cooperative {
   description: string;
   creatorId: string;
   members: string[]; // array of user IDs
+  joinRequests: string[]; // array of user IDs with pending requests
   totalSavings: number;
   totalLoans: number;
   contributionAmount: number;

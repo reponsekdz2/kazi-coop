@@ -10,7 +10,6 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recha
 import { ArrowDownIcon, ArrowUpIcon, BanknotesIcon, BuildingStorefrontIcon, CurrencyDollarIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../contexts/AuthContext';
 import { UserRole } from '../types';
-import RingProgress from '../components/ui/RingProgress';
 
 type WalletTab = 'overview' | 'savings' | 'loans' | 'budgeting';
 
@@ -156,40 +155,47 @@ const SeekerWallet: React.FC = () => {
     );
 }
 
+const BudgetProgressBar: React.FC<{ progress: number; isOverBudget: boolean }> = ({ progress, isOverBudget }) => {
+    const bgColor = isOverBudget ? 'bg-red-500' : 'bg-primary';
+    return (
+        <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+            <div className={`${bgColor} h-2.5 rounded-full`} style={{ width: `${progress > 100 ? 100 : progress}%` }}></div>
+        </div>
+    );
+};
+
 const BudgetingTab: React.FC<{ budgets: BudgetWithSpending[] }> = ({ budgets }) => {
     const { t } = useAppContext();
     return (
         <Card title={t('wallet.budgets')}>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {budgets.map(budget => (
-                    <Card key={budget.id} className="text-center">
-                        <h4 className="font-bold text-lg text-dark dark:text-light">{budget.category}</h4>
-                        <RingProgress
-                            percentage={budget.progress}
-                            size={120}
-                            strokeWidth={10}
-                            className="my-4 mx-auto"
-                            progressColorClassName={budget.remainingAmount < 0 ? 'text-red-500' : 'text-primary'}
-                        />
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                            {budget.remainingAmount >= 0 
-                                ? `RWF ${budget.remainingAmount.toLocaleString()} ${t('wallet.budgeting.remainingLabel')}`
-                                : `RWF ${Math.abs(budget.remainingAmount).toLocaleString()} ${t('wallet.budgeting.overbudgetLabel')}`
-                            }
-                        </p>
-                        <p className="text-xs text-gray-400">
-                           Spent RWF {budget.spentAmount.toLocaleString()} of RWF {budget.budgetAmount.toLocaleString()}
-                        </p>
-                    </Card>
-                ))}
-                 <div className="flex items-center justify-center min-h-[200px] border-2 border-dashed rounded-lg">
+            <div className="space-y-6">
+                {budgets.map(budget => {
+                    const isOverBudget = budget.remainingAmount < 0;
+                    return (
+                        <div key={budget.id}>
+                            <div className="flex justify-between mb-1">
+                                <span className="text-base font-medium text-dark dark:text-light">{budget.category}</span>
+                                <span className={`text-sm font-medium ${isOverBudget ? 'text-red-500' : 'text-gray-500 dark:text-gray-400'}`}>
+                                    {isOverBudget 
+                                        ? `RWF ${Math.abs(budget.remainingAmount).toLocaleString()} ${t('wallet.budgeting.overbudgetLabel')}`
+                                        : `RWF ${budget.remainingAmount.toLocaleString()} ${t('wallet.budgeting.remainingLabel')}`
+                                    }
+                                </span>
+                            </div>
+                            <BudgetProgressBar progress={budget.progress} isOverBudget={isOverBudget} />
+                             <div className="text-xs text-gray-400 mt-1 text-right">
+                                Spent RWF {budget.spentAmount.toLocaleString()} of RWF {budget.budgetAmount.toLocaleString()}
+                            </div>
+                        </div>
+                    );
+                })}
+                 <div className="flex items-center justify-center pt-6">
                     <Button variant="secondary">{t('wallet.budgeting.createNewBudget')}</Button>
                 </div>
             </div>
         </Card>
     );
 };
-
 
 const EmployerWallet: React.FC = () => {
     const { user } = useAuth();

@@ -104,8 +104,8 @@ export const INTERVIEWS: Interview[] = [
 
 // Mock Cooperatives
 export const COOPERATIVES: Cooperative[] = [
-  { id: 'coop-1', name: 'TechSolutions Innovators Circle', description: 'A savings group for employees of TechSolutions Ltd. focused on technology and innovation investments.', creatorId: 'user-2', members: ['user-1', 'user-2'], totalSavings: 12500000, totalLoans: 3000000, contributionAmount: 50000, contributionFrequency: 'Monthly' },
-  { id: 'coop-2', name: 'Kigali Freelancers Fund', description: 'A cooperative for freelance designers, developers, and writers in Kigali to support each other financially.', creatorId: 'another-employer-id', members: ['user-3'], totalSavings: 4800000, totalLoans: 1200000, contributionAmount: 15000, contributionFrequency: 'Weekly' },
+  { id: 'coop-1', name: 'TechSolutions Innovators Circle', description: 'A savings group for employees of TechSolutions Ltd. focused on technology and innovation investments.', creatorId: 'user-2', members: ['user-1', 'user-2'], joinRequests: ['user-3'], totalSavings: 12500000, totalLoans: 3000000, contributionAmount: 50000, contributionFrequency: 'Monthly' },
+  { id: 'coop-2', name: 'Kigali Freelancers Fund', description: 'A cooperative for freelance designers, developers, and writers in Kigali to support each other financially.', creatorId: 'another-employer-id', members: ['user-3'], joinRequests: [], totalSavings: 4800000, totalLoans: 1200000, contributionAmount: 15000, contributionFrequency: 'Weekly' },
 ];
 
 // Mock Transactions

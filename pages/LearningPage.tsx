@@ -3,7 +3,7 @@ import React from 'react';
 import { LEARNING_MODULES } from '../constants';
 import Card from '../components/ui/Card';
 import { Link } from 'react-router-dom';
-import { PlayCircleIcon, DocumentTextIcon } from '@heroicons/react/24/solid';
+import { PlayCircleIcon, DocumentTextIcon, ClockIcon } from '@heroicons/react/24/solid';
 
 const LearningPage: React.FC = () => {
   return (
@@ -23,6 +23,16 @@ const LearningPage: React.FC = () => {
                 </div>
                 <p className="text-sm font-semibold text-primary">{module.category}</p>
                 <h2 className="text-xl font-bold text-dark dark:text-light mt-1 mb-2">{module.title}</h2>
+                 <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 gap-4 mb-2">
+                    <div className="flex items-center gap-1">
+                        {module.type === 'video' ? <PlayCircleIcon className="h-4 w-4" /> : <DocumentTextIcon className="h-4 w-4" />}
+                        <span className="capitalize">{module.type}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <ClockIcon className="h-4 w-4" />
+                        <span>{module.duration}</span>
+                    </div>
+                 </div>
                 <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{module.content.summary}</p>
             </div>
             <div className="mt-4">
@@ -30,7 +40,7 @@ const LearningPage: React.FC = () => {
                     <div className="bg-accent h-2 rounded-full" style={{ width: `${module.progress}%` }}></div>
                 </div>
                 <div className="text-xs text-gray-500 flex justify-between">
-                    <span>{module.duration}</span>
+                    <span>Progress</span>
                     <span>{module.progress}% complete</span>
                 </div>
                 <Link to={`/learning/${module.id}`}>
