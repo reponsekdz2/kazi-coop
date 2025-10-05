@@ -149,7 +149,6 @@ const EmployerJobsView: React.FC = () => {
 
 const JobManagementCard: React.FC<{ job: Job, onViewApplicants: () => void }> = ({ job, onViewApplicants }) => {
     const { applications } = useApplications();
-    // FIX: Cannot find name 't'.
     const { t } = useAppContext();
     const applicantCount = applications.filter(a => a.jobId === job.id).length;
     return (
@@ -172,7 +171,6 @@ const ViewApplicantsModal: React.FC<{ isOpen: boolean; onClose: () => void; job:
     const { t } = useAppContext();
     const [isSchedulingInterview, setIsSchedulingInterview] = useState<Application | null>(null);
     const applicants = applications.filter(a => a.jobId === job.id);
-    // FIX: Type 'boolean' is not assignable to type 'string | number'.
     const applicationStatuses: Application['status'][] = ['Applied', 'Reviewed', 'Interviewing', 'Interview Scheduled', 'Offered', 'Rejected'];
 
     return (
@@ -275,7 +273,6 @@ const ScheduleInterviewModal: React.FC<{isOpen: boolean, onClose: () => void, ap
 
 
 const JobDetailsModal: React.FC<{ isOpen: boolean; onClose: () => void; job: Job; onApply: () => void; isApplied: boolean }> = ({ isOpen, onClose, job, onApply, isApplied }) => {
-    // FIX: Cannot find name 't'.
     const { t } = useAppContext();
     return (
         <Modal isOpen={isOpen} onClose={onClose} title={job.title}>
