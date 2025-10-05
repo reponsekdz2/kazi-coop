@@ -5,6 +5,7 @@ import { LEARNING_MODULES, LEARNING_PATHS } from '../constants';
 import { LearningModule } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
+import { RocketLaunchIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import { useAppContext } from '../contexts/AppContext';
 
 const PersonalizedLearningPath: React.FC = () => {
@@ -17,36 +18,57 @@ const PersonalizedLearningPath: React.FC = () => {
     }
     
     const pathModules = path.moduleIds.map(id => LEARNING_MODULES.find(m => m.id === id)).filter(Boolean) as LearningModule[];
+    const careerGoalText = user.careerGoal || 'your goal';
 
     return (
-        <Card className="mb-12 bg-gradient-to-r from-primary to-secondary text-white dark:from-gray-800 dark:to-dark">
-            <h2 className="text-xl font-bold mb-1 opacity-80">{t('learning.yourPath')}</h2>
-            <h3 className="text-3xl font-bold mb-2">{path.title}</h3>
-            <p className="opacity-90 mb-6">{path.description}</p>
-            <div className="relative flex items-center py-4">
-                {/* Dashed line */}
-                <div className="absolute top-1/2 left-0 w-full h-0.5 bg-white/50 border-t-2 border-dashed border-white/50 transform -translate-y-1/2"></div>
-                
-                <div className="relative flex justify-between w-full">
+        <Card className="mb-12">
+            <h2 className="text-2xl font-bold text-dark dark:text-light">{t('learning.yourPersonalizedPath')}</h2>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">{t('learning.pathDescription').replace('{goal}', careerGoalText)}</p>
+
+            <div className="mt-8">
+                <ol className="relative border-l border-gray-200 dark:border-gray-700">                  
                     {pathModules.map((module, index) => {
                         const isCompleted = user.completedModuleIds?.includes(module.id);
-                        const isNext = !isCompleted && (index === 0 || user.completedModuleIds?.includes(pathModules[index - 1].id));
+                        const isCurrent = !isCompleted && (index === 0 || user.completedModuleIds?.includes(pathModules[index - 1].id));
                         
+                        let statusIcon;
+                        let statusBgColor = '';
+                        let statusText = '';
+
+                        if(isCompleted) {
+                            statusIcon = <CheckCircleIcon className="w-5 h-5 text-white" />;
+                            statusBgColor = 'bg-accent';
+                            statusText = t('learning.completed');
+                        } else if (isCurrent) {
+                            statusIcon = <RocketLaunchIcon className="w-5 h-5 text-white" />;
+                            statusBgColor = 'bg-primary animate-pulse';
+                            statusText = t('learning.current');
+                        } else {
+                            statusIcon = <LockClosedIcon className="w-4 h-4 text-gray-500" />;
+                            statusBgColor = 'bg-gray-200 dark:bg-gray-600';
+                            statusText = t('learning.locked');
+                        }
+
                         return (
-                            <Link to={`/learning/${module.id}`} key={module.id} className="flex flex-col items-center text-center z-10 w-1/3 px-2 group">
-                                <div className={`relative h-16 w-16 rounded-full flex items-center justify-center border-4 transition-all duration-300 ${isNext ? 'border-accent bg-white scale-110' : isCompleted ? 'border-accent bg-accent' : 'border-white/50 bg-primary'}`}>
-                                    {isCompleted ? (
-                                        <CheckCircleIcon className="h-8 w-8 text-white" />
-                                    ) : (
-                                        <div className={`h-12 w-12 rounded-full bg-cover bg-center`} style={{backgroundImage: `url(${module.coverImageUrl})`}} />
-                                    )}
-                                </div>
-                                <p className={`mt-2 text-xs font-semibold group-hover:text-accent transition-colors ${isNext ? 'text-accent' : 'text-white'}`}>{module.title}</p>
-                                {isNext && <span className="mt-1 text-xs px-2 py-0.5 bg-accent rounded-full text-white">{t('learning.nextUp')}</span>}
-                            </Link>
-                        );
+                            <li key={module.id} className="mb-10 ml-8">            
+                                <span className={`absolute flex items-center justify-center w-8 h-8 rounded-full -left-4 ring-4 ring-white dark:ring-dark ${statusBgColor}`}>
+                                    {statusIcon}
+                                </span>
+                                <Link 
+                                    to={`/learning/${module.id}`} 
+                                    className={`block p-4 rounded-lg border transition-all duration-300 ${isCurrent ? 'border-primary shadow-lg' : 'border-gray-200 dark:border-gray-700'} ${isCompleted || isCurrent ? 'hover:bg-light dark:hover:bg-gray-700' : 'opacity-60 cursor-not-allowed'}`}
+                                    onClick={(e) => !(isCompleted || isCurrent) && e.preventDefault()}
+                                >
+                                    <div className="flex justify-between items-center">
+                                        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">{t('learning.step').replace('{number}', (index + 1).toString())}</p>
+                                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${isCompleted ? 'bg-accent/10 text-accent' : isCurrent ? 'bg-primary/10 text-primary' : 'bg-gray-200 dark:bg-gray-600 text-gray-500'}`}>{statusText}</span>
+                                    </div>
+                                    <h3 className="font-semibold text-lg text-dark dark:text-light mt-1">{module.title}</h3>
+                                </Link>
+                            </li>
+                        )
                     })}
-                </div>
+                </ol>
             </div>
         </Card>
     );

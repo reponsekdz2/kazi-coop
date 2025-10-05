@@ -35,6 +35,8 @@ export const ApplicationProvider: React.FC<{ children: ReactNode }> = ({ childre
       status: 'Applied',
       matchScore,
       submissionDate: new Date().toISOString(),
+      // FIX: Add required statusHistory property
+      statusHistory: [{ status: 'Applied', date: new Date().toISOString() }],
     };
 
     setApplications(prev => [newApplication, ...prev]);
@@ -43,9 +45,21 @@ export const ApplicationProvider: React.FC<{ children: ReactNode }> = ({ childre
 
   const updateApplicationStatus = (applicationId: string, status: Application['status']) => {
     setApplications(prev =>
-      prev.map(app =>
-        app.id === applicationId ? { ...app, status } : app
-      )
+      prev.map(app => {
+        if (app.id === applicationId) {
+          // Prevent adding duplicate history entry if status is unchanged
+          if (app.status === status) return app;
+          
+          const newHistoryEntry = { status, date: new Date().toISOString() };
+          return {
+            ...app,
+            status,
+            // FIX: Update statusHistory along with status
+            statusHistory: [...app.statusHistory, newHistoryEntry],
+          };
+        }
+        return app;
+      })
     );
     addToast('Applicant status updated successfully!', 'success');
   };

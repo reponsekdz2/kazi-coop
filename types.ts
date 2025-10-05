@@ -1,3 +1,4 @@
+
 export enum UserRole {
   SEEKER = 'Job Seeker',
   EMPLOYER = 'Employer',
@@ -32,6 +33,8 @@ export interface Job {
   requirements: string[];
   employerId: string;
   matchScore?: number;
+  requiredDocuments?: string[];
+  requiredSkills?: string[];
 }
 
 export interface Application {
@@ -41,6 +44,7 @@ export interface Application {
   status: 'Applied' | 'Reviewed' | 'Interviewing' | 'Offered' | 'Rejected';
   matchScore: number;
   submissionDate: string;
+  statusHistory: { status: Application['status']; date: string }[];
 }
 
 export interface Interview {

@@ -3,7 +3,7 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { useJobs } from '../contexts/JobContext';
 import { Application, Job, User, UserRole } from '../types';
-import { BriefcaseIcon, MapPinIcon, BanknotesIcon, MagnifyingGlassIcon, UserGroupIcon, ChatBubbleLeftEllipsisIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import { BriefcaseIcon, MapPinIcon, BanknotesIcon, MagnifyingGlassIcon, UserGroupIcon, ChatBubbleLeftEllipsisIcon, CheckCircleIcon, DocumentCheckIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import { useAppContext } from '../contexts/AppContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useApplications } from '../contexts/ApplicationContext';
@@ -11,6 +11,7 @@ import Modal from '../components/ui/Modal';
 import { USERS } from '../constants';
 import { useToast } from '../contexts/ToastContext';
 import { Tab } from '@headlessui/react';
+import RingProgress from '../components/ui/RingProgress';
 
 function classNames(...classes: (string | boolean | undefined)[]) {
   return classes.filter(Boolean).join(' ');
@@ -171,6 +172,35 @@ const FindJobsView: React.FC = () => {
                   </ul>
                 </div>
 
+                {selectedJob.requiredSkills && selectedJob.requiredSkills.length > 0 && (
+                    <div>
+                        <h3 className="font-bold text-dark dark:text-light mb-3">{t('jobs.requiredSkills')}</h3>
+                        <div className="flex flex-wrap gap-2">
+                            {selectedJob.requiredSkills.map(skill => (
+                                <span key={skill} className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold dark:bg-blue-900/50 dark:text-blue-300">
+                                    <SparklesIcon className="h-4 w-4 mr-1.5 text-blue-500"/>
+                                    {skill}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {selectedJob.requiredDocuments && selectedJob.requiredDocuments.length > 0 && (
+                     <div>
+                        <h3 className="font-bold text-dark dark:text-light mb-3">{t('jobs.requiredDocuments')}</h3>
+                        <div className="flex flex-wrap gap-2">
+                             {selectedJob.requiredDocuments.map(doc => (
+                                <span key={doc} className="flex items-center bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-semibold dark:bg-gray-700 dark:text-gray-300">
+                                    <DocumentCheckIcon className="h-4 w-4 mr-1.5 text-gray-500"/>
+                                    {doc}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+
                 {employer && (
                      <div>
                         <h3 className="font-bold text-dark dark:text-light mb-2">{t('jobs.aboutTheCompany').replace('{companyName}', employer.companyName || '')}</h3>
@@ -200,6 +230,13 @@ const FindJobsView: React.FC = () => {
 
 const MyApplicationsView: React.FC<{applications: Application[], allJobs: Job[]}> = ({ applications, allJobs }) => {
   const { t } = useAppContext();
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
+
+  const handleViewDetails = (app: Application) => {
+    setSelectedApplication(app);
+    setIsDetailsModalOpen(true);
+  };
   
   const statusStyles: {[key: string]: string} = {
     Applied: 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
@@ -214,35 +251,99 @@ const MyApplicationsView: React.FC<{applications: Application[], allJobs: Job[]}
   }
 
   return (
-    <Card>
-      <div className="space-y-4">
-        {applications.map(app => {
-          const job = allJobs.find(j => j.id === app.jobId);
-          if (!job) return null;
-          return (
-            <div key={app.id} className="p-4 border rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4 dark:border-gray-700">
-              <div className="flex items-center gap-4">
-                <img src={job.companyLogoUrl} alt={job.company} className="h-12 w-12 rounded-md object-contain bg-light p-1"/>
-                <div>
-                  <h2 className="font-bold text-dark dark:text-light">{job.title}</h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{job.company} - {job.location}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">{t('jobs.applicationDate')}: {new Date(app.submissionDate).toLocaleDateString()}</p>
+    <>
+      <Card>
+        <div className="space-y-4">
+          {applications.map(app => {
+            const job = allJobs.find(j => j.id === app.jobId);
+            if (!job) return null;
+            return (
+              <div key={app.id} className="p-4 border rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4 dark:border-gray-700">
+                <div className="flex items-center gap-4">
+                  <img src={job.companyLogoUrl} alt={job.company} className="h-12 w-12 rounded-md object-contain bg-light p-1"/>
+                  <div>
+                    <h2 className="font-bold text-dark dark:text-light">{job.title}</h2>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{job.company} - {job.location}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">{t('jobs.applicationDate')}: {new Date(app.submissionDate).toLocaleDateString()}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className={`px-3 py-1 text-xs font-semibold rounded-full ${statusStyles[app.status] || ''}`}>
+                    {t(`applicationStatus.${app.status}`)}
+                  </span>
+                  <Button variant="secondary" onClick={() => handleViewDetails(app)}>{t('jobs.viewDetails')}</Button>
                 </div>
               </div>
-              <div className="flex items-center gap-4">
-                <span className={`px-3 py-1 text-xs font-semibold rounded-full ${statusStyles[app.status] || ''}`}>
-                  {t(`applicationStatus.${app.status}`)}
-                </span>
-                <Button variant="secondary">{t('jobs.viewDetails')}</Button>
-              </div>
-            </div>
-          )
-        })}
-      </div>
-    </Card>
+            )
+          })}
+        </div>
+      </Card>
+
+      {selectedApplication && (
+        <ApplicationDetailsModal
+          isOpen={isDetailsModalOpen}
+          onClose={() => setIsDetailsModalOpen(false)}
+          application={selectedApplication}
+          job={allJobs.find(j => j.id === selectedApplication.jobId)}
+        />
+      )}
+    </>
   );
 };
 
+// ==================================
+// Application Details Modal
+// ==================================
+interface ApplicationDetailsModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  application: Application;
+  job?: Job;
+}
+
+const ApplicationDetailsModal: React.FC<ApplicationDetailsModalProps> = ({ isOpen, onClose, application, job }) => {
+  const { t } = useAppContext();
+
+  if (!job) return null;
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title={t('jobs.applicationDetails')}>
+      <div className="pb-4 border-b dark:border-gray-700">
+        <h3 className="text-xl font-bold text-dark dark:text-light">{job.title}</h3>
+        <p className="text-gray-500 dark:text-gray-400">{job.company}</p>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+        <div className="md:col-span-2">
+          <h4 className="font-bold text-dark dark:text-light mb-4">{t('jobs.statusHistory')}</h4>
+          <ol className="relative border-l border-gray-200 dark:border-gray-700">
+            {application.statusHistory.map((historyItem, index) => {
+              const isLast = index === application.statusHistory.length - 1;
+              return (
+                <li key={index} className={`ml-6 ${!isLast ? 'pb-6' : ''}`}>
+                  <span className={`absolute flex items-center justify-center w-6 h-6 rounded-full -left-3 ring-4 ring-white dark:ring-dark ${isLast ? 'bg-primary' : 'bg-green-500'}`}>
+                    <CheckCircleIcon className="w-4 h-4 text-white" />
+                  </span>
+                  <h3 className="font-semibold text-dark dark:text-light">{t(`applicationStatus.${historyItem.status}`)}</h3>
+                  <time className="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">
+                    {new Date(historyItem.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                  </time>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+        <div className="md:col-span-1">
+          <Card className="text-center">
+            <h4 className="font-bold text-dark dark:text-light mb-2">{t('jobs.matchScore')}</h4>
+            <div className="flex justify-center">
+              <RingProgress percentage={application.matchScore} size={120} strokeWidth={10} />
+            </div>
+          </Card>
+        </div>
+      </div>
+    </Modal>
+  );
+};
 
 // ==================================
 // Employer View
@@ -253,6 +354,7 @@ const EmployerJobsView: React.FC = () => {
     const { applications } = useApplications();
     const { t } = useAppContext();
     const [isApplicantsModalOpen, setIsApplicantsModalOpen] = useState(false);
+    const [isNewJobModalOpen, setIsNewJobModalOpen] = useState(false);
     const [selectedJob, setSelectedJob] = useState<Job | null>(null);
 
     const myJobs = user ? jobs.filter(job => job.employerId === user.id) : [];
@@ -266,7 +368,7 @@ const EmployerJobsView: React.FC = () => {
         <div>
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold text-dark dark:text-light">{t('jobs.myPostings')}</h1>
-                <Button>{t('jobs.postNewJob')}</Button>
+                <Button onClick={() => setIsNewJobModalOpen(true)}>{t('jobs.postNewJob')}</Button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -295,6 +397,10 @@ const EmployerJobsView: React.FC = () => {
                     job={selectedJob}
                 />
             )}
+             <NewJobModal
+                isOpen={isNewJobModalOpen}
+                onClose={() => setIsNewJobModalOpen(false)}
+            />
         </div>
     );
 };
@@ -359,6 +465,119 @@ const ApplicantsModal: React.FC<ApplicantsModalProps> = ({ isOpen, onClose, job 
                     </div>
                 )}
             </div>
+        </Modal>
+    );
+};
+
+// ==================================
+// New Job Modal
+// ==================================
+const NewJobModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
+    const { t } = useAppContext();
+    const { addJob } = useJobs();
+    const { user } = useAuth();
+    const [jobDetails, setJobDetails] = useState({
+        title: '',
+        location: 'Kigali, Rwanda',
+        type: 'Full-time',
+        salary: '',
+        description: '',
+        requirements: '',
+        requiredSkills: '',
+    });
+    const [requiredDocuments, setRequiredDocuments] = useState<string[]>([]);
+    
+    const availableDocuments = ['CV', 'Cover Letter', 'Diploma', 'Portfolio'];
+
+    const handleDocChange = (doc: string) => {
+        setRequiredDocuments(prev => 
+            prev.includes(doc) ? prev.filter(d => d !== doc) : [...prev, doc]
+        );
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        setJobDetails({ ...jobDetails, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!user || user.role !== UserRole.EMPLOYER) return;
+
+        const newJob: Omit<Job, 'id'> = {
+            ...jobDetails,
+            company: user.companyName || 'Unknown Company',
+            companyLogoUrl: user.companyLogoUrl || '',
+            employerId: user.id,
+            requirements: jobDetails.requirements.split('\n').filter(r => r.trim() !== ''),
+            requiredSkills: jobDetails.requiredSkills.split(',').map(s => s.trim()).filter(s => s !== ''),
+            requiredDocuments: requiredDocuments
+        };
+        addJob(newJob);
+        onClose();
+        // Reset form
+        setJobDetails({ title: '', location: 'Kigali, Rwanda', type: 'Full-time', salary: '', description: '', requirements: '', requiredSkills: '' });
+        setRequiredDocuments([]);
+    };
+
+    return (
+        <Modal isOpen={isOpen} onClose={onClose} title={t('jobs.newJobModal.title')}>
+            <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('jobs.newJobModal.jobTitle')}</label>
+                        <input name="title" value={jobDetails.title} onChange={handleChange} className="w-full input-field" required />
+                    </div>
+                     <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('jobs.newJobModal.location')}</label>
+                        <input name="location" value={jobDetails.location} onChange={handleChange} className="w-full input-field" required />
+                    </div>
+                     <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('jobs.newJobModal.jobType')}</label>
+                        <select name="type" value={jobDetails.type} onChange={handleChange} className="w-full input-field">
+                            <option>Full-time</option>
+                            <option>Part-time</option>
+                            <option>Contract</option>
+                            <option>Internship</option>
+                        </select>
+                    </div>
+                     <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('jobs.newJobModal.salary')}</label>
+                        <input name="salary" value={jobDetails.salary} onChange={handleChange} className="w-full input-field" placeholder="e.g., RWF 1.5M - 2M" required />
+                    </div>
+                </div>
+                 <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('jobs.newJobModal.description')}</label>
+                    <textarea name="description" value={jobDetails.description} onChange={handleChange} className="w-full input-field" rows={4} required />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('jobs.newJobModal.requirements')}</label>
+                    <textarea name="requirements" value={jobDetails.requirements} onChange={handleChange} className="w-full input-field" rows={4} required />
+                </div>
+                 <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('jobs.newJobModal.skillsLabel')}</label>
+                    <input name="requiredSkills" value={jobDetails.requiredSkills} onChange={handleChange} className="w-full input-field" placeholder="e.g., React, TypeScript, Figma" />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('jobs.newJobModal.requiredDocumentsLabel')}</label>
+                    <div className="grid grid-cols-2 gap-2 mt-2">
+                        {availableDocuments.map(doc => (
+                            <label key={doc} className="flex items-center space-x-2 p-2 rounded-md bg-light dark:bg-gray-700 cursor-pointer">
+                                <input 
+                                    type="checkbox" 
+                                    checked={requiredDocuments.includes(doc)} 
+                                    onChange={() => handleDocChange(doc)} 
+                                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                                />
+                                <span className="text-sm text-dark dark:text-light">{t(`jobs.documents.${doc.toLowerCase().replace(' ', '')}`)}</span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
+                <div className="flex justify-end gap-2 pt-4">
+                    <Button type="button" variant="secondary" onClick={onClose}>{t('common.cancel')}</Button>
+                    <Button type="submit">{t('common.submit')}</Button>
+                </div>
+            </form>
         </Modal>
     );
 };

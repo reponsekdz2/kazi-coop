@@ -67,7 +67,7 @@ const App: React.FC = () => {
 
           {/* Private Routes */}
           <Route element={<PrivateRoute />}>
-            <Route index element={<Navigate to="/dashboard" />} />
+            <Route index element={<DashboardPage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/jobs" element={<JobsPage />} />
             <Route path="/interviews" element={<InterviewsPage />} />

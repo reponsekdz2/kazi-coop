@@ -118,19 +118,24 @@ const SavingsGoalsTab: React.FC = () => {
     const { t } = useAppContext();
     return (
          <Card title={t('wallet.savingsGoals')}>
-            <div className="space-y-4">
+            <div className="space-y-6">
                 {goals.map(goal => {
                     const progress = (goal.currentAmount / goal.targetAmount) * 100;
                     return (
                          <div key={goal.id}>
-                            <div className="flex justify-between mb-1 text-sm">
+                            <div className="flex justify-between mb-2 text-sm">
                                 <span className="font-medium text-dark dark:text-light">{goal.name}</span>
                                 <span className="text-gray-500 dark:text-gray-400">
                                     RWF {goal.currentAmount.toLocaleString()} / RWF {goal.targetAmount.toLocaleString()}
                                 </span>
                             </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                <div className="bg-accent h-2.5 rounded-full" style={{ width: `${progress}%` }}></div>
+                            <div className="w-full bg-gray-200 rounded-full h-4 dark:bg-gray-700">
+                                <div 
+                                  className="bg-accent h-4 rounded-full flex items-center justify-center text-white text-xs font-bold" 
+                                  style={{ width: `${progress}%` }}
+                                >
+                                    {Math.round(progress)}%
+                                </div>
                             </div>
                         </div>
                     )

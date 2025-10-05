@@ -85,7 +85,29 @@
       "myApplications": "Ibyo Nasabye"
     },
     "aboutTheCompany": "Ibyerekeye {companyName}",
-    "postedBy": "Byatangajwe na"
+    "postedBy": "Byatangajwe na",
+    "applicationDetails": "Amakuru yo Gusaba",
+    "statusHistory": "Amateka y'Ibyiciro",
+    "matchScore": "Inota ryawe ryo Guhura",
+    "requiredDocuments": "Inyandiko zisabwa",
+    "requiredSkills": "Ubumenyi busabwa",
+    "newJobModal": {
+      "title": "Kora itangazo rishya ry'akazi",
+      "jobTitle": "Izina ry'akazi",
+      "location": "Aho gaherereye",
+      "jobType": "Ubwoko bw'akazi",
+      "salary": "Umushahara",
+      "description": "Ibisobanuro by'akazi",
+      "requirements": "Ibisabwa (kimwe kuri buri murongo)",
+      "requiredDocumentsLabel": "Inyandiko zisabwa",
+      "skillsLabel": "Ubumenyi busabwa (tandukanya na koma)"
+    },
+    "documents": {
+      "cv": "CV / Umwirondoro",
+      "coverletter": "Ibaruwa isaba akazi",
+      "diploma": "Impamyabumenyi",
+      "portfolio": "Ibikorwa byakoze"
+    }
   },
    "applicationStatus": {
     "Applied": "Byasabwe",
@@ -192,7 +214,13 @@
       "webdevelopment": "Gukora Imbuga",
       "careerskills": "Ubumenyi bw'umwuga",
       "entrepreneurship": "Kwihangira imirimo"
-    }
+    },
+    "yourPersonalizedPath": "Urugendo rwawe rwihariye",
+    "pathDescription": "Kurikira izi ntambwe kugirango ugere ku ntego yawe y'umwuga ya {goal}.",
+    "step": "Intambwe {number}",
+    "completed": "Byarangiye",
+    "current": "Intambwe irimo",
+    "locked": "Hifunze"
   },
   "profile": {
     "title": "Umwirondoro wanjye",

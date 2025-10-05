@@ -85,7 +85,29 @@
       "myApplications": "Mes Candidatures"
     },
     "aboutTheCompany": "À propos de {companyName}",
-    "postedBy": "Publié par"
+    "postedBy": "Publié par",
+    "applicationDetails": "Détails de la candidature",
+    "statusHistory": "Historique des statuts",
+    "matchScore": "Votre score de compatibilité",
+    "requiredDocuments": "Documents requis",
+    "requiredSkills": "Compétences requises",
+    "newJobModal": {
+      "title": "Créer une nouvelle offre d'emploi",
+      "jobTitle": "Titre du poste",
+      "location": "Lieu",
+      "jobType": "Type de poste",
+      "salary": "Fourchette de salaire",
+      "description": "Description du poste",
+      "requirements": "Exigences (une par ligne)",
+      "requiredDocumentsLabel": "Documents requis",
+      "skillsLabel": "Compétences requises (séparées par des virgules)"
+    },
+    "documents": {
+      "cv": "CV / Résumé",
+      "coverletter": "Lettre de motivation",
+      "diploma": "Diplôme / Certificat",
+      "portfolio": "Portfolio"
+    }
   },
    "applicationStatus": {
     "Applied": "Postulé",
@@ -192,7 +214,13 @@
       "webdevelopment": "Développement Web",
       "careerskills": "Compétences professionnelles",
       "entrepreneurship": "Entrepreneuriat"
-    }
+    },
+    "yourPersonalizedPath": "Votre parcours personnalisé",
+    "pathDescription": "Suivez ces étapes pour atteindre votre objectif de carrière de {goal}.",
+    "step": "Étape {number}",
+    "completed": "Terminé",
+    "current": "Étape actuelle",
+    "locked": "Verrouillé"
   },
   "profile": {
     "title": "Mon Profil",

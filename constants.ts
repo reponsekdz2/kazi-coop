@@ -11,21 +11,120 @@ export const USERS: User[] = [
 
 // JOBS
 export const JOBS: Job[] = [
-  { id: 'job-1', employerId: 'user-2', title: 'Senior Frontend Developer', company: 'TechSolutions Ltd.', companyLogoUrl: 'https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600', location: 'Kigali, Rwanda', type: 'Full-time', salary: 'RWF 1.5M - 2M', description: 'We are looking for an experienced frontend developer to join our dynamic team. You will be responsible for building the client-side of our web applications, ensuring a seamless user experience. You should be able to translate our company and customer needs into functional and appealing interactive applications.', requirements: ['5+ years experience with React', 'Proficiency in TypeScript and modern state management libraries', 'Strong understanding of RESTful APIs', 'Experience with Agile development methodologies'], matchScore: 92 },
-  { id: 'job-2', employerId: 'user-2', title: 'Project Manager', company: 'BuildIt Rwanda', companyLogoUrl: 'https://tailwindui.com/img/logos/mark.svg?color=green&shade=600', location: 'Remote', type: 'Contract', salary: 'RWF 1.2M', description: 'Manage our new construction project from start to finish. Responsibilities include defining project scope, setting deadlines, assigning responsibilities, and monitoring progress. You will need excellent communication and leadership skills.', requirements: ['Agile or PMP Certification', '3+ years of project management experience', 'Strong leadership and communication skills', 'Experience in the construction industry is a plus'], matchScore: 78 },
-  { id: 'job-3', employerId: 'user-2', title: 'Backend Engineer', company: 'Fintech Innovators', companyLogoUrl: 'https://tailwindui.com/img/logos/mark.svg?color=blue&shade=600', location: 'Kigali, Rwanda', type: 'Full-time', salary: 'RWF 1.3M - 1.8M', description: 'Develop and maintain our backend services. This includes managing databases, building server-side logic, and integrating with third-party services. A strong understanding of security and scalability is required.', requirements: ['Expertise in Node.js and PostgreSQL', 'Experience designing and building microservices architecture', 'Familiarity with cloud platforms (AWS, Azure, or GCP)', 'Knowledge of financial systems is a bonus'], matchScore: 85 },
-  { id: 'job-4', employerId: 'user-2', title: 'UX/UI Designer', company: 'Creative Minds Inc.', companyLogoUrl: 'https://tailwindui.com/img/logos/mark.svg?color=rose&shade=600', location: 'Kigali, Rwanda', type: 'Part-time', salary: 'RWF 700k', description: 'Create beautiful and intuitive user interfaces. You will be involved in the entire design process, from user research and wireframing to creating high-fidelity mockups and prototypes.', requirements: ['Proficiency in Figma, Sketch, or Adobe XD', 'A strong portfolio showcasing your design process', 'Experience with user research and usability testing', 'Ability to work collaboratively with developers and product managers'], matchScore: 65 },
+  { 
+    id: 'job-1', 
+    employerId: 'user-2', 
+    title: 'Senior Frontend Developer', 
+    company: 'TechSolutions Ltd.', 
+    companyLogoUrl: 'https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600', 
+    location: 'Kigali, Rwanda', 
+    type: 'Full-time', 
+    salary: 'RWF 1.5M - 2M', 
+    description: 'We are looking for an experienced frontend developer to join our dynamic team. You will be responsible for building the client-side of our web applications, ensuring a seamless user experience. You should be able to translate our company and customer needs into functional and appealing interactive applications.', 
+    requirements: ['5+ years experience with React', 'Proficiency in TypeScript and modern state management libraries', 'Strong understanding of RESTful APIs', 'Experience with Agile development methodologies'], 
+    requiredDocuments: ['CV', 'Cover Letter', 'Portfolio'],
+    requiredSkills: ['React', 'TypeScript', 'Redux', 'Jest', 'Tailwind CSS'],
+    matchScore: 92 
+  },
+  { 
+    id: 'job-2', 
+    employerId: 'user-2', 
+    title: 'Project Manager', 
+    company: 'BuildIt Rwanda', 
+    companyLogoUrl: 'https://tailwindui.com/img/logos/mark.svg?color=green&shade=600', 
+    location: 'Remote', 
+    type: 'Contract', 
+    salary: 'RWF 1.2M', 
+    description: 'Manage our new construction project from start to finish. Responsibilities include defining project scope, setting deadlines, assigning responsibilities, and monitoring progress. You will need excellent communication and leadership skills.', 
+    requirements: ['Agile or PMP Certification', '3+ years of project management experience', 'Strong leadership and communication skills', 'Experience in the construction industry is a plus'], 
+    requiredDocuments: ['CV', 'Cover Letter'],
+    requiredSkills: ['Agile', 'Scrum', 'JIRA', 'Budget Management'],
+    matchScore: 78 
+  },
+  { 
+    id: 'job-3', 
+    employerId: 'user-2', 
+    title: 'Backend Engineer', 
+    company: 'Fintech Innovators', 
+    companyLogoUrl: 'https://tailwindui.com/img/logos/mark.svg?color=blue&shade=600', 
+    location: 'Kigali, Rwanda', 
+    type: 'Full-time', 
+    salary: 'RWF 1.3M - 1.8M', 
+    description: 'Develop and maintain our backend services. This includes managing databases, building server-side logic, and integrating with third-party services. A strong understanding of security and scalability is required.', 
+    requirements: ['Expertise in Node.js and PostgreSQL', 'Experience designing and building microservices architecture', 'Familiarity with cloud platforms (AWS, Azure, or GCP)', 'Knowledge of financial systems is a bonus'], 
+    requiredDocuments: ['CV', 'Diploma'],
+    requiredSkills: ['Node.js', 'PostgreSQL', 'Microservices', 'AWS', 'REST APIs'],
+    matchScore: 85 
+  },
+  { 
+    id: 'job-4', 
+    employerId: 'user-2', 
+    title: 'UX/UI Designer', 
+    company: 'Creative Minds Inc.', 
+    companyLogoUrl: 'https://tailwindui.com/img/logos/mark.svg?color=rose&shade=600', 
+    location: 'Kigali, Rwanda', 
+    type: 'Part-time', 
+    salary: 'RWF 700k', 
+    description: 'Create beautiful and intuitive user interfaces. You will be involved in the entire design process, from user research and wireframing to creating high-fidelity mockups and prototypes.', 
+    requirements: ['Proficiency in Figma, Sketch, or Adobe XD', 'A strong portfolio showcasing your design process', 'Experience with user research and usability testing', 'Ability to work collaboratively with developers and product managers'], 
+    requiredDocuments: ['CV', 'Portfolio'],
+    requiredSkills: ['Figma', 'User Research', 'Prototyping', 'Design Systems'],
+    matchScore: 65 
+  },
 ];
 
 // APPLICATIONS
 export const APPLICATIONS: Application[] = [
-    { id: 'app-1', userId: 'user-1', jobId: 'job-1', status: 'Interviewing', matchScore: 92, submissionDate: new Date(Date.now() - 86400000 * 5).toISOString() },
-    { id: 'app-2', userId: 'user-4', jobId: 'job-2', status: 'Applied', matchScore: 78, submissionDate: new Date(Date.now() - 86400000 * 2).toISOString() },
-    { id: 'app-3', userId: 'user-5', jobId: 'job-3', status: 'Reviewed', matchScore: 85, submissionDate: new Date(Date.now() - 86400000 * 10).toISOString() },
-    { id: 'app-4', userId: 'user-1', jobId: 'job-3', status: 'Applied', matchScore: 60, submissionDate: new Date(Date.now() - 86400000 * 1).toISOString() },
-    { id: 'app-5', userId: 'user-4', jobId: 'job-1', status: 'Applied', matchScore: 70, submissionDate: new Date(Date.now() - 86400000 * 3).toISOString() },
-    { id: 'app-6', userId: 'user-5', jobId: 'job-1', status: 'Rejected', matchScore: 55, submissionDate: new Date(Date.now() - 86400000 * 6).toISOString() },
-    { id: 'app-7', userId: 'user-1', jobId: 'job-4', status: 'Offered', matchScore: 88, submissionDate: new Date(Date.now() - 86400000 * 4).toISOString() },
+    { 
+      id: 'app-1', userId: 'user-1', jobId: 'job-1', status: 'Interviewing', matchScore: 92, submissionDate: new Date(Date.now() - 86400000 * 5).toISOString(),
+      statusHistory: [
+        { status: 'Applied', date: new Date(Date.now() - 86400000 * 5).toISOString() },
+        { status: 'Reviewed', date: new Date(Date.now() - 86400000 * 3).toISOString() },
+        { status: 'Interviewing', date: new Date(Date.now() - 86400000 * 1).toISOString() }
+      ]
+    },
+    { 
+      id: 'app-2', userId: 'user-4', jobId: 'job-2', status: 'Applied', matchScore: 78, submissionDate: new Date(Date.now() - 86400000 * 2).toISOString(),
+      statusHistory: [
+        { status: 'Applied', date: new Date(Date.now() - 86400000 * 2).toISOString() }
+      ]
+    },
+    { 
+      id: 'app-3', userId: 'user-5', jobId: 'job-3', status: 'Reviewed', matchScore: 85, submissionDate: new Date(Date.now() - 86400000 * 10).toISOString(),
+      statusHistory: [
+        { status: 'Applied', date: new Date(Date.now() - 86400000 * 10).toISOString() },
+        { status: 'Reviewed', date: new Date(Date.now() - 86400000 * 8).toISOString() }
+      ]
+    },
+    { 
+      id: 'app-4', userId: 'user-1', jobId: 'job-3', status: 'Applied', matchScore: 60, submissionDate: new Date(Date.now() - 86400000 * 1).toISOString(),
+      statusHistory: [
+        { status: 'Applied', date: new Date(Date.now() - 86400000 * 1).toISOString() }
+      ]
+    },
+    { 
+      id: 'app-5', userId: 'user-4', jobId: 'job-1', status: 'Applied', matchScore: 70, submissionDate: new Date(Date.now() - 86400000 * 3).toISOString(),
+      statusHistory: [
+        { status: 'Applied', date: new Date(Date.now() - 86400000 * 3).toISOString() }
+      ]
+    },
+    { 
+      id: 'app-6', userId: 'user-5', jobId: 'job-1', status: 'Rejected', matchScore: 55, submissionDate: new Date(Date.now() - 86400000 * 6).toISOString(),
+      statusHistory: [
+        { status: 'Applied', date: new Date(Date.now() - 86400000 * 6).toISOString() },
+        { status: 'Reviewed', date: new Date(Date.now() - 86400000 * 4).toISOString() },
+        { status: 'Rejected', date: new Date(Date.now() - 86400000 * 3).toISOString() }
+      ]
+    },
+    { 
+      id: 'app-7', userId: 'user-1', jobId: 'job-4', status: 'Offered', matchScore: 88, submissionDate: new Date(Date.now() - 86400000 * 4).toISOString(),
+      statusHistory: [
+        { status: 'Applied', date: new Date(Date.now() - 86400000 * 4).toISOString() },
+        { status: 'Reviewed', date: new Date(Date.now() - 86400000 * 3).toISOString() },
+        { status: 'Interviewing', date: new Date(Date.now() - 86400000 * 2).toISOString() },
+        { status: 'Offered', date: new Date(Date.now() - 86400000 * 1).toISOString() }
+      ]
+    },
 ];
 
 // INTERVIEWS

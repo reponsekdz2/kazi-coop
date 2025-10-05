@@ -85,7 +85,29 @@
       "myApplications": "My Applications"
     },
     "aboutTheCompany": "About {companyName}",
-    "postedBy": "Posted by"
+    "postedBy": "Posted by",
+    "applicationDetails": "Application Details",
+    "statusHistory": "Status History",
+    "matchScore": "Your Match Score",
+    "requiredDocuments": "Required Documents",
+    "requiredSkills": "Required Skills",
+    "newJobModal": {
+      "title": "Create a New Job Posting",
+      "jobTitle": "Job Title",
+      "location": "Location",
+      "jobType": "Job Type",
+      "salary": "Salary Range",
+      "description": "Job Description",
+      "requirements": "Requirements (one per line)",
+      "requiredDocumentsLabel": "Required Documents",
+      "skillsLabel": "Required Skills (comma separated)"
+    },
+    "documents": {
+      "cv": "CV / Resume",
+      "coverletter": "Cover Letter",
+      "diploma": "Diploma / Certificate",
+      "portfolio": "Portfolio"
+    }
   },
   "applicationStatus": {
     "Applied": "Applied",
@@ -192,7 +214,13 @@
       "webdevelopment": "Web Development",
       "careerskills": "Career Skills",
       "entrepreneurship": "Entrepreneurship"
-    }
+    },
+    "yourPersonalizedPath": "Your Personalized Path",
+    "pathDescription": "Follow these steps to achieve your career goal of {goal}.",
+    "step": "Step {number}",
+    "completed": "Completed",
+    "current": "Current Step",
+    "locked": "Locked"
   },
   "profile": {
     "title": "My Profile",
