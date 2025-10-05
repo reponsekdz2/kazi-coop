@@ -1,4 +1,4 @@
-import { User, UserRole, Job, Application, Cooperative, MemberContribution, Transaction, LearningResource, Badge, Notification, Interview } from './types';
+import { User, UserRole, Job, Application, Cooperative, MemberContribution, Transaction, LearningResource, Badge, Notification, Interview, Message } from './types';
 
 export const USERS: User[] = [
   {
@@ -9,8 +9,9 @@ export const USERS: User[] = [
     avatarUrl: 'https://picsum.photos/seed/user1/100/100',
     profile: {
       title: 'Software Developer',
-      bio: 'Passionate frontend developer with 3 years of experience in React and TypeScript.',
-      skills: ['React', 'TypeScript', 'Node.js', 'Tailwind CSS'],
+      bio: 'Passionate frontend developer with 3 years of experience in React and TypeScript. Eager to join a mission-driven company.',
+      skills: ['React', 'TypeScript', 'Node.js', 'Tailwind CSS', 'GraphQL'],
+      completeness: 80,
     },
   },
   {
@@ -21,7 +22,8 @@ export const USERS: User[] = [
     avatarUrl: 'https://picsum.photos/seed/user2/100/100',
     profile: {
       company: 'Innovate Rwanda Ltd.',
-      bio: 'Hiring manager at a leading tech company in Kigali. Looking for talented individuals.',
+      bio: 'Hiring manager at a leading tech company in Kigali. Looking for talented individuals to help us build the future of tech in Africa.',
+      completeness: 100,
     },
   },
   {
@@ -33,18 +35,34 @@ export const USERS: User[] = [
     profile: {
       company: 'Turemerane Cooperative',
       bio: 'Administrator for Turemerane Cooperative, focused on empowering our members financially.',
+      completeness: 100,
     },
   },
+  {
+    id: 'user-4',
+    name: 'David Nsenga',
+    email: 'david@example.com',
+    role: UserRole.SEEKER,
+    avatarUrl: 'https://picsum.photos/seed/user4/100/100',
+    profile: {
+      title: 'UX/UI Designer',
+      bio: 'Creative designer focused on user-centric and beautiful interfaces. Proficient in Figma, Sketch, and Adobe XD.',
+      skills: ['Figma', 'User Research', 'Prototyping', 'Wireframing'],
+      completeness: 90,
+    }
+  }
 ];
 
 export const JOBS: Job[] = [
   { id: 'job-1', title: 'Frontend Developer', company: 'Innovate Rwanda Ltd.', location: 'Kigali, Rwanda', type: 'Full-time', postedDate: '2024-07-20', description: 'Seeking a skilled React developer to join our dynamic team.', employerId: 'user-2' },
-  { id: 'job-2', title: 'UX/UI Designer', company: 'Kigali Creatives', location: 'Remote', type: 'Contract', postedDate: '2024-07-18', description: 'Design beautiful and intuitive user interfaces for mobile and web applications.', employerId: 'user-2' },
+  { id: 'job-2', title: 'UX/UI Designer', company: 'Innovate Rwanda Ltd.', location: 'Remote', type: 'Contract', postedDate: '2024-07-18', description: 'Design beautiful and intuitive user interfaces for mobile and web applications.', employerId: 'user-2' },
   { id: 'job-3', title: 'Backend Engineer (Node.js)', company: 'Africa Tech Solutions', location: 'Kigali, Rwanda', type: 'Full-time', postedDate: '2024-07-15', description: 'Build and maintain scalable server-side applications and APIs.', employerId: 'another-employer' },
 ];
 
 export const APPLICATIONS: Application[] = [
   { id: 'app-1', jobId: 'job-1', seekerId: 'user-1', status: 'Interviewing', appliedDate: '2024-07-21' },
+  { id: 'app-2', jobId: 'job-2', seekerId: 'user-4', status: 'Under Review', appliedDate: '2024-07-22' },
+  { id: 'app-3', jobId: 'job-1', seekerId: 'user-4', status: 'Rejected', appliedDate: '2024-07-19' },
 ];
 
 export const INTERVIEWS: Interview[] = [
@@ -85,4 +103,11 @@ export const NOTIFICATIONS: Notification[] = [
     {id: 'n-1', message: 'Your interview for Frontend Developer is scheduled for tomorrow.', date: '2024-07-24', read: false},
     {id: 'n-2', message: 'Your monthly cooperative contribution is due in 3 days.', date: '2024-07-23', read: false},
     {id: 'n-3', message: 'A new job matching your skills has been posted.', date: '2024-07-22', read: true},
+];
+
+export const MESSAGES: Message[] = [
+    { id: 'msg-1', conversationId: 'conv-1', senderId: 'user-2', receiverId: 'user-1', text: 'Hi Aline, thanks for applying! We were impressed with your profile. Are you available for a quick chat tomorrow?', timestamp: '2024-07-22 14:30', read: false },
+    { id: 'msg-2', conversationId: 'conv-1', senderId: 'user-1', receiverId: 'user-2', text: 'Hi Jean Bosco, thank you! Yes, I am. How about 10:00 AM?', timestamp: '2024-07-22 14:35', read: true },
+    { id: 'msg-3', conversationId: 'conv-1', senderId: 'user-2', receiverId: 'user-1', text: 'Perfect. I will send you a calendar invite shortly.', timestamp: '2024-07-22 14:36', read: true },
+    { id: 'msg-4', conversationId: 'conv-2', senderId: 'user-2', receiverId: 'user-4', text: 'Hello David, we\'d like to move forward with an initial design review. Please let me know your availability.', timestamp: '2024-07-23 11:00', read: true },
 ];

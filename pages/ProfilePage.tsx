@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Card from '../components/ui/Card';
@@ -10,11 +9,23 @@ const ProfilePage: React.FC = () => {
   if (!user) {
     return <p>Loading profile...</p>;
   }
+  
+  const completeness = user.profile.completeness || 60;
 
   return (
     <div>
       <h1 className="text-3xl font-bold text-dark mb-6">My Profile</h1>
       <Card>
+        <div className="mb-8">
+            <div className="flex justify-between items-center mb-1">
+                <h3 className="font-bold text-dark">Profile Completeness</h3>
+                <span className="text-primary font-semibold">{completeness}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div className="bg-primary h-2.5 rounded-full" style={{ width: `${completeness}%` }}></div>
+            </div>
+        </div>
+
         <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
             <div className="text-center">
                 <img src={user.avatarUrl} alt="User Avatar" className="h-32 w-32 rounded-full mx-auto" />
@@ -36,7 +47,7 @@ const ProfilePage: React.FC = () => {
                     </div>
                     {user.profile.skills && (
                          <div>
-                            <label className="block text-sm font-medium text-gray-700">Skills</label>
+                            <label className="block text-sm font-medium text-gray-700">Skills (comma separated)</label>
                             <input type="text" defaultValue={user.profile.skills.join(', ')} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm" />
                         </div>
                     )}

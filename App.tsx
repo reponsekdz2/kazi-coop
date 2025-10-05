@@ -14,6 +14,7 @@ import WalletPage from './pages/WalletPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import LearningPage from './pages/LearningPage';
 import ProfilePage from './pages/ProfilePage';
+import MessagesPage from './pages/MessagesPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 const App: React.FC = () => {
@@ -42,6 +43,7 @@ const MainRouter: React.FC = () => {
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="learning" element={<LearningPage />} />
             <Route path="profile" element={<ProfilePage />} />
+            <Route path="messages" element={<MessagesPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         ) : (

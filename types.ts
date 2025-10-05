@@ -1,3 +1,5 @@
+
+
 export enum UserRole {
   SEEKER = 'Seeker',
   EMPLOYER = 'Employer',
@@ -16,6 +18,7 @@ export interface User {
     company?: string;
     bio: string;
     skills?: string[];
+    completeness?: number;
   };
 }
 
@@ -30,11 +33,13 @@ export interface Job {
   employerId: string;
 }
 
+export type ApplicationStatus = 'Applied' | 'Under Review' | 'Interviewing' | 'Offered' | 'Rejected';
+
 export interface Application {
   id: string;
   jobId: string;
   seekerId: string;
-  status: 'Pending' | 'Interviewing' | 'Offered' | 'Rejected';
+  status: ApplicationStatus;
   appliedDate: string;
 }
 
@@ -95,4 +100,14 @@ export interface Interview {
   time: string;
   type: 'Online' | 'In-Person';
   status: 'Scheduled' | 'Completed' | 'Canceled';
+}
+
+export interface Message {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  receiverId: string;
+  text: string;
+  timestamp: string;
+  read: boolean;
 }
