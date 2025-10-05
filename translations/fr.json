@@ -107,6 +107,12 @@
       "coverletter": "Lettre de motivation",
       "diploma": "Diplôme / Certificat",
       "portfolio": "Portfolio"
+    },
+    "details": {
+      "jobInfo": "Informations sur le poste",
+      "salary": "Salaire",
+      "location": "Lieu",
+      "jobType": "Type de poste"
     }
   },
    "applicationStatus": {
@@ -119,7 +125,7 @@
   "cooperatives": {
     "title": "Coopératives communautaires",
     "create": "Créer une coopérative",
-    "goal": "Progression de l'objectif",
+    "goal": "Objectif",
     "members": "Membres",
     "join": "Rejoindre",
     "view": "Voir le tableau de bord",
@@ -136,7 +142,8 @@
       "postPlaceholder": "Partagez une nouvelle ou une idée...",
       "postButton": "Publier",
       "noMessages": "Aucun message pour le moment. Soyez le premier à partager quelque chose !"
-    }
+    },
+    "goalProgress": "{progress}% vers l'objectif"
   },
   "wallet": {
     "title": "Mon Portefeuille",
@@ -186,7 +193,9 @@
       "createNewBudget": "Créer un budget",
       "newBudgetTitle": "Créer un nouveau budget",
       "category": "Catégorie",
-      "budgetAmount": "Montant du budget (RWF)"
+      "budgetAmount": "Montant du budget (RWF)",
+      "remaining": "{amount} Restant",
+      "overbudget": "{amount} de Dépassement"
     },
     "categories": {
       "income": "Revenu",
@@ -220,7 +229,8 @@
     "step": "Étape {number}",
     "completed": "Terminé",
     "current": "Étape actuelle",
-    "locked": "Verrouillé"
+    "locked": "Verrouillé",
+    "pathProgress": "Progression du parcours"
   },
   "profile": {
     "title": "Mon Profil",

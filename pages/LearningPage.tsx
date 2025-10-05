@@ -5,8 +5,9 @@ import { LEARNING_MODULES, LEARNING_PATHS } from '../constants';
 import { LearningModule } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
-import { RocketLaunchIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import { RocketLaunchIcon, LockClosedIcon, VideoCameraIcon, DocumentTextIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { useAppContext } from '../contexts/AppContext';
+import RingProgress from '../components/ui/RingProgress';
 
 const PersonalizedLearningPath: React.FC = () => {
     const { user } = useAuth();
@@ -19,56 +20,93 @@ const PersonalizedLearningPath: React.FC = () => {
     
     const pathModules = path.moduleIds.map(id => LEARNING_MODULES.find(m => m.id === id)).filter(Boolean) as LearningModule[];
     const careerGoalText = user.careerGoal || 'your goal';
+    
+    const completedCount = pathModules.filter(m => user.completedModuleIds?.includes(m.id)).length;
+    const overallProgress = pathModules.length > 0 ? Math.round((completedCount / pathModules.length) * 100) : 0;
+
 
     return (
         <Card className="mb-12">
-            <h2 className="text-2xl font-bold text-dark dark:text-light">{t('learning.yourPersonalizedPath')}</h2>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">{t('learning.pathDescription').replace('{goal}', careerGoalText)}</p>
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-8">
+                <div>
+                    <h2 className="text-2xl font-bold text-dark dark:text-light">{t('learning.yourPersonalizedPath')}</h2>
+                    <p className="text-gray-600 dark:text-gray-400 mt-1">{t('learning.pathDescription').replace('{goal}', careerGoalText)}</p>
+                </div>
+                <div className="mt-4 sm:mt-0 flex-shrink-0 text-center">
+                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">{t('learning.pathProgress')}</p>
+                    <RingProgress percentage={overallProgress} size={80} strokeWidth={8} />
+                </div>
+            </div>
 
-            <div className="mt-8">
-                <ol className="relative border-l border-gray-200 dark:border-gray-700">                  
-                    {pathModules.map((module, index) => {
-                        const isCompleted = user.completedModuleIds?.includes(module.id);
-                        const isCurrent = !isCompleted && (index === 0 || user.completedModuleIds?.includes(pathModules[index - 1].id));
-                        
-                        let statusIcon;
-                        let statusBgColor = '';
-                        let statusText = '';
+            <div className="space-y-0">
+                {pathModules.map((module, index) => {
+                    const isCompleted = user.completedModuleIds?.includes(module.id);
+                    const isCurrent = !isCompleted && (index === 0 || user.completedModuleIds?.includes(pathModules[index - 1].id));
+                    const isLocked = !isCompleted && !isCurrent;
 
-                        if(isCompleted) {
-                            statusIcon = <CheckCircleIcon className="w-5 h-5 text-white" />;
-                            statusBgColor = 'bg-accent';
-                            statusText = t('learning.completed');
-                        } else if (isCurrent) {
-                            statusIcon = <RocketLaunchIcon className="w-5 h-5 text-white" />;
-                            statusBgColor = 'bg-primary animate-pulse';
-                            statusText = t('learning.current');
-                        } else {
-                            statusIcon = <LockClosedIcon className="w-4 h-4 text-gray-500" />;
-                            statusBgColor = 'bg-gray-200 dark:bg-gray-600';
-                            statusText = t('learning.locked');
-                        }
+                    let statusIcon, statusBgColor, statusText, statusTextColor;
 
-                        return (
-                            <li key={module.id} className="mb-10 ml-8">            
-                                <span className={`absolute flex items-center justify-center w-8 h-8 rounded-full -left-4 ring-4 ring-white dark:ring-dark ${statusBgColor}`}>
+                    if (isCompleted) {
+                        statusIcon = <CheckCircleIcon className="w-5 h-5 text-white" />;
+                        statusBgColor = 'bg-accent';
+                        statusText = t('learning.completed');
+                        statusTextColor = 'bg-accent/10 text-accent';
+                    } else if (isCurrent) {
+                        statusIcon = <RocketLaunchIcon className="w-5 h-5 text-white" />;
+                        statusBgColor = 'bg-primary animate-pulse';
+                        statusText = t('learning.current');
+                        statusTextColor = 'bg-primary/10 text-primary';
+                    } else { // Locked
+                        statusIcon = <LockClosedIcon className="w-4 h-4 text-gray-500 dark:text-gray-400" />;
+                        statusBgColor = 'bg-gray-200 dark:bg-gray-600';
+                        statusText = t('learning.locked');
+                        statusTextColor = 'bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-400';
+                    }
+
+                    return (
+                        <div key={module.id} className="flex">
+                            {/* Stepper Visuals */}
+                            <div className="flex flex-col items-center mr-6">
+                                <div className={`h-10 w-10 rounded-full flex items-center justify-center ring-4 ring-light dark:ring-dark ${statusBgColor}`}>
                                     {statusIcon}
-                                </span>
+                                </div>
+                                {index < pathModules.length - 1 && (
+                                    <div className={`w-0.5 flex-grow my-2 ${isCompleted ? 'bg-accent' : 'bg-gray-200 dark:bg-gray-700'}`}></div>
+                                )}
+                            </div>
+
+                            {/* Module Card */}
+                            <div className="flex-1 pb-8">
                                 <Link 
-                                    to={`/learning/${module.id}`} 
-                                    className={`block p-4 rounded-lg border transition-all duration-300 ${isCurrent ? 'border-primary shadow-lg' : 'border-gray-200 dark:border-gray-700'} ${isCompleted || isCurrent ? 'hover:bg-light dark:hover:bg-gray-700' : 'opacity-60 cursor-not-allowed'}`}
-                                    onClick={(e) => !(isCompleted || isCurrent) && e.preventDefault()}
+                                    to={`/learning/${module.id}`}
+                                    className={`block p-4 rounded-lg border-2 transition-all duration-300 ${
+                                        isCurrent ? 'border-primary bg-primary/5 shadow-lg' : 'border-transparent bg-light dark:bg-dark'
+                                    } ${
+                                        isLocked ? 'opacity-60 cursor-not-allowed' : 'hover:shadow-md hover:border-secondary'
+                                    }`}
+                                    onClick={(e) => isLocked && e.preventDefault()}
                                 >
-                                    <div className="flex justify-between items-center">
+                                    <div className="flex justify-between items-center mb-1">
                                         <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">{t('learning.step').replace('{number}', (index + 1).toString())}</p>
-                                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${isCompleted ? 'bg-accent/10 text-accent' : isCurrent ? 'bg-primary/10 text-primary' : 'bg-gray-200 dark:bg-gray-600 text-gray-500'}`}>{statusText}</span>
+                                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${statusTextColor}`}>{statusText}</span>
                                     </div>
-                                    <h3 className="font-semibold text-lg text-dark dark:text-light mt-1">{module.title}</h3>
+                                    <h3 className="font-bold text-lg text-dark dark:text-light">{module.title}</h3>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-3">{module.content.summary}</p>
+                                    <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 border-t pt-2 dark:border-gray-700">
+                                        <div className="flex items-center gap-1.5">
+                                            {module.type === 'video' ? <VideoCameraIcon className="h-4 w-4" /> : <DocumentTextIcon className="h-4 w-4" />}
+                                            <span className="capitalize">{module.type}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5">
+                                            <ClockIcon className="h-4 w-4" />
+                                            <span>{module.duration}</span>
+                                        </div>
+                                    </div>
                                 </Link>
-                            </li>
-                        )
-                    })}
-                </ol>
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
         </Card>
     );

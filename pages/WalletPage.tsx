@@ -145,6 +145,18 @@ const SavingsGoalsTab: React.FC = () => {
     );
 };
 
+const BudgetProgressBar: React.FC<{ progress: number; isOverBudget: boolean }> = ({ progress, isOverBudget }) => {
+    const displayProgress = Math.min(progress, 100);
+    return (
+        <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+            <div 
+                className={`h-2.5 rounded-full ${isOverBudget ? 'bg-red-500' : 'bg-primary'}`} 
+                style={{ width: `${displayProgress}%` }}
+            ></div>
+        </div>
+    );
+};
+
 const BudgetingTab: React.FC = () => {
     const { budgetsWithSpending } = useBudget();
     const { t } = useAppContext();
@@ -154,24 +166,33 @@ const BudgetingTab: React.FC = () => {
             <Card title={
                  <div className="flex justify-between items-center">
                     <span>{t('wallet.budgets')}</span>
-                    <Button size="sm" onClick={() => setIsNewBudgetModalOpen(true)}>
+                    <Button onClick={() => setIsNewBudgetModalOpen(true)}>
                         <PlusIcon className="h-4 w-4 mr-1 inline" />
                         {t('wallet.budgeting.createNewBudget')}
                     </Button>
                 </div>
             } className="lg:col-span-1">
-                 <div className="space-y-4">
-                    {budgetsWithSpending.map(budget => (
-                        <div key={budget.id} className="flex items-center gap-4">
-                           <RingProgress percentage={Math.round(budget.progress)} size={60} strokeWidth={6} />
-                           <div>
-                                <p className="font-bold text-dark dark:text-light">{t(`wallet.categories.${budget.category.toLowerCase().replace(' ', '')}`)}</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">
-                                    <span className="font-semibold text-dark dark:text-light">RWF {budget.spentAmount.toLocaleString()}</span> / {budget.budgetAmount.toLocaleString()}
-                                </p>
+                 <div className="space-y-6">
+                    {budgetsWithSpending.map(budget => {
+                       const isOverBudget = budget.spentAmount > budget.budgetAmount;
+                       return (
+                           <div key={budget.id}>
+                               <div className="flex justify-between mb-1">
+                                   <p className="font-bold text-dark dark:text-light text-sm">{t(`wallet.categories.${budget.category.toLowerCase().replace(' ', '')}`)}</p>
+                                   <p className="text-sm text-gray-500 dark:text-gray-400">
+                                       <span className="font-semibold text-dark dark:text-light">RWF {budget.spentAmount.toLocaleString()}</span> / {budget.budgetAmount.toLocaleString()}
+                                   </p>
+                               </div>
+                               <BudgetProgressBar progress={budget.progress} isOverBudget={isOverBudget} />
+                               <p className={`mt-1 text-right text-xs font-bold ${isOverBudget ? 'text-red-500' : 'text-green-600'}`}>
+                                   {isOverBudget
+                                       ? t('wallet.budgeting.overbudget').replace('{amount}', `RWF ${Math.abs(budget.remainingAmount).toLocaleString()}`)
+                                       : t('wallet.budgeting.remaining').replace('{amount}', `RWF ${budget.remainingAmount.toLocaleString()}`)
+                                   }
+                               </p>
                            </div>
-                        </div>
-                    ))}
+                       )
+                    })}
                 </div>
             </Card>
              <Card title={t('wallet.spendingBreakdown')} className="lg:col-span-2">

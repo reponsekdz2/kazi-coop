@@ -50,6 +50,43 @@ const getBasename = () => {
     return '/';
 };
 
+const AuthRoutes: React.FC = () => {
+  const { user } = useAuth();
+
+  return (
+    <Routes>
+      {/* Public Routes */}
+      <Route element={<PublicLayout />}>
+        <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+      </Route>
+
+      {/* Private Routes */}
+      <Route element={<PrivateRoute />}>
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/jobs" element={<JobsPage />} />
+        <Route path="/interviews" element={<InterviewsPage />} />
+        <Route path="/cooperatives" element={<CooperativesPage />} />
+        <Route path="/wallet" element={<WalletPage />} />
+        <Route path="/learning" element={<LearningPage />} />
+        <Route path="/learning/:moduleId" element={<LearningModulePage />} />
+        <Route path="/messages" element={<MessagesPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/help" element={<HelpCenterPage />} />
+        
+        {/* Employer/Admin only routes */}
+        <Route path="/analytics" element={<AnalyticsPage />} />
+        <Route path="/user-analytics" element={<UserAnalyticsPage />} />
+
+        {/* Wildcard for private routes, redirects to dashboard */}
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Route>
+
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
+  )
+}
 
 const App: React.FC = () => {
   const basename = getBasename();
@@ -57,35 +94,7 @@ const App: React.FC = () => {
   return (
     <AppProvider>
       <Router basename={basename}>
-        <Routes>
-          {/* Public Routes */}
-          <Route element={<PublicLayout />}>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-          </Route>
-
-          {/* Private Routes */}
-          <Route element={<PrivateRoute />}>
-            <Route index element={<DashboardPage />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/jobs" element={<JobsPage />} />
-            <Route path="/interviews" element={<InterviewsPage />} />
-            <Route path="/cooperatives" element={<CooperativesPage />} />
-            <Route path="/wallet" element={<WalletPage />} />
-            <Route path="/learning" element={<LearningPage />} />
-            <Route path="/learning/:moduleId" element={<LearningModulePage />} />
-            <Route path="/messages" element={<MessagesPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/help" element={<HelpCenterPage />} />
-            
-            {/* Employer/Admin only routes */}
-            <Route path="/analytics" element={<AnalyticsPage />} />
-            <Route path="/user-analytics" element={<UserAnalyticsPage />} />
-          </Route>
-
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+        <AuthRoutes />
       </Router>
     </AppProvider>
   );

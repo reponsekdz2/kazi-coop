@@ -107,6 +107,12 @@
       "coverletter": "Cover Letter",
       "diploma": "Diploma / Certificate",
       "portfolio": "Portfolio"
+    },
+    "details": {
+      "jobInfo": "Job Information",
+      "salary": "Salary",
+      "location": "Location",
+      "jobType": "Job Type"
     }
   },
   "applicationStatus": {
@@ -119,7 +125,7 @@
   "cooperatives": {
     "title": "Community Cooperatives",
     "create": "Create a Cooperative",
-    "goal": "Goal Progress",
+    "goal": "Goal",
     "members": "Members",
     "join": "Join",
     "view": "View Dashboard",
@@ -136,7 +142,8 @@
       "postPlaceholder": "Share an update or idea...",
       "postButton": "Post",
       "noMessages": "No messages yet. Be the first to share something!"
-    }
+    },
+    "goalProgress": "{progress}% towards goal"
   },
   "wallet": {
     "title": "My Wallet",
@@ -186,7 +193,9 @@
       "createNewBudget": "Create Budget",
       "newBudgetTitle": "Create New Budget",
       "category": "Category",
-      "budgetAmount": "Budget Amount (RWF)"
+      "budgetAmount": "Budget Amount (RWF)",
+      "remaining": "{amount} Remaining",
+      "overbudget": "{amount} Over Budget"
     },
     "categories": {
       "income": "Income",
@@ -220,7 +229,8 @@
     "step": "Step {number}",
     "completed": "Completed",
     "current": "Current Step",
-    "locked": "Locked"
+    "locked": "Locked",
+    "pathProgress": "Path Progress"
   },
   "profile": {
     "title": "My Profile",

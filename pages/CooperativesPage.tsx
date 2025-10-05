@@ -131,30 +131,30 @@ const OverviewTab: React.FC<{cooperative: Cooperative}> = ({ cooperative }) => {
     const loanPoolPercentage = cooperative.totalSavings > 0 ? Math.round((cooperative.loanPoolAmount / cooperative.totalSavings) * 100) : 0;
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card title={t('cooperatives.totalSavings')}>
-                <p className="text-4xl font-bold text-dark dark:text-light">RWF {cooperative.totalSavings.toLocaleString()}</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Total contributed by all members.</p>
-            </Card>
-            <Card title={t('cooperatives.loanPool')}>
-                 <div className="flex items-center gap-4">
-                    <RingProgress percentage={loanPoolPercentage} size={80} strokeWidth={8} />
-                    <div>
-                        <p className="text-2xl font-bold text-dark dark:text-light">RWF {cooperative.loanPoolAmount.toLocaleString()}</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{t('cooperatives.availableForLoans')}</p>
-                    </div>
-                 </div>
-            </Card>
-            <Card title={t('cooperatives.goal')} className="md:col-span-2">
-                <div className="flex justify-between mb-1 text-sm">
-                    <span className="font-medium text-dark dark:text-light">{cooperative.goal}</span>
-                    <span className="text-gray-500 dark:text-gray-400">{cooperative.goalProgress}%</span>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Total Savings Card */}
+            <Card className="!p-4 text-center">
+                <div className="flex items-center justify-center text-primary bg-primary/10 rounded-full h-12 w-12 mx-auto mb-3">
+                    <BanknotesIcon className="h-6 w-6" />
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-4 dark:bg-gray-700">
-                    <div className="bg-accent h-4 rounded-full flex items-center justify-center text-white text-xs font-bold" style={{ width: `${cooperative.goalProgress}%` }}>
-                        {cooperative.goalProgress}%
-                    </div>
-                </div>
+                <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">{t('cooperatives.totalSavings')}</p>
+                <p className="text-2xl font-bold text-dark dark:text-light mt-1">RWF {cooperative.totalSavings.toLocaleString()}</p>
+            </Card>
+            
+            {/* Loan Pool Card */}
+            <Card className="flex flex-col items-center justify-center text-center !p-4">
+                <h4 className="font-bold text-dark dark:text-light mb-2">{t('cooperatives.loanPool')}</h4>
+                <RingProgress percentage={loanPoolPercentage} size={100} strokeWidth={10} />
+                <p className="mt-2 font-semibold text-lg text-dark dark:text-light">RWF {cooperative.loanPoolAmount.toLocaleString()}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{t('cooperatives.availableForLoans')}</p>
+            </Card>
+
+            {/* Goal Progress Card */}
+            <Card className="flex flex-col items-center justify-center text-center !p-4">
+                <h4 className="font-bold text-dark dark:text-light mb-2">{t('cooperatives.goal')}</h4>
+                <RingProgress percentage={cooperative.goalProgress} size={100} strokeWidth={10} progressColorClassName="text-accent" />
+                <p className="mt-2 font-semibold text-lg text-dark dark:text-light truncate max-w-full" title={cooperative.goal}>{cooperative.goal}</p>
+                 <p className="text-xs text-gray-500 dark:text-gray-400">{t('cooperatives.goalProgress').replace('{progress}', cooperative.goalProgress.toString())}</p>
             </Card>
         </div>
     );

@@ -107,6 +107,12 @@
       "coverletter": "Ibaruwa isaba akazi",
       "diploma": "Impamyabumenyi",
       "portfolio": "Ibikorwa byakoze"
+    },
+    "details": {
+      "jobInfo": "Amakuru y'Akazi",
+      "salary": "Umushahara",
+      "location": "Aho Gaherereye",
+      "jobType": "Ubwoko bw'Akazi"
     }
   },
    "applicationStatus": {
@@ -119,7 +125,7 @@
   "cooperatives": {
     "title": "Amakoperative y'abaturage",
     "create": "Kurema Koperative",
-    "goal": "Iterambere ry'intego",
+    "goal": "Intego",
     "members": "Abanyamuryango",
     "join": "Jya muri",
     "view": "Reba Imbonerahamwe",
@@ -136,7 +142,8 @@
       "postPlaceholder": "Sangiza amakuru cyangwa igitekerezo...",
       "postButton": "Ohereza",
       "noMessages": "Nta butumwa buriho. Ba uwa mbere mu gusangiza!"
-    }
+    },
+    "goalProgress": "{progress}% by'intego"
   },
   "wallet": {
     "title": "Ikofi Yanjye",
@@ -186,7 +193,9 @@
       "createNewBudget": "Kora Ingengo",
       "newBudgetTitle": "Kora Ingengo Nshya",
       "category": "Icyiciro",
-      "budgetAmount": "Umubare w'ingengo (RWF)"
+      "budgetAmount": "Umubare w'ingengo (RWF)",
+      "remaining": "{amount} Hasigaye",
+      "overbudget": "{amount} Byarenze"
     },
     "categories": {
       "income": "Inyungu",
@@ -220,7 +229,8 @@
     "step": "Intambwe {number}",
     "completed": "Byarangiye",
     "current": "Intambwe irimo",
-    "locked": "Hifunze"
+    "locked": "Hifunze",
+    "pathProgress": "Iterambere ry'Urugendo"
   },
   "profile": {
     "title": "Umwirondoro wanjye",

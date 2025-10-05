@@ -312,25 +312,47 @@ const ApplicationDetailsModal: React.FC<ApplicationDetailsModalProps> = ({ isOpe
         <h3 className="text-xl font-bold text-dark dark:text-light">{job.title}</h3>
         <p className="text-gray-500 dark:text-gray-400">{job.company}</p>
       </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-        <div className="md:col-span-2">
-          <h4 className="font-bold text-dark dark:text-light mb-4">{t('jobs.statusHistory')}</h4>
-          <ol className="relative border-l border-gray-200 dark:border-gray-700">
-            {application.statusHistory.map((historyItem, index) => {
-              const isLast = index === application.statusHistory.length - 1;
-              return (
-                <li key={index} className={`ml-6 ${!isLast ? 'pb-6' : ''}`}>
-                  <span className={`absolute flex items-center justify-center w-6 h-6 rounded-full -left-3 ring-4 ring-white dark:ring-dark ${isLast ? 'bg-primary' : 'bg-green-500'}`}>
-                    <CheckCircleIcon className="w-4 h-4 text-white" />
-                  </span>
-                  <h3 className="font-semibold text-dark dark:text-light">{t(`applicationStatus.${historyItem.status}`)}</h3>
-                  <time className="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">
-                    {new Date(historyItem.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                  </time>
-                </li>
-              );
-            })}
-          </ol>
+        <div className="md:col-span-2 space-y-6">
+          {/* Job Info */}
+          <div>
+            <h4 className="font-bold text-dark dark:text-light mb-3">{t('jobs.details.jobInfo')}</h4>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                    <p className="text-gray-500 dark:text-gray-400">{t('jobs.details.salary')}</p>
+                    <p className="font-semibold text-dark dark:text-light">{job.salary}</p>
+                </div>
+                <div>
+                    <p className="text-gray-500 dark:text-gray-400">{t('jobs.details.location')}</p>
+                    <p className="font-semibold text-dark dark:text-light">{job.location}</p>
+                </div>
+                <div>
+                    <p className="text-gray-500 dark:text-gray-400">{t('jobs.details.jobType')}</p>
+                    <p className="font-semibold text-dark dark:text-light">{job.type}</p>
+                </div>
+            </div>
+          </div>
+          {/* Status History */}
+          <div>
+            <h4 className="font-bold text-dark dark:text-light mb-4">{t('jobs.statusHistory')}</h4>
+            <ol className="relative border-l border-gray-200 dark:border-gray-700">
+              {application.statusHistory.map((historyItem, index) => {
+                const isLast = index === application.statusHistory.length - 1;
+                return (
+                  <li key={index} className={`ml-6 ${!isLast ? 'pb-6' : ''}`}>
+                    <span className={`absolute flex items-center justify-center w-6 h-6 rounded-full -left-3 ring-4 ring-white dark:ring-dark ${isLast ? 'bg-primary' : 'bg-accent'}`}>
+                      <CheckCircleIcon className="w-4 h-4 text-white" />
+                    </span>
+                    <h3 className="font-semibold text-dark dark:text-light">{t(`applicationStatus.${historyItem.status}`)}</h3>
+                    <time className="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">
+                      {new Date(historyItem.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                    </time>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
         </div>
         <div className="md:col-span-1">
           <Card className="text-center">
