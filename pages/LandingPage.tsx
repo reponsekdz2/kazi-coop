@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../components/ui/Button';
@@ -10,16 +9,20 @@ const LandingPage: React.FC = () => {
   return (
     <div>
       {/* Hero Section */}
-      <section className="bg-white dark:bg-gray-900 py-20 lg:py-32">
-        <div className="container mx-auto px-4 lg:px-6 text-center">
-          <h1 className="text-4xl md:text-6xl font-extrabold text-dark dark:text-light mb-4">
+      <section 
+        className="relative py-20 lg:py-32 bg-cover bg-center"
+        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1521791136064-7986c2920216?q=80&w=2070&auto=format&fit=crop')" }}
+      >
+        <div className="absolute inset-0 bg-black/60"></div>
+        <div className="container mx-auto px-4 lg:px-6 text-center relative z-10">
+          <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4">
             Unlock Your Potential in Rwanda's
             <br />
-            <span className="text-primary">
+            <span className="text-secondary">
               <Typewriter strings={['Job Market.', 'Community.', 'Future.']} />
             </span>
           </h1>
-          <p className="max-w-3xl mx-auto text-lg text-gray-600 dark:text-gray-400 mb-8">
+          <p className="max-w-3xl mx-auto text-lg text-gray-200 mb-8">
             KaziCoop connects you with job opportunities, empowers your savings through community cooperatives (Ikimina), and provides learning resources to accelerate your career.
           </p>
           <div className="flex justify-center gap-4">

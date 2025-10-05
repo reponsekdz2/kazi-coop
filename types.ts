@@ -1,5 +1,3 @@
-
-
 export enum UserRole {
   SEEKER = 'Job Seeker',
   EMPLOYER = 'Employer',
@@ -38,7 +36,7 @@ export interface Application {
   userId: string;
   jobId: string;
   submissionDate: string;
-  status: 'Applied' | 'Reviewed' | 'Interviewing' | 'Offered' | 'Rejected';
+  status: 'Applied' | 'Reviewed' | 'Interviewing' | 'Interview Scheduled' | 'Offered' | 'Rejected';
 }
 
 export interface Interview {
@@ -48,6 +46,13 @@ export interface Interview {
   date: string;
   type: 'Phone Screen' | 'Technical' | 'On-site' | 'Final';
   status: 'Scheduled' | 'Completed' | 'Canceled';
+  details?: string;
+}
+
+export interface Contribution {
+    userId: string;
+    amount: number;
+    date: string;
 }
 
 export interface Cooperative {
@@ -59,8 +64,11 @@ export interface Cooperative {
   joinRequests: string[]; // array of user IDs with pending requests
   totalSavings: number;
   totalLoans: number;
-  contributionAmount: number;
-  contributionFrequency: 'Weekly' | 'Monthly';
+  contributionSettings: {
+      amount: number;
+      frequency: 'Weekly' | 'Monthly';
+  };
+  contributions: Contribution[];
 }
 
 export type TransactionCategory =
@@ -75,7 +83,8 @@ export type TransactionCategory =
   | 'Payouts'
   | 'Marketing'
   | 'Operations'
-  | 'Investments';
+  | 'Investments'
+  | 'Cooperative Contribution';
 
 export interface Transaction {
   id: string;

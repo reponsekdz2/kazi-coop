@@ -1,15 +1,16 @@
 import React, { createContext, useState, useContext, ReactNode, useMemo } from 'react';
-import { Cooperative, UserRole } from '../types';
+import { Cooperative, UserRole, Contribution } from '../types';
 import { COOPERATIVES } from '../constants';
 import { useAuth } from './AuthContext';
 import { useToast } from './ToastContext';
 
 interface CooperativeContextType {
   cooperatives: Cooperative[];
-  createCooperative: (details: Omit<Cooperative, 'id' | 'creatorId' | 'members' | 'totalSavings' | 'totalLoans' | 'joinRequests'>) => void;
+  createCooperative: (details: Omit<Cooperative, 'id' | 'creatorId' | 'members' | 'totalSavings' | 'totalLoans' | 'joinRequests' | 'contributions'>) => void;
   requestToJoin: (cooperativeId: string) => void;
   approveJoinRequest: (cooperativeId: string, userId: string) => void;
   denyJoinRequest: (cooperativeId: string, userId: string) => void;
+  makeContribution: (cooperativeId: string, amount: number) => void;
 }
 
 const CooperativeContext = createContext<CooperativeContextType | undefined>(undefined);
@@ -26,7 +27,7 @@ export const CooperativeProvider: React.FC<{ children: ReactNode }> = ({ childre
       return allCooperatives;
   }, [user, allCooperatives]);
   
-  const createCooperative = (details: Omit<Cooperative, 'id' | 'creatorId' | 'members' | 'totalSavings' | 'totalLoans' | 'joinRequests'>) => {
+  const createCooperative = (details: Omit<Cooperative, 'id' | 'creatorId' | 'members' | 'totalSavings' | 'totalLoans' | 'joinRequests' | 'contributions'>) => {
       if (!user || user.role !== UserRole.EMPLOYER) {
           addToast("Only employers can create cooperatives.", "error");
           return;
@@ -38,6 +39,7 @@ export const CooperativeProvider: React.FC<{ children: ReactNode }> = ({ childre
           joinRequests: [],
           totalSavings: 0,
           totalLoans: 0,
+          contributions: [],
           ...details,
       };
       setAllCooperatives(prev => [...prev, newCooperative]);
@@ -86,9 +88,29 @@ export const CooperativeProvider: React.FC<{ children: ReactNode }> = ({ childre
     }));
   };
 
+  const makeContribution = (cooperativeId: string, amount: number) => {
+    if (!user) return;
+    setAllCooperatives(prev => prev.map(coop => {
+        if (coop.id === cooperativeId && coop.members.includes(user.id)) {
+            const newContribution: Contribution = {
+                userId: user.id,
+                amount,
+                date: new Date().toISOString(),
+            };
+            addToast(`Successfully contributed RWF ${amount.toLocaleString()}.`, 'success');
+            return {
+                ...coop,
+                totalSavings: coop.totalSavings + amount,
+                contributions: [newContribution, ...coop.contributions],
+            };
+        }
+        return coop;
+    }));
+  };
+
 
   return (
-    <CooperativeContext.Provider value={{ cooperatives, createCooperative, requestToJoin, approveJoinRequest, denyJoinRequest }}>
+    <CooperativeContext.Provider value={{ cooperatives, createCooperative, requestToJoin, approveJoinRequest, denyJoinRequest, makeContribution }}>
       {children}
     </CooperativeContext.Provider>
   );

@@ -104,8 +104,33 @@ export const INTERVIEWS: Interview[] = [
 
 // Mock Cooperatives
 export const COOPERATIVES: Cooperative[] = [
-  { id: 'coop-1', name: 'TechSolutions Innovators Circle', description: 'A savings group for employees of TechSolutions Ltd. focused on technology and innovation investments.', creatorId: 'user-2', members: ['user-1', 'user-2'], joinRequests: ['user-3'], totalSavings: 12500000, totalLoans: 3000000, contributionAmount: 50000, contributionFrequency: 'Monthly' },
-  { id: 'coop-2', name: 'Kigali Freelancers Fund', description: 'A cooperative for freelance designers, developers, and writers in Kigali to support each other financially.', creatorId: 'another-employer-id', members: ['user-3'], joinRequests: [], totalSavings: 4800000, totalLoans: 1200000, contributionAmount: 15000, contributionFrequency: 'Weekly' },
+  { 
+    id: 'coop-1', 
+    name: 'TechSolutions Innovators Circle', 
+    description: 'A savings group for employees of TechSolutions Ltd. focused on technology and innovation investments.', 
+    creatorId: 'user-2', 
+    members: ['user-1', 'user-2'], 
+    joinRequests: ['user-3'], 
+    totalSavings: 12500000, 
+    totalLoans: 3000000, 
+    contributionSettings: { amount: 50000, frequency: 'Monthly' },
+    contributions: [
+      { userId: 'user-1', amount: 50000, date: new Date(Date.now() - 10 * 86400000).toISOString() },
+      { userId: 'user-2', amount: 50000, date: new Date(Date.now() - 12 * 86400000).toISOString() }
+    ]
+  },
+  { 
+    id: 'coop-2', 
+    name: 'Kigali Freelancers Fund', 
+    description: 'A cooperative for freelance designers, developers, and writers in Kigali to support each other financially.', 
+    creatorId: 'another-employer-id', 
+    members: ['user-3'], 
+    joinRequests: [], 
+    totalSavings: 4800000, 
+    totalLoans: 1200000, 
+    contributionSettings: { amount: 15000, frequency: 'Weekly' },
+    contributions: []
+  },
 ];
 
 // Mock Transactions
@@ -113,7 +138,7 @@ export const TRANSACTIONS: Transaction[] = [
   { id: 'txn-1', userId: 'user-1', date: new Date(Date.now() - 1 * 86400000).toISOString(), description: 'Salary Deposit', amount: 800000, category: 'Income' },
   { id: 'txn-2', userId: 'user-1', date: new Date(Date.now() - 2 * 86400000).toISOString(), description: 'Groceries', amount: -25000, category: 'Groceries' },
   { id: 'txn-3', userId: 'user-1', date: new Date(Date.now() - 3 * 86400000).toISOString(), description: 'MTN Airtime', amount: -5000, category: 'Utilities' },
-  { id: 'txn-4', userId: 'user-1', date: new Date(Date.now() - 4 * 86400000).toISOString(), description: 'Ikimina Contribution', amount: -50000, category: 'Savings Contribution' },
+  { id: 'txn-4', userId: 'user-1', date: new Date(Date.now() - 4 * 86400000).toISOString(), description: 'Ikimina Contribution', amount: -50000, category: 'Cooperative Contribution' },
   { id: 'txn-5', userId: 'user-1', date: new Date(Date.now() - 5 * 86400000).toISOString(), description: 'Moto Fare', amount: -1500, category: 'Transport' },
 ];
 
