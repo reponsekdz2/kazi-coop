@@ -83,6 +83,7 @@ const SeekerDashboard: React.FC = () => {
 
 // --- Employer Dashboard ---
 const EmployerDashboard: React.FC = () => {
+    const { user } = useAuth();
     const totalApplicants = APPLICATIONS.length;
     const interviewingApplicants = APPLICATIONS.filter(a => a.status === 'Interviewing').length;
     const interviewRate = totalApplicants > 0 ? Math.round((interviewingApplicants / totalApplicants) * 100) : 0;
@@ -92,6 +93,8 @@ const EmployerDashboard: React.FC = () => {
         return acc;
     }, {} as {[key: string]: number});
     const funnelData = Object.keys(statusCounts).map(key => ({ name: key, value: statusCounts[key] }));
+    
+    const ikimina = COOPERATIVES.find(c => c.creatorId === user?.id && c.type === 'Corporate');
 
     return (
      <div className="space-y-6">
@@ -104,18 +107,55 @@ const EmployerDashboard: React.FC = () => {
                 </div>
             </Card>
         </div>
-        <Card title="Hiring Funnel">
-            <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={funnelData} layout="vertical" margin={{ left: 30 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis type="number" />
-                    <YAxis type="category" dataKey="name" width={100} />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="value" name="Applicants" fill="#005A9C" />
-                </BarChart>
-            </ResponsiveContainer>
-        </Card>
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            <div className="lg:col-span-3">
+                <Card title="Hiring Funnel">
+                    <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={funnelData} layout="vertical" margin={{ left: 30 }}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis type="number" />
+                            <YAxis type="category" dataKey="name" width={100} />
+                            <Tooltip />
+                            <Legend />
+                            <Bar dataKey="value" name="Applicants" fill="#005A9C" />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </Card>
+            </div>
+            <div className="lg:col-span-2">
+                <Card title="My Corporate Ikimina" className="h-full">
+                    {ikimina ? (
+                        <div className="flex flex-col justify-between h-full">
+                            <div>
+                                <h3 className="text-lg font-bold text-primary">{ikimina.name}</h3>
+                                <p className="text-sm text-gray-500 mt-1">{ikimina.description}</p>
+                            </div>
+                            <div className="space-y-3 mt-4">
+                                <div className="flex justify-between items-center bg-light p-3 rounded-md">
+                                    <span className="font-semibold text-dark">Total Members</span>
+                                    <span className="font-bold text-lg text-primary">{ikimina.members.length}</span>
+                                </div>
+                                <div className="flex justify-between items-center bg-light p-3 rounded-md">
+                                    <span className="font-semibold text-dark">Total Savings</span>
+                                    <span className="font-bold text-lg text-primary">RWF {ikimina.savings.toLocaleString()}</span>
+                                </div>
+                            </div>
+                            <Link to="/cooperatives" className="mt-4">
+                                <Button className="w-full">Manage Ikimina</Button>
+                            </Link>
+                        </div>
+                    ) : (
+                        <div className="text-center flex flex-col items-center justify-center h-full">
+                            <UserGroupIcon className="h-12 w-12 text-gray-300 mb-2" />
+                            <p className="text-gray-600 mb-4">Engage your employees by creating a corporate savings group.</p>
+                            <Link to="/cooperatives">
+                                <Button>Create an Ikimina</Button>
+                            </Link>
+                        </div>
+                    )}
+                </Card>
+            </div>
+        </div>
      </div>
     );
 };

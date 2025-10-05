@@ -30,6 +30,7 @@ const employerLinks = [
     { name: 'Jobs', path: '/jobs', icon: BriefcaseIcon },
     { name: 'Messages', path: '/messages', icon: ChatBubbleLeftRightIcon },
     { name: 'Interviews', path: '/interviews', icon: TicketIcon },
+    { name: 'My Ikimina', path: '/cooperatives', icon: UserGroupIcon },
 ];
 
 const adminLinks = [

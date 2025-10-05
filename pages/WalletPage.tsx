@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
+import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
-import { TRANSACTIONS, SAVINGS_GOALS, INVESTMENT_PODS, LOAN_OFFERS, USERS } from '../constants';
-import { SavingsGoal, InvestmentPod, LoanOffer } from '../types';
-import { ArrowDownCircleIcon, ArrowUpCircleIcon, ChartPieIcon, BanknotesIcon, ScaleIcon } from '@heroicons/react/24/solid';
+import { TRANSACTIONS, SAVINGS_GOALS, INVESTMENT_PODS, LOAN_OFFERS, USERS, COOPERATIVES } from '../constants';
+import { SavingsGoal, InvestmentPod, LoanOffer, Cooperative } from '../types';
+import { ArrowDownCircleIcon, ArrowUpCircleIcon, ChartPieIcon, BanknotesIcon, ScaleIcon, UserGroupIcon } from '@heroicons/react/24/solid';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 
 type WalletTab = 'overview' | 'goals' | 'invest' | 'loans';
@@ -124,7 +125,7 @@ const OverviewTab: React.FC = () => {
                     </div>
                 </Card>
             </div>
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1 space-y-6">
                  <Card className="!shadow-none !p-0">
                     <h2 className="text-xl font-bold text-dark mb-4">Quick Actions</h2>
                      <div className="space-y-3">
@@ -133,10 +134,60 @@ const OverviewTab: React.FC = () => {
                         <Button className="w-full !justify-start !py-3 !text-base"><ScaleIcon className="h-5 w-5 mr-3" /> Apply for Loan</Button>
                      </div>
                  </Card>
+                 <IkiminaWalletCard />
             </div>
         </div>
     )
 }
+
+const IkiminaWalletCard: React.FC = () => {
+    const { user } = useAuth();
+    const { addToast } = useToast();
+    const [isContributeOpen, setIsContributeOpen] = useState(false);
+    const [isPayoutOpen, setIsPayoutOpen] = useState(false);
+
+    const ikimina = COOPERATIVES.find(c => c.id === user?.cooperativeId && c.type === 'Corporate');
+    
+    if (!ikimina) return null;
+
+    const handleContribute = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const amount = (e.currentTarget.elements.namedItem('amount') as HTMLInputElement).value;
+        addToast(`Successfully contributed RWF ${amount} to ${ikimina.name}!`, 'success');
+        setIsContributeOpen(false);
+    };
+
+    return (
+        <>
+            <Card className="!shadow-none !p-0">
+                <h2 className="text-xl font-bold text-dark mb-4">My Ikimina Savings</h2>
+                <div className="bg-light p-4 rounded-lg text-center">
+                    <p className="text-sm text-gray-500">{ikimina.name}</p>
+                    <p className="text-3xl font-bold text-primary my-2">RWF 125,000</p>
+                    <p className="text-xs text-gray-500">Your current share</p>
+                </div>
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                    <Button onClick={() => setIsContributeOpen(true)}>Contribute</Button>
+                    <Button variant="secondary" onClick={() => setIsPayoutOpen(true)}>Payout</Button>
+                </div>
+            </Card>
+            <Modal isOpen={isContributeOpen} onClose={() => setIsContributeOpen(false)} title="Contribute to Ikimina">
+                <form onSubmit={handleContribute} className="space-y-4">
+                    <p>Contribute to <span className="font-semibold">{ikimina.name}</span> from your main balance.</p>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Amount (RWF)</label>
+                        <input type="number" name="amount" className="w-full mt-1 px-3 py-2 border rounded-md" placeholder="50000" required />
+                    </div>
+                    <Button type="submit" className="w-full">Confirm Contribution</Button>
+                </form>
+            </Modal>
+             <Modal isOpen={isPayoutOpen} onClose={() => setIsPayoutOpen(false)} title="Request Payout">
+                <p>Payout requests are subject to approval by the Ikimina manager.</p>
+            </Modal>
+        </>
+    );
+};
+
 
 // --- Goals Tab ---
 const GoalsTab: React.FC = () => {

@@ -19,6 +19,8 @@ const LandingPage: React.FC = () => {
                 "Your Path to Financial Freedom",
                 "Your Connection to Community"
               ]}
+              typeSpeed={150}
+              deleteSpeed={70}
             />
           </h1>
           <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-8">

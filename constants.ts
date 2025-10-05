@@ -2,7 +2,7 @@
 import { User, UserRole, Job, Application, SavingsGoal, Cooperative, Transaction, Message, Notification, InvestmentPod, LoanOffer } from './types';
 
 export const USERS: User[] = [
-  { id: 'user1', name: 'Aline Umutoni', email: 'aline@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user1', cooperativeId: 'coop3', cooperativeStatus: 'Member' },
+  { id: 'user1', name: 'Aline Umutoni', email: 'aline@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user1', cooperativeId: 'coop4', cooperativeStatus: 'Member' },
   { id: 'user2', name: 'Jean-Claude Dusabe', email: 'jean@example.com', role: UserRole.EMPLOYER, avatarUrl: 'https://i.pravatar.cc/150?u=user2' },
   { id: 'user3', name: 'Admin Kazi', email: 'admin@example.com', role: UserRole.COOP_ADMIN, avatarUrl: 'https://i.pravatar.cc/150?u=user3', cooperativeId: 'coop3' },
   { id: 'user4', name: 'Fatima Zahra', email: 'fatima@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user4', cooperativeId: 'coop3', cooperativeStatus: 'Pending' },
@@ -30,14 +30,15 @@ export const SAVINGS_GOALS: SavingsGoal[] = [
 ];
 
 export const COOPERATIVES: Cooperative[] = [
-  { id: 'coop1', name: 'Agri-Tech Innovators', logoUrl: 'https://via.placeholder.com/150/92c950/ffffff?Text=Agri', description: 'A cooperative for technology enthusiasts in the agricultural sector.', members: USERS.filter(u => u.cooperativeId === 'coop1'), savings: 15000000 },
-  { id: 'coop2', name: 'Kigali Artisans United', logoUrl: 'https://via.placeholder.com/150/f9a8d4/ffffff?Text=Art', description: 'Empowering local artisans through shared resources and market access.', members: [], savings: 8500000 },
-  { id: 'coop3', name: 'Future Leaders Savings', logoUrl: 'https://via.placeholder.com/150/60a5fa/ffffff?Text=Future', description: 'A savings and credit cooperative for young professionals.', members: USERS.filter(u => u.cooperativeId === 'coop3'), savings: 25000000 },
+  { id: 'coop1', name: 'Agri-Tech Innovators', logoUrl: 'https://via.placeholder.com/150/92c950/ffffff?Text=Agri', description: 'A cooperative for technology enthusiasts in the agricultural sector.', members: USERS.filter(u => u.cooperativeId === 'coop1'), savings: 15000000, type: 'Community' },
+  { id: 'coop2', name: 'Kigali Artisans United', logoUrl: 'https://via.placeholder.com/150/f9a8d4/ffffff?Text=Art', description: 'Empowering local artisans through shared resources and market access.', members: [], savings: 8500000, type: 'Community' },
+  { id: 'coop3', name: 'Future Leaders Savings', logoUrl: 'https://via.placeholder.com/150/60a5fa/ffffff?Text=Future', description: 'A savings and credit cooperative for young professionals.', members: USERS.filter(u => u.cooperativeId === 'coop3'), savings: 25000000, type: 'Community' },
+  { id: 'coop4', name: 'TechSolutions Innovators Circle', logoUrl: 'https://via.placeholder.com/150/1d4ed8/ffffff?Text=Tech', description: 'A savings and investment group for employees of TechSolutions Ltd.', members: USERS.filter(u => u.cooperativeId === 'coop4'), savings: 5200000, type: 'Corporate', creatorId: 'user2' },
 ];
 
 export const TRANSACTIONS: Transaction[] = [
     { id: 'txn1', description: 'Salary Deposit - TechSolutions', amount: 750000, date: '2024-07-30T10:00:00Z' },
-    { id: 'txn2', description: 'Cooperative Savings Contribution', amount: -50000, date: '2024-08-01T11:00:00Z' },
+    { id: 'txn2', description: 'Ikimina Contribution', amount: -50000, date: '2024-08-01T11:00:00Z' },
     { id: 'txn3', description: 'Groceries', amount: -25000, date: '2024-08-02T15:00:00Z' },
     { id: 'txn4', description: 'Freelance Project Payment', amount: 150000, date: '2024-08-05T09:00:00Z' },
     { id: 'txn5', description: 'Rent', amount: -200000, date: '2024-08-05T12:00:00Z' },

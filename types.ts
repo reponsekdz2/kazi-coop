@@ -48,6 +48,8 @@ export interface Cooperative {
     description: string;
     members: User[];
     savings: number;
+    creatorId?: string; // To link to an employer
+    type: 'Community' | 'Corporate';
 }
 
 export interface Transaction {
