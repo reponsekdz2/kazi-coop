@@ -1,103 +1,94 @@
+
 import React from 'react';
-import { NavLink, Link } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { UserRole } from '../../types';
+import { NavLink } from 'react-router-dom';
 import {
-  ChartBarIcon,
-  BriefcaseIcon,
+  ChartPieIcon,
   UserGroupIcon,
+  BriefcaseIcon,
   WalletIcon,
   AcademicCapIcon,
   ChatBubbleLeftRightIcon,
-  Cog6ToothIcon,
+  UserCircleIcon,
   QuestionMarkCircleIcon,
-  ArrowLeftOnRectangleIcon,
-  TicketIcon,
-  PresentationChartLineIcon
+  UsersIcon,
+  BuildingOffice2Icon
 } from '@heroicons/react/24/outline';
+import { useAuth } from '../../contexts/AuthContext';
+import { UserRole } from '../../types';
 import { useAppContext } from '../../contexts/AppContext';
 
 const Sidebar: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const { t } = useAppContext();
-  
-  const seekerNavItems = [
-    { to: '/dashboard', label: t('sidebar.dashboard'), icon: ChartBarIcon },
-    { to: '/jobs', label: t('sidebar.findJobs'), icon: BriefcaseIcon },
-    { to: '/interviews', label: t('sidebar.interviews'), icon: TicketIcon },
-    { to: '/cooperatives', label: t('sidebar.cooperatives'), icon: UserGroupIcon },
-    { to: '/wallet', label: t('sidebar.wallet'), icon: WalletIcon },
-    { to: '/learning', label: t('sidebar.learningHub'), icon: AcademicCapIcon },
-    { to: '/messages', label: t('sidebar.messages'), icon: ChatBubbleLeftRightIcon },
-  ];
-  
-  const employerNavItems = [
-      { to: '/dashboard', label: t('sidebar.dashboard'), icon: ChartBarIcon },
-      { to: '/jobs', label: t('sidebar.jobPostings'), icon: BriefcaseIcon },
-      { to: '/user-analytics', label: t('sidebar.talentPool'), icon: UserGroupIcon },
-      { to: '/messages', label: t('sidebar.messages'), icon: ChatBubbleLeftRightIcon },
-  ];
-  
-  const adminNavItems = [
-      { to: '/dashboard', label: t('sidebar.dashboard'), icon: ChartBarIcon },
-      { to: '/analytics', label: t('sidebar.platformAnalytics'), icon: PresentationChartLineIcon },
+
+  const seekerLinks = [
+    { name: t('sidebar.dashboard'), to: '/dashboard', icon: ChartPieIcon },
+    { name: t('sidebar.findJobs'), to: '/jobs', icon: BriefcaseIcon },
+    { name: t('sidebar.interviews'), to: '/interviews', icon: UsersIcon },
+    { name: t('sidebar.cooperatives'), to: '/cooperatives', icon: UserGroupIcon },
+    { name: t('sidebar.wallet'), to: '/wallet', icon: WalletIcon },
+    { name: t('sidebar.learningHub'), to: '/learning', icon: AcademicCapIcon },
+    { name: t('sidebar.messages'), to: '/messages', icon: ChatBubbleLeftRightIcon },
   ];
 
-  const navItems = user?.role === UserRole.SEEKER ? seekerNavItems :
-                   user?.role === UserRole.EMPLOYER ? employerNavItems :
-                   adminNavItems;
+  const employerLinks = [
+    { name: t('sidebar.dashboard'), to: '/dashboard', icon: ChartPieIcon },
+    { name: t('sidebar.jobPostings'), to: '/jobs', icon: BriefcaseIcon },
+    { name: t('sidebar.talentPool'), to: '/user-analytics', icon: UsersIcon },
+    { name: t('sidebar.platformAnalytics'), to: '/analytics', icon: BuildingOffice2Icon },
+    { name: t('sidebar.messages'), to: '/messages', icon: ChatBubbleLeftRightIcon },
+  ];
+  
+  const bottomLinks = [
+    { name: t('sidebar.myProfile'), to: '/profile', icon: UserCircleIcon },
+    { name: t('sidebar.helpCenter'), to: '/help', icon: QuestionMarkCircleIcon },
+  ];
+
+  const links = user?.role === UserRole.EMPLOYER ? employerLinks : seekerLinks;
 
   return (
-    <div className="flex flex-col w-64 bg-dark text-white dark:bg-gray-800">
-      <div className="flex items-center justify-center h-16 border-b border-gray-700 dark:border-gray-700">
-        <Link to="/dashboard" className="text-2xl font-bold text-white">KaziCoop</Link>
+    <aside className="w-64 flex-shrink-0 bg-white dark:bg-dark border-r dark:border-gray-700 flex flex-col">
+      <div className="h-16 flex items-center justify-center border-b dark:border-gray-700">
+        <h1 className="text-2xl font-bold text-primary">KaziCoop</h1>
       </div>
-      <nav className="flex-1 px-2 py-4 space-y-2">
-        {navItems.map(item => (
+      <nav className="flex-1 px-4 py-6 space-y-2">
+        {links.map((link) => (
           <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.to === '/dashboard'}
+            key={link.name}
+            to={link.to}
+            end={link.to === '/dashboard'}
             className={({ isActive }) =>
-              `flex items-center px-4 py-2 text-sm rounded-md transition-colors ${
-                isActive ? 'bg-primary text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white dark:text-gray-400 dark:hover:bg-gray-600'
+              `flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-colors ${
+                isActive
+                  ? 'bg-primary text-white'
+                  : 'text-gray-600 dark:text-gray-300 hover:bg-light dark:hover:bg-gray-700'
               }`
             }
           >
-            <item.icon className="h-5 w-5 mr-3" />
-            {item.label}
+            <link.icon className="h-5 w-5 mr-3" />
+            {link.name}
           </NavLink>
         ))}
       </nav>
-      <div className="px-2 py-4 border-t border-gray-700 dark:border-gray-700">
-         <NavLink
-            to="/profile"
-            className={({ isActive }) =>
-              `flex items-center px-4 py-2 text-sm rounded-md transition-colors ${
-                isActive ? 'bg-primary text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white dark:text-gray-400 dark:hover:bg-gray-600'
-              }`
-            }
-          >
-            <Cog6ToothIcon className="h-5 w-5 mr-3" />
-            {t('sidebar.myProfile')}
-          </NavLink>
-          <NavLink
-            to="/help"
-            className={({ isActive }) =>
-              `flex items-center px-4 py-2 text-sm rounded-md transition-colors ${
-                isActive ? 'bg-primary text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white dark:text-gray-400 dark:hover:bg-gray-600'
-              }`
-            }
-          >
-            <QuestionMarkCircleIcon className="h-5 w-5 mr-3" />
-            {t('sidebar.helpCenter')}
-          </NavLink>
-        <button onClick={logout} className="w-full flex items-center px-4 py-2 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white dark:text-gray-400 dark:hover:bg-gray-600 mt-2">
-          <ArrowLeftOnRectangleIcon className="h-5 w-5 mr-3" />
-          {t('header.logout')}
-        </button>
+      <div className="px-4 py-6 border-t dark:border-gray-700 space-y-2">
+        {bottomLinks.map((link) => (
+             <NavLink
+             key={link.name}
+             to={link.to}
+             className={({ isActive }) =>
+               `flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-colors ${
+                 isActive
+                   ? 'bg-primary text-white'
+                   : 'text-gray-600 dark:text-gray-300 hover:bg-light dark:hover:bg-gray-700'
+               }`
+             }
+           >
+             <link.icon className="h-5 w-5 mr-3" />
+             {link.name}
+           </NavLink>
+        ))}
       </div>
-    </div>
+    </aside>
   );
 };
 

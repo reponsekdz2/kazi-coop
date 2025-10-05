@@ -10,9 +10,7 @@ interface CooperativeContextType {
 const CooperativeContext = createContext<CooperativeContextType | undefined>(undefined);
 
 export const CooperativeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [cooperatives, setCooperatives] = useState<Cooperative[]>(COOPERATIVES);
-
-  // Add functions to add/update cooperatives if needed
+  const [cooperatives] = useState<Cooperative[]>(COOPERATIVES);
 
   return (
     <CooperativeContext.Provider value={{ cooperatives }}>

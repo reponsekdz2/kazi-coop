@@ -12,9 +12,7 @@ const InterviewContext = createContext<InterviewContextType | undefined>(undefin
 
 export const InterviewProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { user } = useAuth();
-  const [interviews, setInterviews] = useState<Interview[]>(() => 
-    INTERVIEWS.filter(i => i.userId === user?.id)
-  );
+  const [interviews] = useState<Interview[]>(() => INTERVIEWS.filter(i => i.userId === user?.id));
 
   return (
     <InterviewContext.Provider value={{ interviews }}>
