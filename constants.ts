@@ -109,14 +109,46 @@ export const COOPERATIVES: Cooperative[] = [
     name: 'TechSolutions Innovators Circle', 
     description: 'A savings group for employees of TechSolutions Ltd. focused on technology and innovation investments.', 
     creatorId: 'user-2', 
-    members: ['user-1', 'user-2'], 
-    joinRequests: ['user-3'], 
+    members: ['user-1', 'user-2', 'user-3'], 
+    joinRequests: [], 
     totalSavings: 12500000, 
     totalLoans: 3000000, 
     contributionSettings: { amount: 50000, frequency: 'Monthly' },
+    loanSettings: { interestRate: 10, maxLoanPercentage: 80 },
     contributions: [
       { userId: 'user-1', amount: 50000, date: new Date(Date.now() - 10 * 86400000).toISOString() },
       { userId: 'user-2', amount: 50000, date: new Date(Date.now() - 12 * 86400000).toISOString() }
+    ],
+    loans: [
+      {
+        id: 'coop-loan-1',
+        cooperativeId: 'coop-1',
+        userId: 'user-3',
+        amount: 3000000,
+        purpose: 'Business expansion',
+        status: 'Approved',
+        applicationDate: new Date(Date.now() - 20 * 86400000).toISOString(),
+        approvalDate: new Date(Date.now() - 18 * 86400000).toISOString(),
+        repayments: [],
+        remainingAmount: 3000000,
+        repaymentPeriod: 12,
+        interestRate: 10,
+        repaymentSchedule: [],
+      },
+      {
+        id: 'coop-loan-2',
+        cooperativeId: 'coop-1',
+        userId: 'user-1',
+        amount: 200000,
+        purpose: 'Emergency fund',
+        status: 'Pending',
+        applicationDate: new Date(Date.now() - 1 * 86400000).toISOString(),
+        repayments: [],
+        remainingAmount: 200000,
+        repaymentPeriod: 6,
+        interestRate: 10,
+        repaymentSchedule: [],
+      }
     ]
   },
   { 
@@ -129,7 +161,25 @@ export const COOPERATIVES: Cooperative[] = [
     totalSavings: 4800000, 
     totalLoans: 1200000, 
     contributionSettings: { amount: 15000, frequency: 'Weekly' },
-    contributions: []
+    loanSettings: { interestRate: 12, maxLoanPercentage: 75 },
+    contributions: [],
+    loans: [
+       {
+        id: 'coop-loan-3',
+        cooperativeId: 'coop-2',
+        userId: 'user-3',
+        amount: 1200000,
+        purpose: 'Education',
+        status: 'Approved',
+        applicationDate: new Date(Date.now() - 30 * 86400000).toISOString(),
+        approvalDate: new Date(Date.now() - 28 * 86400000).toISOString(),
+        repayments: [],
+        remainingAmount: 1200000,
+        repaymentPeriod: 24,
+        interestRate: 12,
+        repaymentSchedule: [],
+      },
+    ]
   },
 ];
 

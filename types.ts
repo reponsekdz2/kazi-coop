@@ -56,6 +56,22 @@ export interface Contribution {
     date: string;
 }
 
+export interface CooperativeLoan {
+  id: string;
+  cooperativeId: string;
+  userId: string;
+  amount: number;
+  purpose: string;
+  status: 'Pending' | 'Approved' | 'Rejected' | 'Repaid';
+  applicationDate: string;
+  approvalDate?: string;
+  repayments: Repayment[];
+  remainingAmount: number;
+  repaymentPeriod: number; // in months
+  interestRate: number; // annual percentage
+  repaymentSchedule: RepaymentInstallment[];
+}
+
 export interface Cooperative {
   id: string;
   name: string;
@@ -69,7 +85,12 @@ export interface Cooperative {
       amount: number;
       frequency: 'Weekly' | 'Monthly';
   };
+  loanSettings: {
+    interestRate: number; // annual percentage rate
+    maxLoanPercentage: number; // max % of total savings that can be loaned out
+  };
   contributions: Contribution[];
+  loans: CooperativeLoan[];
 }
 
 export type TransactionCategory =
@@ -102,9 +123,10 @@ export interface Repayment {
 }
 
 export interface RepaymentInstallment {
+  id: string;
   dueDate: string;
   amount: number;
-  status: 'pending' | 'paid' | 'overdue';
+  status: 'pending' | 'paid';
 }
 
 export interface LoanApplication {

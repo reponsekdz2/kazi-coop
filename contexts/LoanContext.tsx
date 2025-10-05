@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 import { LoanApplication, RepaymentInstallment } from '../types';
 import { LOAN_APPLICATIONS } from '../constants';
@@ -40,6 +41,8 @@ export const LoanProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           if (app.id === newApplication.id) {
             const installmentAmount = app.amount / app.repaymentPeriod;
             const schedule: RepaymentInstallment[] = Array.from({ length: app.repaymentPeriod }, (_, i) => ({
+              // FIX: Added a unique `id` to each installment to match the RepaymentInstallment type.
+              id: `${app.id}-installment-${i}`,
               dueDate: new Date(new Date().setMonth(new Date().getMonth() + i + 1)).toISOString(),
               amount: installmentAmount,
               status: 'pending',

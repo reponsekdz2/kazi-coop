@@ -286,23 +286,23 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     <AppContext.Provider value={{ theme, toggleTheme, language, changeLanguage, t }}>
       <ToastProvider>
         <AuthProvider>
-          <JobProvider>
-            <ApplicationProvider>
-              <InterviewProvider>
-                <CooperativeProvider>
-                    <TransactionProvider>
-                        <SavingsGoalProvider>
-                            <BudgetProvider>
-                                <LoanProvider>
-                                    {children}
-                                </LoanProvider>
-                            </BudgetProvider>
-                        </SavingsGoalProvider>
-                    </TransactionProvider>
-                </CooperativeProvider>
-              </InterviewProvider>
-            </ApplicationProvider>
-          </JobProvider>
+          <TransactionProvider>
+            <JobProvider>
+              <ApplicationProvider>
+                <InterviewProvider>
+                  <CooperativeProvider>
+                    <BudgetProvider>
+                      <SavingsGoalProvider>
+                        <LoanProvider>
+                          {children}
+                        </LoanProvider>
+                      </SavingsGoalProvider>
+                    </BudgetProvider>
+                  </CooperativeProvider>
+                </InterviewProvider>
+              </ApplicationProvider>
+            </JobProvider>
+          </TransactionProvider>
         </AuthProvider>
       </ToastProvider>
     </AppContext.Provider>

@@ -10,6 +10,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recha
 import { ArrowDownIcon, ArrowUpIcon, BanknotesIcon, BuildingStorefrontIcon, CurrencyDollarIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../contexts/AuthContext';
 import { UserRole } from '../types';
+import RingProgress from '../components/ui/RingProgress';
 
 type WalletTab = 'overview' | 'savings' | 'loans' | 'budgeting';
 
@@ -96,8 +97,8 @@ const SeekerWallet: React.FC = () => {
                                         <Pie data={spendingData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
                                             {spendingData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
                                         </Pie>
-                                        <Tooltip formatter={(value: number) => `RWF ${value.toLocaleString()}`} />
-                                        <Legend />
+                                        <Tooltip formatter={(value) => `RWF ${Number(value).toLocaleString()}`} />
+                                        <Legend formatter={(value) => String(value).toLowerCase()} />
                                     </PieChart>
                                 </ResponsiveContainer>
                             </Card>
@@ -155,45 +156,50 @@ const SeekerWallet: React.FC = () => {
     );
 }
 
-const BudgetProgressBar: React.FC<{ progress: number; isOverBudget: boolean }> = ({ progress, isOverBudget }) => {
-    const bgColor = isOverBudget ? 'bg-red-500' : 'bg-primary';
-    return (
-        <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-            <div className={`${bgColor} h-2.5 rounded-full`} style={{ width: `${progress > 100 ? 100 : progress}%` }}></div>
-        </div>
-    );
-};
-
 const BudgetingTab: React.FC<{ budgets: BudgetWithSpending[] }> = ({ budgets }) => {
     const { t } = useAppContext();
     return (
-        <Card title={t('wallet.budgets')}>
-            <div className="space-y-6">
+        <div>
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-dark dark:text-light">{t('wallet.budgets')}</h2>
+                <Button variant="secondary">{t('wallet.budgeting.createNewBudget')}</Button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {budgets.map(budget => {
                     const isOverBudget = budget.remainingAmount < 0;
+                    const progressPercentage = budget.budgetAmount > 0 ? (budget.spentAmount / budget.budgetAmount) * 100 : 0;
+
                     return (
-                        <div key={budget.id}>
-                            <div className="flex justify-between mb-1">
-                                <span className="text-base font-medium text-dark dark:text-light">{budget.category}</span>
-                                <span className={`text-sm font-medium ${isOverBudget ? 'text-red-500' : 'text-gray-500 dark:text-gray-400'}`}>
+                        <Card key={budget.id} className="flex flex-col items-center text-center p-4">
+                            <h3 className="font-bold text-lg text-dark dark:text-light mb-3">{budget.category}</h3>
+                            <div className="relative">
+                                <RingProgress 
+                                    percentage={Math.round(progressPercentage)} 
+                                    size={140} 
+                                    strokeWidth={12}
+                                    progressColorClassName={isOverBudget ? 'text-red-500' : 'text-primary'}
+                                    textColorClassName={`dark:text-light ${isOverBudget ? 'text-red-500' : 'text-dark'}`}
+                                />
+                            </div>
+                            <div className="mt-4">
+                                <p className={`font-bold text-2xl ${isOverBudget ? 'text-red-500' : 'text-dark dark:text-light'}`}>
+                                    RWF {Math.abs(budget.remainingAmount).toLocaleString()}
+                                </p>
+                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
                                     {isOverBudget 
-                                        ? `RWF ${Math.abs(budget.remainingAmount).toLocaleString()} ${t('wallet.budgeting.overbudgetLabel')}`
-                                        : `RWF ${budget.remainingAmount.toLocaleString()} ${t('wallet.budgeting.remainingLabel')}`
+                                        ? t('wallet.budgeting.overbudgetLabel')
+                                        : t('wallet.budgeting.remainingLabel')
                                     }
-                                </span>
+                                </p>
+                                <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+                                    Spent RWF {budget.spentAmount.toLocaleString()} of RWF {budget.budgetAmount.toLocaleString()}
+                                </p>
                             </div>
-                            <BudgetProgressBar progress={budget.progress} isOverBudget={isOverBudget} />
-                             <div className="text-xs text-gray-400 mt-1 text-right">
-                                Spent RWF {budget.spentAmount.toLocaleString()} of RWF {budget.budgetAmount.toLocaleString()}
-                            </div>
-                        </div>
+                        </Card>
                     );
                 })}
-                 <div className="flex items-center justify-center pt-6">
-                    <Button variant="secondary">{t('wallet.budgeting.createNewBudget')}</Button>
-                </div>
             </div>
-        </Card>
+        </div>
     );
 };
 
@@ -204,7 +210,7 @@ const EmployerWallet: React.FC = () => {
     const companyDetails = user?.companyDetails;
     if (!companyDetails) return null;
 
-    const budgetData = companyDetails.operationalBudget.map(b => ({ name: b.category, value: b.amount }));
+    const budgetData = companyDetails.operationalBudget.map(b => ({ name: t(`wallet.categories.${b.category.toLowerCase()}`) || b.category, value: b.amount }));
 
     return (
         <div>
@@ -212,7 +218,7 @@ const EmployerWallet: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <Card>
                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-blue-100 rounded-full">
+                        <div className="p-3 bg-blue-100 dark:bg-blue-900/50 rounded-full">
                             <BanknotesIcon className="h-6 w-6 text-primary" />
                         </div>
                         <div>
@@ -223,7 +229,7 @@ const EmployerWallet: React.FC = () => {
                 </Card>
                  <Card>
                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-green-100 rounded-full">
+                        <div className="p-3 bg-green-100 dark:bg-green-900/50 rounded-full">
                             <CurrencyDollarIcon className="h-6 w-6 text-green-600" />
                         </div>
                         <div>
@@ -234,7 +240,7 @@ const EmployerWallet: React.FC = () => {
                 </Card>
                  <Card>
                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-indigo-100 rounded-full">
+                        <div className="p-3 bg-indigo-100 dark:bg-indigo-900/50 rounded-full">
                             <BuildingStorefrontIcon className="h-6 w-6 text-indigo-600" />
                         </div>
                         <div>
@@ -250,7 +256,7 @@ const EmployerWallet: React.FC = () => {
                         <Pie data={budgetData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={70} outerRadius={100} paddingAngle={5} label>
                              {budgetData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
                         </Pie>
-                         <Tooltip formatter={(value: number) => `RWF ${value.toLocaleString()}`} />
+                         <Tooltip formatter={(value) => `RWF ${Number(value).toLocaleString()}`} />
                         <Legend />
                     </PieChart>
                 </ResponsiveContainer>
