@@ -1,27 +1,27 @@
-import { User, UserRole, Job, Application, Message, LearningModule, Cooperative, Transaction, SavingsGoal, LoanApplication, CooperativeBudget, CooperativeTransaction, LearningPath } from './types';
+import { User, UserRole, Job, Application, Message, LearningModule, Cooperative, Transaction, SavingsGoal, LoanApplication, CooperativeBudget, CooperativeTransaction, LearningPath, Budget, CooperativeActivity, Meeting, Election } from './types';
 
 export const USERS: User[] = [
-  { id: 'user-1', name: 'Aline U.', email: 'aline@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user1', skills: ['React', 'TypeScript', 'Node.js', 'GraphQL'], cooperativeIds: ['coop-1', 'coop-3'], careerProgress: 3, careerGoal: 'Senior Frontend Developer', completedModuleIds: ['lm-1'] },
+  { id: 'user-1', name: 'Aline U.', email: 'aline@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user1', skills: ['React', 'TypeScript', 'Node.js', 'GraphQL'], cooperativeIds: ['coop-1', 'coop-3'], careerProgress: 3, careerGoal: 'Senior Frontend Developer', completedModuleIds: ['lm-1'], documents: [{id: 'doc-1', name: 'University Diploma', fileUrl: '/documents/aline-diploma.pdf'}] },
   { id: 'user-2', name: 'Jean-Claude D.', email: 'jean@example.com', role: UserRole.EMPLOYER, avatarUrl: 'https://i.pravatar.cc/150?u=user2', skills: ['Management', 'Hiring'], cooperativeIds: ['coop-1'] },
   { id: 'user-3', name: 'Admin User', email: 'admin@example.com', role: UserRole.ADMIN, avatarUrl: 'https://i.pravatar.cc/150?u=user3', skills: ['System Administration'], cooperativeIds: ['coop-4'] },
-  { id: 'user-4', name: 'Peter G.', email: 'peter@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user4', skills: ['Project Management', 'Agile', 'Scrum'], careerProgress: 1, careerGoal: 'Project Manager', completedModuleIds: [] },
-  { id: 'user-5', name: 'Samuel M.', email: 'samuel@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user5', skills: ['UX/UI Design', 'Figma', 'Adobe XD'], cooperativeIds: ['coop-2', 'coop-1'], careerProgress: 5, careerGoal: 'Lead UX/UI Designer', completedModuleIds: ['lm-2', 'lm-3'] },
+  { id: 'user-4', name: 'Peter G.', email: 'peter@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user4', skills: ['Project Management', 'Agile', 'Scrum'], careerProgress: 1, careerGoal: 'Project Manager', completedModuleIds: [], documents: [{id: 'doc-2', name: 'PMP Certificate', fileUrl: '/documents/peter-pmp.pdf'}] },
+  { id: 'user-5', name: 'Samuel M.', email: 'samuel@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user5', skills: ['UX/UI Design', 'Figma', 'Adobe XD'], cooperativeIds: ['coop-2', 'coop-1'], careerProgress: 5, careerGoal: 'Lead UX/UI Designer', completedModuleIds: ['lm-2', 'lm-3'], documents: [{id: 'doc-3', name: 'Design Portfolio', fileUrl: '/documents/samuel-portfolio.pdf'}] },
   { id: 'user-6', name: 'Grace K.', email: 'grace@example.com', role: UserRole.SEEKER, avatarUrl: 'https://i.pravatar.cc/150?u=user6', skills: ['Marketing', 'SEO'], careerProgress: 2, cooperativeIds: ['coop-1'], completedModuleIds: [] },
 ];
 
 export const JOBS: Job[] = [
-  { id: 'job-1', title: 'Frontend Developer', company: 'TechSolutions Ltd.', location: 'Kigali, Rwanda', type: 'Full-time', description: 'We are looking for a skilled Frontend Developer to join our team...', skills: ['React', 'TypeScript', 'Next.js'], salary: 'RWF 1.2M - 1.5M', salaryMin: 1200000, salaryMax: 1500000 },
-  { id: 'job-2', title: 'Project Manager', company: 'BuildIt Rwanda', location: 'Kigali, Rwanda', type: 'Contract', description: 'Seeking an experienced Project Manager to lead our new construction project...', skills: ['Agile', 'JIRA', 'Scrum'], salary: 'RWF 1.8M - 2.2M', salaryMin: 1800000, salaryMax: 2200000 },
-  { id: 'job-3', title: 'UX/UI Designer', company: 'Creative Minds Inc.', location: 'Remote', type: 'Part-time', description: 'Creative Minds is looking for a talented designer to create amazing user experiences...', skills: ['Figma', 'User Research'], salary: 'RWF 800k - 1M', salaryMin: 800000, salaryMax: 1000000 },
-  { id: 'job-4', title: 'Backend Developer', company: 'TechSolutions Ltd.', location: 'Kigali, Rwanda', type: 'Full-time', description: 'Join our backend team to build scalable and robust services...', skills: ['Node.js', 'PostgreSQL', 'Docker'], salary: 'RWF 1.3M - 1.6M', salaryMin: 1300000, salaryMax: 1600000 },
+  { id: 'job-1', title: 'Frontend Developer', company: 'TechSolutions Ltd.', location: 'Kigali, Rwanda', type: 'Full-time', description: 'We are looking for a skilled Frontend Developer to join our team...', skills: ['React', 'TypeScript', 'Next.js'], salary: 'RWF 1.2M - 1.5M', salaryMin: 1200000, salaryMax: 1500000, requiredEducation: 'Bachelors Degree in Computer Science', requiredExperience: 2, requiredDocuments: [{ name: 'University Diploma', required: true }, { name: 'CV', required: true }] },
+  { id: 'job-2', title: 'Project Manager', company: 'BuildIt Rwanda', location: 'Kigali, Rwanda', type: 'Contract', description: 'Seeking an experienced Project Manager to lead our new construction project...', skills: ['Agile', 'JIRA', 'Scrum'], salary: 'RWF 1.8M - 2.2M', salaryMin: 1800000, salaryMax: 2200000, requiredEducation: 'Bachelors Degree', requiredExperience: 5, requiredDocuments: [{ name: 'PMP Certificate', required: false }, { name: 'CV', required: true }] },
+  { id: 'job-3', title: 'UX/UI Designer', company: 'Creative Minds Inc.', location: 'Remote', type: 'Part-time', description: 'Creative Minds is looking for a talented designer to create amazing user experiences...', skills: ['Figma', 'User Research'], salary: 'RWF 800k - 1M', salaryMin: 800000, salaryMax: 1000000, requiredEducation: 'Any', requiredExperience: 3, requiredDocuments: [{ name: 'Design Portfolio', required: true }] },
+  { id: 'job-4', title: 'Backend Developer', company: 'TechSolutions Ltd.', location: 'Kigali, Rwanda', type: 'Full-time', description: 'Join our backend team to build scalable and robust services...', skills: ['Node.js', 'PostgreSQL', 'Docker'], salary: 'RWF 1.3M - 1.6M', salaryMin: 1300000, salaryMax: 1600000, requiredEducation: 'Bachelors Degree', requiredExperience: 3, requiredDocuments: [{ name: 'CV', required: true }] },
 ];
 
 export const APPLICATIONS: Application[] = [
-  { id: 'app-1', jobId: 'job-1', userId: 'user-1', status: 'Interviewing', matchScore: 92 },
-  { id: 'app-2', jobId: 'job-2', userId: 'user-4', status: 'Pending', matchScore: 85 },
-  { id: 'app-3', jobId: 'job-1', userId: 'user-5', status: 'Rejected', matchScore: 65 },
-  { id: 'app-4', jobId: 'job-3', userId: 'user-5', status: 'Offered', matchScore: 95 },
-  { id: 'app-5', jobId: 'job-4', userId: 'user-1', status: 'Pending', matchScore: 78 },
+  { id: 'app-1', jobId: 'job-1', userId: 'user-1', status: 'Interviewing', matchScore: 92, submittedDocuments: [{ name: 'University Diploma', fileUrl: '/documents/aline-diploma.pdf' }] },
+  { id: 'app-2', jobId: 'job-2', userId: 'user-4', status: 'Pending', matchScore: 85, submittedDocuments: [] },
+  { id: 'app-3', jobId: 'job-1', userId: 'user-5', status: 'Rejected', matchScore: 65, submittedDocuments: [] },
+  { id: 'app-4', jobId: 'job-3', userId: 'user-5', status: 'Offered', matchScore: 95, submittedDocuments: [{ name: 'Design Portfolio', fileUrl: '/documents/samuel-portfolio.pdf' }] },
+  { id: 'app-5', jobId: 'job-4', userId: 'user-1', status: 'Pending', matchScore: 78, submittedDocuments: [] },
 ];
 
 export const MESSAGES: Message[] = [
@@ -72,8 +72,66 @@ export const LEARNING_PATHS: LearningPath[] = [
     },
 ];
 
+export const COOPERATIVE_ACTIVITIES: CooperativeActivity[] = [
+    { id: 'ca-1', cooperativeId: 'coop-1', type: 'NEW_MEMBER', description: 'Grace K. was approved as a new member.', timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
+    { id: 'ca-2', cooperativeId: 'coop-1', type: 'LOAN_APPROVED', description: 'A loan of RWF 250,000 was approved for Aline U.', timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() },
+    { id: 'ca-3', cooperativeId: 'coop-1', type: 'NEW_MEETING', description: 'A meeting for "Q3 Investment Strategy" has been scheduled.', timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() },
+    { id: 'ca-4', cooperativeId: 'coop-1', type: 'NEW_ELECTION', description: 'An election for "Cooperative Chairperson" has started.', timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() },
+];
+
+export const MEETINGS: Meeting[] = [
+    { id: 'm-1', cooperativeId: 'coop-1', title: 'Q3 Investment Strategy', description: 'Discuss potential investments for the third quarter.', date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), status: 'Scheduled' },
+    { id: 'm-2', cooperativeId: 'coop-1', title: 'Annual General Meeting', description: 'Review of the past year and planning for the next.', date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), status: 'Completed' },
+];
+
+export const ELECTIONS: Election[] = [
+    { 
+        id: 'e-1', 
+        cooperativeId: 'coop-1', 
+        title: 'Cooperative Chairperson Election', 
+        description: 'Vote for the next chairperson to lead our cooperative.', 
+        status: 'Active',
+        votedUserIds: ['user-2'],
+        options: [
+            { id: 'eo-1', text: 'Aline U.', votes: 1 },
+            { id: 'eo-2', text: 'Samuel M.', votes: 0 },
+        ]
+    },
+    { 
+        id: 'e-2', 
+        cooperativeId: 'coop-1', 
+        title: 'Investment Proposal: Agri-Tech Startup', 
+        description: 'Should we invest RWF 200,000 in a local agri-tech startup?', 
+        status: 'Closed',
+        votedUserIds: ['user-1', 'user-2', 'user-5', 'user-6'],
+        options: [
+            { id: 'eo-3', text: 'Yes, Approve Investment', votes: 4 },
+            { id: 'eo-4', text: 'No, Decline Investment', votes: 1 },
+        ]
+    },
+];
+
 export const COOPERATIVES: Cooperative[] = [
-    { id: 'coop-1', name: 'TechSolutions Innovators Circle', members: 5, totalSavings: 1250000, loanPool: 800000, creator: 'Jean-Claude D.', creatorId: 'user-2', imageUrl: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?q=80&w=870', joinRequests: [ { userId: 'user-4', status: 'pending' }], loansDisbursed: 250000, profit: 50000, messages: [ {id: 'cm-1', userId: 'user-2', text: 'Welcome everyone! Let\'s discuss our investment strategy for this quarter.', timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() }, {id: 'cm-2', userId: 'user-5', text: 'Great idea! I have some thoughts on investing in local tech startups.', timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() }], communityGoal: 'Fund New Workspace', goalAmount: 2000000, goalProgress: 1250000 },
+    { 
+        id: 'coop-1', 
+        name: 'TechSolutions Innovators Circle', 
+        members: 5, 
+        totalSavings: 1250000, 
+        loanPool: 800000, 
+        creator: 'Jean-Claude D.', 
+        creatorId: 'user-2', 
+        imageUrl: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?q=80&w=870', 
+        joinRequests: [ { userId: 'user-4', status: 'pending' }], 
+        loansDisbursed: 250000, 
+        profit: 50000, 
+        messages: [ {id: 'cm-1', userId: 'user-2', text: 'Welcome everyone! Let\'s discuss our investment strategy for this quarter.', timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() }, {id: 'cm-2', userId: 'user-5', text: 'Great idea! I have some thoughts on investing in local tech startups.', timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() }], 
+        communityGoal: 'Fund New Workspace', 
+        goalAmount: 2000000, 
+        goalProgress: 1250000,
+        activities: COOPERATIVE_ACTIVITIES.filter(a => a.cooperativeId === 'coop-1'),
+        meetings: MEETINGS.filter(m => m.cooperativeId === 'coop-1'),
+        elections: ELECTIONS.filter(e => e.cooperativeId === 'coop-1'),
+    },
     { id: 'coop-2', name: 'Kigali Creatives Fund', members: 12, totalSavings: 3400000, loanPool: 2000000, creator: 'Samuel M.', creatorId: 'user-5', imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=871' },
     { id: 'coop-3', name: 'Future Builders Cooperative', members: 8, totalSavings: 980000, loanPool: 500000, creator: 'Aline U.', creatorId: 'user-1', imageUrl: 'https://images.unsplash.com/photo-1556761175-b413da4b248a?q=80&w=934' },
     { id: 'coop-4', name: 'Rwanda Agri-Ventures', members: 25, totalSavings: 8500000, loanPool: 5000000, creator: 'Admin User', creatorId: 'user-3', imageUrl: 'https://images.unsplash.com/photo-1492496913980-50133821932d?q=80&w=987' },
@@ -99,14 +157,23 @@ export const COOPERATIVE_TRANSACTIONS: CooperativeTransaction[] = [
 
 
 export const TRANSACTIONS: Transaction[] = [
-    { id: 't-1', type: 'deposit', description: 'Salary from TechSolutions Ltd.', amount: 800000, date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
-    { id: 't-2', type: 'payment', description: 'Ikimina Contribution', amount: -50000, date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() },
-    { id: 't-3', type: 'withdrawal', description: 'Rent Payment', amount: -200000, date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString() },
+    { id: 't-1', type: 'deposit', description: 'Salary from TechSolutions Ltd.', amount: 800000, date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), category: 'Salary' },
+    { id: 't-2', type: 'payment', description: 'Ikimina Contribution', amount: -50000, date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), category: 'Contribution' },
+    { id: 't-3', type: 'withdrawal', description: 'Rent Payment', amount: -200000, date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(), category: 'Rent' },
+    { id: 't-4', type: 'payment', description: 'Groceries', amount: -75000, date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), category: 'Food' },
+    { id: 't-5', type: 'payment', description: 'Bus Fare', amount: -15000, date: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(), category: 'Transport' },
 ];
 
 export const SAVINGS_GOALS: SavingsGoal[] = [
     { id: 'sg-1', name: 'New Laptop', targetAmount: 1500000, currentAmount: 1050000 },
     { id: 'sg-2', name: 'Emergency Fund', targetAmount: 1000000, currentAmount: 450000 },
+];
+
+export const BUDGETS: Budget[] = [
+    { id: 'b-1', category: 'Food', budgetAmount: 150000 },
+    { id: 'b-2', category: 'Transport', budgetAmount: 50000 },
+    { id: 'b-3', category: 'Entertainment', budgetAmount: 75000 },
+    { id: 'b-4', category: 'Rent', budgetAmount: 200000 },
 ];
 
 const today = new Date();
@@ -119,6 +186,7 @@ export const LOAN_APPLICATIONS: LoanApplication[] = [
         userId: 'user-1', 
         cooperativeId: 'coop-1',
         amount: 250000,
+        interestRate: 10,
         remainingAmount: 125000, 
         purpose: 'Laptop Purchase', 
         repaymentPeriod: 6, 
@@ -141,6 +209,7 @@ export const LOAN_APPLICATIONS: LoanApplication[] = [
         userId: 'user-5', 
         cooperativeId: 'coop-2',
         amount: 500000,
+        interestRate: 12,
         remainingAmount: 500000,
         purpose: 'Business Startup', 
         repaymentPeriod: 12, 
@@ -153,6 +222,7 @@ export const LOAN_APPLICATIONS: LoanApplication[] = [
         userId: 'user-1', 
         cooperativeId: 'coop-3',
         amount: 100000,
+        interestRate: 8,
         remainingAmount: 0,
         purpose: 'Emergency', 
         repaymentPeriod: 2, 

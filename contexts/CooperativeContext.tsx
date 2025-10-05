@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode, useMemo } from 'react';
-import { Cooperative, CooperativeMessage } from '../types';
+import { Cooperative, CooperativeMessage, Meeting, Election, ElectionOption } from '../types';
 import { COOPERATIVES } from '../constants';
 import { useAuth } from './AuthContext';
 import { useToast } from './ToastContext';
@@ -11,6 +11,9 @@ interface CooperativeContextType {
   approveJoinRequest: (coopId: string, userId: string) => void;
   denyJoinRequest: (coopId: string, userId: string) => void;
   postMessage: (coopId: string, messageText: string) => void;
+  scheduleMeeting: (coopId: string, meetingDetails: Omit<Meeting, 'id' | 'cooperativeId' | 'status'>) => void;
+  createElection: (coopId: string, electionDetails: Omit<Election, 'id' | 'cooperativeId' | 'status' | 'votedUserIds' | 'options'> & { optionTexts: string[] }) => void;
+  castVote: (coopId: string, electionId: string, optionId: string) => void;
 }
 
 const CooperativeContext = createContext<CooperativeContextType | undefined>(undefined);
@@ -77,10 +80,74 @@ export const CooperativeProvider: React.FC<{ children: ReactNode }> = ({ childre
             return coop;
         })
     );
-  }
+  };
+
+  const scheduleMeeting = (coopId: string, meetingDetails: Omit<Meeting, 'id' | 'cooperativeId' | 'status'>) => {
+      setCooperatives(prev => prev.map(coop => {
+          if (coop.id === coopId) {
+              const newMeeting: Meeting = {
+                  ...meetingDetails,
+                  id: `m-${Date.now()}`,
+                  cooperativeId: coopId,
+                  status: 'Scheduled',
+              };
+              addToast(`Meeting "${newMeeting.title}" scheduled successfully!`, 'success');
+              return { ...coop, meetings: [...(coop.meetings || []), newMeeting] };
+          }
+          return coop;
+      }));
+  };
+
+  const createElection = (coopId: string, electionDetails: Omit<Election, 'id' | 'cooperativeId' | 'status' | 'votedUserIds' | 'options'> & { optionTexts: string[] }) => {
+      setCooperatives(prev => prev.map(coop => {
+          if (coop.id === coopId) {
+              const newElection: Election = {
+                  id: `e-${Date.now()}`,
+                  cooperativeId: coopId,
+                  title: electionDetails.title,
+                  description: electionDetails.description,
+                  status: 'Active',
+                  votedUserIds: [],
+                  options: electionDetails.optionTexts.map((text, i) => ({
+                      id: `eo-${Date.now()}-${i}`,
+                      text,
+                      votes: 0,
+                  })),
+              };
+              addToast(`Election "${newElection.title}" has been created!`, 'success');
+              return { ...coop, elections: [...(coop.elections || []), newElection] };
+          }
+          return coop;
+      }));
+  };
+
+  const castVote = (coopId: string, electionId: string, optionId: string) => {
+      if(!user) return;
+      setCooperatives(prev => prev.map(coop => {
+          if (coop.id === coopId) {
+              const updatedElections = (coop.elections || []).map(election => {
+                  if (election.id === electionId) {
+                      if(election.votedUserIds.includes(user.id)) {
+                          addToast('You have already voted in this election.', 'error');
+                          return election;
+                      }
+                      const updatedOptions = election.options.map(opt => 
+                          opt.id === optionId ? { ...opt, votes: opt.votes + 1 } : opt
+                      );
+                      addToast('Your vote has been cast successfully!', 'success');
+                      return { ...election, options: updatedOptions, votedUserIds: [...election.votedUserIds, user.id] };
+                  }
+                  return election;
+              });
+              return { ...coop, elections: updatedElections };
+          }
+          return coop;
+      }));
+  };
+
 
   return (
-    <CooperativeContext.Provider value={{ cooperatives, userCooperatives, getCooperativeById, approveJoinRequest, denyJoinRequest, postMessage }}>
+    <CooperativeContext.Provider value={{ cooperatives, userCooperatives, getCooperativeById, approveJoinRequest, denyJoinRequest, postMessage, scheduleMeeting, createElection, castVote }}>
       {children}
     </CooperativeContext.Provider>
   );

@@ -1,8 +1,14 @@
-
+// FIX: Defined UserRole enum to resolve a circular dependency where the file was importing from itself.
 export enum UserRole {
   SEEKER = 'Job Seeker',
   EMPLOYER = 'Employer',
   ADMIN = 'Admin',
+}
+
+export interface UserDocument {
+    id: string;
+    name: string;
+    fileUrl: string; // In a real app, this would be a URL to the stored file
 }
 
 export interface User {
@@ -16,6 +22,12 @@ export interface User {
   careerProgress?: number;
   careerGoal?: string;
   completedModuleIds?: string[];
+  documents?: UserDocument[];
+}
+
+export interface RequiredDocument {
+    name: string;
+    required: boolean;
 }
 
 export interface Job {
@@ -29,6 +41,14 @@ export interface Job {
   salary: string;
   salaryMin: number;
   salaryMax: number;
+  requiredEducation: string;
+  requiredExperience: number; // in years
+  requiredDocuments: RequiredDocument[];
+}
+
+export interface SubmittedDocument {
+    name: string;
+    fileUrl: string;
 }
 
 export interface Application {
@@ -37,6 +57,7 @@ export interface Application {
   userId: string;
   status: 'Pending' | 'Reviewed' | 'Interviewing' | 'Offered' | 'Rejected';
   matchScore: number; // Percentage
+  submittedDocuments: SubmittedDocument[];
 }
 
 export interface Message {
@@ -89,6 +110,38 @@ export interface CooperativeMessage {
     timestamp: string;
 }
 
+export interface CooperativeActivity {
+    id: string;
+    cooperativeId: string;
+    type: 'NEW_MEMBER' | 'LOAN_APPROVED' | 'GOAL_REACHED' | 'NEW_MEETING' | 'NEW_ELECTION';
+    description: string;
+    timestamp: string;
+}
+
+export interface Meeting {
+    id: string;
+    cooperativeId: string;
+    title: string;
+    description: string;
+    date: string;
+    status: 'Scheduled' | 'Completed' | 'Cancelled';
+}
+
+export interface ElectionOption {
+    id: string;
+    text: string;
+    votes: number;
+}
+export interface Election {
+    id: string;
+    cooperativeId: string;
+    title: string;
+    description: string;
+    options: ElectionOption[];
+    status: 'Active' | 'Closed';
+    votedUserIds: string[];
+}
+
 export interface Cooperative {
     id: string;
     name: string;
@@ -106,6 +159,9 @@ export interface Cooperative {
     loansDisbursed?: number;
     profit?: number;
     messages?: CooperativeMessage[];
+    activities?: CooperativeActivity[];
+    meetings?: Meeting[];
+    elections?: Election[];
 }
 
 export interface CooperativeBudget {
@@ -123,6 +179,7 @@ export interface CooperativeTransaction {
     date: string;
 }
 
+export type TransactionCategory = 'Salary' | 'Contribution' | 'Rent' | 'Food' | 'Transport' | 'Shopping' | 'Entertainment' | 'Utilities' | 'Other';
 
 export interface Transaction {
     id: string;
@@ -130,6 +187,7 @@ export interface Transaction {
     description: string;
     amount: number;
     date: string;
+    category: TransactionCategory;
 }
 
 export interface SavingsGoal {
@@ -137,6 +195,12 @@ export interface SavingsGoal {
     name: string;
     targetAmount: number;
     currentAmount: number;
+}
+
+export interface Budget {
+    id: string;
+    category: TransactionCategory;
+    budgetAmount: number;
 }
 
 export interface Repayment {
@@ -151,10 +215,11 @@ export interface RepaymentInstallment {
 }
 
 export interface LoanApplication {
-  id: string;
+  id:string;
   userId: string;
   cooperativeId: string;
   amount: number;
+  interestRate: number; // Annual percentage rate
   remainingAmount: number;
   purpose: string;
   repaymentPeriod: number; // in months

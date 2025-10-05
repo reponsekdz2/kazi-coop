@@ -1,4 +1,5 @@
 
+
 import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback } from 'react';
 import { AuthProvider } from './AuthContext';
 import { ToastProvider } from './ToastContext';
@@ -6,6 +7,9 @@ import { CooperativeProvider } from './CooperativeContext';
 import { LoanProvider } from './LoanContext';
 import { TransactionProvider } from './TransactionContext';
 import { SavingsGoalProvider } from './SavingsGoalContext';
+import { BudgetProvider } from './BudgetContext';
+import { JobProvider } from './JobContext';
+import { ApplicationProvider } from './ApplicationContext';
 
 type Theme = 'light' | 'dark';
 type Language = 'en' | 'fr' | 'rw';
@@ -97,15 +101,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     <AuthProvider>
       <ToastProvider>
         <CooperativeProvider>
-          <LoanProvider>
-            <TransactionProvider>
-              <SavingsGoalProvider>
-                <AppContextProvider>
-                  {children}
-                </AppContextProvider>
-              </SavingsGoalProvider>
-            </TransactionProvider>
-          </LoanProvider>
+          <TransactionProvider>
+            <JobProvider>
+             <ApplicationProvider>
+                <LoanProvider>
+                    <SavingsGoalProvider>
+                      <BudgetProvider>
+                        <AppContextProvider>
+                          {children}
+                        </AppContextProvider>
+                      </BudgetProvider>
+                    </SavingsGoalProvider>
+                </LoanProvider>
+              </ApplicationProvider>
+            </JobProvider>
+          </TransactionProvider>
         </CooperativeProvider>
       </ToastProvider>
     </AuthProvider>

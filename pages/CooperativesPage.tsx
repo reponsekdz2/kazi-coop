@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { useCooperatives } from '../contexts/CooperativeContext';
-import { Cooperative, User } from '../types';
-import { UserGroupIcon, ArrowTrendingUpIcon, BanknotesIcon, ArrowDownLeftIcon, ArrowUpRightIcon, BuildingLibraryIcon, ReceiptPercentIcon, PaperAirplaneIcon, UsersIcon, ChatBubbleBottomCenterTextIcon } from '@heroicons/react/24/outline';
+import { Cooperative, Election, Meeting, User } from '../types';
+import { UserGroupIcon, ArrowTrendingUpIcon, BanknotesIcon, ArrowDownLeftIcon, ArrowUpRightIcon, BuildingLibraryIcon, ReceiptPercentIcon, PaperAirplaneIcon, UsersIcon, ChatBubbleBottomCenterTextIcon, MagnifyingGlassIcon, CalendarDaysIcon, PlusIcon, MegaphoneIcon, TrophyIcon, ChatBubbleLeftEllipsisIcon, CheckCircleIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../contexts/AuthContext';
 import Modal from '../components/ui/Modal';
 import { useLoan } from '../contexts/LoanContext';
 import { useAppContext } from '../contexts/AppContext';
 import { COOPERATIVE_BUDGET, COOPERATIVE_TRANSACTIONS, USERS } from '../constants';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import RingProgress from '../components/ui/RingProgress';
 
 const COLORS = ['#005A9C', '#10B981', '#5E96C3', '#F59E0B', '#6366F1'];
@@ -170,7 +170,8 @@ const LoanRequestModal: React.FC<LoanRequestModalProps> = ({ isOpen, onClose, co
             amount: Number(amount),
             purpose,
             repaymentPeriod: Number(period),
-            cooperativeId: cooperative.id
+            cooperativeId: cooperative.id,
+            interestRate: 10 // Mock interest rate
         });
         onClose();
         // Reset form
@@ -238,6 +239,9 @@ const CooperativeDetailsModal: React.FC<CooperativeDetailsModalProps> = ({ isOpe
 
     const tabs = [
         { id: 'overview', label: t('cooperatives.details.overview'), icon: BuildingLibraryIcon },
+        { id: 'activity', label: t('cooperatives.details.activity'), icon: ClockIcon },
+        { id: 'meetings', label: t('cooperatives.details.meetings'), icon: CalendarDaysIcon },
+        { id: 'elections', label: t('cooperatives.details.elections'), icon: MegaphoneIcon },
         { id: 'budget', label: t('cooperatives.details.budget'), icon: ReceiptPercentIcon },
         { id: 'transactions', label: t('cooperatives.details.transactions'), icon: ArrowDownLeftIcon },
         { id: 'members', label: t('cooperatives.details.members'), icon: UsersIcon },
@@ -245,7 +249,7 @@ const CooperativeDetailsModal: React.FC<CooperativeDetailsModalProps> = ({ isOpe
     ];
     
     if (isCreator) {
-        tabs.push({ id: 'management', label: t('cooperatives.details.management'), icon: UserGroupIcon });
+        tabs.splice(4, 0, { id: 'management', label: t('cooperatives.details.management'), icon: UserGroupIcon });
     }
 
     return (
@@ -270,6 +274,9 @@ const CooperativeDetailsModal: React.FC<CooperativeDetailsModalProps> = ({ isOpe
             </div>
             <div className="min-h-[400px]">
                 {activeTab === 'overview' && <OverviewTab cooperative={cooperative} />}
+                {activeTab === 'activity' && <ActivityTab cooperative={cooperative} />}
+                {activeTab === 'meetings' && <MeetingsTab cooperative={cooperative} />}
+                {activeTab === 'elections' && <ElectionsTab cooperative={cooperative} />}
                 {activeTab === 'budget' && <BudgetTab cooperative={cooperative} />}
                 {activeTab === 'transactions' && <TransactionsTab cooperative={cooperative} />}
                 {activeTab === 'members' && <MembersTab cooperative={cooperative} />}
@@ -280,51 +287,67 @@ const CooperativeDetailsModal: React.FC<CooperativeDetailsModalProps> = ({ isOpe
     );
 };
 
+const FinancialMetricRingCard: React.FC<{title: string; value: number; total: number; helpText: string; icon: React.ElementType}> = ({title, value, total, helpText, icon: Icon}) => {
+    const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+    return (
+        <Card className="!p-4 bg-light dark:!bg-gray-700/50 !shadow-inner">
+            <div className="flex items-center gap-4">
+                <RingProgress percentage={percentage} size={80} strokeWidth={8} />
+                <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">{title}</p>
+                    <p className="font-bold text-2xl text-dark dark:text-light">RWF {value.toLocaleString()}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500">{helpText}</p>
+                </div>
+            </div>
+        </Card>
+    );
+};
+
+
 const OverviewTab: React.FC<{cooperative: Cooperative}> = ({ cooperative }) => {
     const { t } = useAppContext();
-    const goalProgressPercent = cooperative.goalAmount ? Math.round((cooperative.goalProgress || 0) / cooperative.goalAmount * 100) : 0;
     return (
          <div className="space-y-6">
-            <h3 className="text-lg font-bold text-dark dark:text-light mb-4">{t('cooperatives.details.keyMetrics')}</h3>
+            <h3 className="text-lg font-bold text-dark dark:text-light mb-4">{t('cooperatives.details.financialHealth')}</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FinancialMetricRingCard 
+                    title={t('cooperatives.totalSavings')}
+                    value={cooperative.goalProgress || cooperative.totalSavings}
+                    total={cooperative.goalAmount || cooperative.totalSavings * 1.5}
+                    // FIX: The translation function `t` only accepts one argument. Changed to use .replace() for dynamic values.
+                    helpText={t('cooperatives.details.communityGoalHelp').replace('{goal}', cooperative.communityGoal || "growth")}
+                    icon={BanknotesIcon}
+                />
+                 <FinancialMetricRingCard 
+                    title={t('cooperatives.loanPool')}
+                    value={cooperative.loanPool}
+                    total={cooperative.totalSavings}
+                    helpText={t('cooperatives.details.loanPoolHelp')}
+                    icon={ArrowTrendingUpIcon}
+                />
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                <Card className="!p-4">
-                    <UserGroupIcon className="h-8 w-8 mx-auto text-primary mb-2"/>
-                    <p className="font-bold text-2xl text-dark dark:text-light">{cooperative.members}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('cooperatives.members')}</p>
+                <Card className="!p-3">
+                    <UserGroupIcon className="h-6 w-6 mx-auto text-primary mb-1"/>
+                    <p className="font-bold text-lg text-dark dark:text-light">{cooperative.members}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('cooperatives.members')}</p>
                 </Card>
-                <Card className="!p-4">
-                    <BanknotesIcon className="h-8 w-8 mx-auto text-primary mb-2"/>
-                    <p className="font-bold text-2xl text-dark dark:text-light">RWF {cooperative.totalSavings.toLocaleString()}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('cooperatives.totalSavings')}</p>
+                 <Card className="!p-3">
+                    <ReceiptPercentIcon className="h-6 w-6 mx-auto text-primary mb-1"/>
+                    <p className="font-bold text-lg text-dark dark:text-light">RWF {cooperative.loansDisbursed?.toLocaleString() || 0}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('cooperatives.details.loansDisbursed')}</p>
                 </Card>
-                 <Card className="!p-4">
-                    <ArrowTrendingUpIcon className="h-8 w-8 mx-auto text-primary mb-2"/>
-                    <p className="font-bold text-2xl text-dark dark:text-light">RWF {cooperative.loanPool.toLocaleString()}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('cooperatives.loanPool')}</p>
+                 <Card className="!p-3">
+                    <TrophyIcon className="h-6 w-6 mx-auto text-primary mb-1"/>
+                    <p className="font-bold text-lg text-dark dark:text-light">RWF {cooperative.profit?.toLocaleString() || 0}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('cooperatives.details.profit')}</p>
                 </Card>
-                <Card className="!p-4">
-                    <ReceiptPercentIcon className="h-8 w-8 mx-auto text-primary mb-2"/>
-                    <p className="font-bold text-2xl text-dark dark:text-light">RWF {cooperative.loansDisbursed?.toLocaleString() || 0}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('cooperatives.details.loansDisbursed')}</p>
+                 <Card className="!p-3">
+                    <ChatBubbleLeftEllipsisIcon className="h-6 w-6 mx-auto text-primary mb-1"/>
+                    <p className="font-bold text-lg text-dark dark:text-light">{cooperative.messages?.length || 0}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('cooperatives.details.messages')}</p>
                 </Card>
             </div>
-            
-            {cooperative.communityGoal && (
-                <Card title={t('cooperatives.details.communityGoal')}>
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                        <div className="flex-1">
-                            <h4 className="text-lg font-bold text-dark dark:text-light">{cooperative.communityGoal}</h4>
-                            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{t('cooperatives.details.goalProgress')}</p>
-                            <p className="text-2xl font-bold text-primary mt-2">
-                                RWF {(cooperative.goalProgress || 0).toLocaleString()} / {(cooperative.goalAmount || 0).toLocaleString()}
-                            </p>
-                        </div>
-                        <div className="flex-shrink-0">
-                            <RingProgress percentage={goalProgressPercent} size={120} strokeWidth={10} />
-                        </div>
-                    </div>
-                </Card>
-            )}
         </div>
     );
 };
@@ -456,13 +479,30 @@ const ManagementTab: React.FC<{cooperative: Cooperative}> = ({ cooperative }) =>
 
 const MembersTab: React.FC<{cooperative: Cooperative}> = ({ cooperative }) => {
     const { t } = useAppContext();
+    const [searchTerm, setSearchTerm] = useState('');
     const members = USERS.filter(u => u.cooperativeIds?.includes(cooperative.id));
     
+    const filteredMembers = members.filter(member => 
+        member.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
          <div>
-            <h3 className="text-lg font-bold text-dark dark:text-light mb-4">{t('cooperatives.details.memberList')} ({members.length})</h3>
+            <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-bold text-dark dark:text-light">{t('cooperatives.details.memberList')} ({members.length})</h3>
+                <div className="relative w-1/2">
+                    <MagnifyingGlassIcon className="h-4 w-4 text-gray-400 absolute top-1/2 left-3 -translate-y-1/2" />
+                    <input 
+                        type="text"
+                        placeholder={t('cooperatives.details.searchMembers')}
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                        className="w-full pl-9 pr-3 py-1.5 border rounded-md text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                </div>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[350px] overflow-y-auto pr-2">
-                {members.map(member => (
+                {filteredMembers.map(member => (
                     <div key={member.id} className="flex items-center p-3 rounded bg-light dark:bg-gray-700">
                         <img src={member.avatarUrl} alt={member.name} className="h-10 w-10 rounded-full mr-3" />
                         <div>
@@ -519,6 +559,184 @@ const CommunityTab: React.FC<{cooperative: Cooperative}> = ({ cooperative }) => 
                 <Button type="submit" className="!px-3"><PaperAirplaneIcon className="h-5 w-5" /></Button>
             </form>
         </div>
+    );
+};
+
+const ActivityTab: React.FC<{cooperative: Cooperative}> = ({ cooperative }) => {
+    const { t } = useAppContext();
+    const activities = cooperative.activities || [];
+
+    const iconMap = {
+        NEW_MEMBER: { icon: UserGroupIcon, color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/50' },
+        LOAN_APPROVED: { icon: BanknotesIcon, color: 'text-green-600', bg: 'bg-green-100 dark:bg-green-900/50' },
+        GOAL_REACHED: { icon: TrophyIcon, color: 'text-yellow-600', bg: 'bg-yellow-100 dark:bg-yellow-900/50' },
+        NEW_MEETING: { icon: CalendarDaysIcon, color: 'text-purple-600', bg: 'bg-purple-100 dark:bg-purple-900/50' },
+        NEW_ELECTION: { icon: MegaphoneIcon, color: 'text-indigo-600', bg: 'bg-indigo-100 dark:bg-indigo-900/50' },
+    };
+
+    return (
+        <div className="max-h-[400px] overflow-y-auto pr-2">
+            <h3 className="text-lg font-bold text-dark dark:text-light mb-4">{t('cooperatives.details.activityFeed')}</h3>
+            {activities.length > 0 ? (
+                <ul className="space-y-4">
+                    {activities.map(activity => {
+                        const { icon: Icon, color, bg } = iconMap[activity.type];
+                        return (
+                             <li key={activity.id} className="flex items-start gap-3">
+                                <div className={`p-2 rounded-full mt-1 ${bg}`}>
+                                    <Icon className={`h-5 w-5 ${color}`}/>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-dark dark:text-light">{activity.description}</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">{new Date(activity.timestamp).toLocaleString()}</p>
+                                </div>
+                            </li>
+                        );
+                    })}
+                </ul>
+            ) : (
+                <p className="text-center text-gray-500 dark:text-gray-400 py-8">{t('cooperatives.details.noActivity')}</p>
+            )}
+        </div>
+    );
+};
+
+const MeetingsTab: React.FC<{cooperative: Cooperative}> = ({ cooperative }) => {
+    const { t } = useAppContext();
+    const { user } = useAuth();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const meetings = cooperative.meetings || [];
+    const isCreator = cooperative.creatorId === user?.id;
+    
+    return (
+        <div>
+            <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-bold text-dark dark:text-light">{t('cooperatives.details.meetingsTitle')}</h3>
+                {isCreator && <Button onClick={() => setIsModalOpen(true)}><PlusIcon className="h-4 w-4 mr-2 inline"/>{t('cooperatives.details.scheduleMeeting')}</Button>}
+            </div>
+            <div className="space-y-3 max-h-[350px] overflow-y-auto pr-2">
+                {meetings.length > 0 ? meetings.map(meeting => (
+                    <Card key={meeting.id} className="!p-3">
+                        <p className="font-bold text-dark dark:text-light">{meeting.title}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 my-1">{meeting.description}</p>
+                        <div className="flex justify-between items-center mt-2">
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${meeting.status === 'Scheduled' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>{meeting.status}</span>
+                            <span className="text-xs text-gray-500 font-semibold">{new Date(meeting.date).toLocaleString()}</span>
+                        </div>
+                    </Card>
+                )) : <p className="text-center text-gray-500 dark:text-gray-400 py-8">{t('cooperatives.details.noMeetings')}</p>}
+            </div>
+            {isModalOpen && <ScheduleMeetingModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} cooperativeId={cooperative.id}/>}
+        </div>
+    );
+};
+
+const ScheduleMeetingModal: React.FC<{isOpen: boolean, onClose: () => void, cooperativeId: string}> = ({isOpen, onClose, cooperativeId}) => {
+    const { t } = useAppContext();
+    const { scheduleMeeting } = useCooperatives();
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
+    const [date, setDate] = useState('');
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        scheduleMeeting(cooperativeId, { title, description, date: new Date(date).toISOString() });
+        onClose();
+    };
+
+    return (
+        <Modal isOpen={isOpen} onClose={onClose} title={t('cooperatives.details.scheduleMeeting')}>
+            <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Form fields... */}
+                 <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('cooperatives.details.meetingTitle')}</label>
+                    <input type="text" value={title} onChange={e => setTitle(e.target.value)} className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" required />
+                </div>
+                 <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('cooperatives.details.meetingDesc')}</label>
+                    <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" required />
+                </div>
+                 <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('cooperatives.details.meetingDate')}</label>
+                    <input type="datetime-local" value={date} onChange={e => setDate(e.target.value)} className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" required />
+                </div>
+                <div className="flex justify-end gap-2 pt-4">
+                    <Button type="button" variant="secondary" onClick={onClose}>{t('common.cancel')}</Button>
+                    <Button type="submit">{t('common.submit')}</Button>
+                </div>
+            </form>
+        </Modal>
+    );
+};
+
+const ElectionsTab: React.FC<{cooperative: Cooperative}> = ({ cooperative }) => {
+    const { t } = useAppContext();
+    const { user } = useAuth();
+    const { castVote } = useCooperatives();
+    const elections = cooperative.elections || [];
+    const isCreator = cooperative.creatorId === user?.id;
+
+    return (
+        <div>
+             <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-bold text-dark dark:text-light">{t('cooperatives.details.electionsTitle')}</h3>
+                {isCreator && <Button><PlusIcon className="h-4 w-4 mr-2 inline"/>{t('cooperatives.details.createElection')}</Button>}
+            </div>
+             <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2">
+                {elections.length > 0 ? elections.map(election => (
+                    <ElectionCard key={election.id} election={election} coopId={cooperative.id}/>
+                )) : <p className="text-center text-gray-500 dark:text-gray-400 py-8">{t('cooperatives.details.noElections')}</p>}
+             </div>
+        </div>
+    );
+};
+
+const ElectionCard: React.FC<{election: Election, coopId: string}> = ({ election, coopId }) => {
+    const { t } = useAppContext();
+    const { user } = useAuth();
+    const { castVote } = useCooperatives();
+    const totalVotes = election.options.reduce((sum, opt) => sum + opt.votes, 0);
+    const userHasVoted = user && election.votedUserIds.includes(user.id);
+    const { theme } = useAppContext();
+    const axisColor = theme === 'dark' ? '#9CA3AF' : '#6B7280';
+    const gridColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(128, 128, 128, 0.3)';
+
+    return (
+        <Card>
+            <div className="flex justify-between items-start">
+                <div>
+                    <h4 className="font-bold text-dark dark:text-light">{election.title}</h4>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{election.description}</p>
+                </div>
+                <span className={`text-xs px-2 py-0.5 rounded-full ${election.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>{election.status}</span>
+            </div>
+            <div className="mt-4">
+                {election.status === 'Active' ? (
+                    <div className="space-y-2">
+                        {userHasVoted ? <p className="text-sm text-green-600 flex items-center gap-2"><CheckCircleIcon className="h-5 w-5"/>{t('cooperatives.details.voted')}</p> : <p className="text-sm font-semibold">{t('cooperatives.details.castVote')}</p>}
+                        {election.options.map(option => (
+                            <div key={option.id} className="flex items-center justify-between p-2 bg-light dark:bg-gray-700 rounded-md">
+                                <span>{option.text}</span>
+                                <Button size="sm" onClick={() => castVote(coopId, election.id, option.id)} disabled={userHasVoted}>{t('cooperatives.details.vote')}</Button>
+                            </div>
+                        ))}
+                    </div>
+                ) : ( // Closed
+                    <div>
+                        <h5 className="text-sm font-semibold mb-2">{t('cooperatives.details.results')} ({totalVotes} {t('cooperatives.details.votes')})</h5>
+                         <ResponsiveContainer width="100%" height={election.options.length * 50}>
+                            <BarChart data={election.options} layout="vertical" margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
+                                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={gridColor}/>
+                                <XAxis type="number" hide />
+                                <YAxis type="category" dataKey="text" width={150} tick={{ fill: axisColor, fontSize: 12 }}/>
+                                <Tooltip cursor={{fill: 'rgba(128,128,128,0.1)'}}/>
+                                <Bar dataKey="votes" fill="#005A9C" background={{ fill: '#eee' }} barSize={20} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                )}
+            </div>
+        </Card>
     );
 };
 
