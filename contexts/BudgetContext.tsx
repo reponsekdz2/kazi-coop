@@ -1,8 +1,10 @@
+
 import React, { createContext, useState, useContext, ReactNode, useMemo } from 'react';
 import { Budget, TransactionCategory } from '../types';
 import { BUDGETS } from '../constants';
 import { useToast } from './ToastContext';
 import { useTransactions } from './TransactionContext';
+import { useAuth } from './AuthContext';
 
 export interface BudgetWithSpending extends Budget {
     spentAmount: number;
@@ -12,23 +14,26 @@ export interface BudgetWithSpending extends Budget {
 
 interface BudgetContextType {
   budgetsWithSpending: BudgetWithSpending[];
-  addBudget: (details: Omit<Budget, 'id'>) => void;
+  addBudget: (details: Omit<Budget, 'id' | 'userId'>) => void;
 }
 
 const BudgetContext = createContext<BudgetContextType | undefined>(undefined);
 
 export const BudgetProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [budgets, setBudgets] = useState<Budget[]>(BUDGETS);
+  const { user } = useAuth();
+  const [budgets, setBudgets] = useState<Budget[]>(() => BUDGETS.filter(b => b.userId === user?.id));
   const { addToast } = useToast();
   const { transactions } = useTransactions();
 
-  const addBudget = (details: Omit<Budget, 'id'>) => {
+  const addBudget = (details: Omit<Budget, 'id' | 'userId'>) => {
+    if (!user) return;
     if (budgets.some(b => b.category === details.category)) {
         addToast(`A budget for ${details.category} already exists.`, 'error');
         return;
     }
     const newBudget: Budget = {
       id: `b-${new Date().getTime()}`,
+      userId: user.id,
       ...details,
     };
 
@@ -43,7 +48,7 @@ export const BudgetProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             .reduce((sum, t) => sum + Math.abs(t.amount), 0);
         
         const remainingAmount = budget.budgetAmount - spentAmount;
-        const progress = Math.min((spentAmount / budget.budgetAmount) * 100, 100);
+        const progress = budget.budgetAmount > 0 ? Math.min((spentAmount / budget.budgetAmount) * 100, 100) : 0;
 
         return {
             ...budget,

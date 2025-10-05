@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import Card from '../components/ui/Card';
 import StatCard from '../components/ui/StatCard';
@@ -8,6 +9,7 @@ import {
     PieChart, Pie, Cell, ComposedChart, Area, Line 
 } from 'recharts';
 import { UserPlusIcon, BriefcaseIcon, BanknotesIcon, ArrowTrendingUpIcon, SparklesIcon } from '@heroicons/react/24/outline';
+// Correct import for GoogleGenAI
 import { GoogleGenAI } from '@google/genai';
 import { useToast } from '../contexts/ToastContext';
 
@@ -43,6 +45,7 @@ const AnalyticsPage: React.FC = () => {
         setIsGenerating(true);
         setSummary('');
         try {
+            // Correct initialization of GoogleGenAI
             const ai = new GoogleGenAI({apiKey: process.env.API_KEY as string});
             
             const prompt = `
@@ -71,7 +74,9 @@ ${JSON.stringify(memberRoleData, null, 2)}
 ${ACTIVITY_LOG.slice(0, 4).map(log => `- ${log.description}`).join('\n')}
 `;
             
+            // Correct API call to generateContent
             const response = await ai.models.generateContent({ model: 'gemini-2.5-flash', contents: prompt });
+            // Correct way to extract text from response
             setSummary(response.text);
 
         } catch (error) {
@@ -174,15 +179,15 @@ ${ACTIVITY_LOG.slice(0, 4).map(log => `- ${log.description}`).join('\n')}
                 <div className="space-y-4 flex-1 h-[420px] overflow-y-auto pr-2">
                     {ACTIVITY_LOG.map(log => (
                         <div key={log.id} className="flex items-start">
-                            <div className="bg-light p-2 rounded-full mr-3 mt-1">
+                            <div className="bg-light dark:bg-gray-700/50 p-2 rounded-full mr-3 mt-1">
                                 {log.type === 'NEW_MEMBER' && <UserPlusIcon className="h-5 w-5 text-primary"/>}
                                 {log.type === 'NEW_JOB' && <BriefcaseIcon className="h-5 w-5 text-primary"/>}
                                 {log.type === 'SAVINGS_GOAL' && <ArrowTrendingUpIcon className="h-5 w-5 text-accent"/>}
                                 {log.type === 'LARGE_DEPOSIT' && <BanknotesIcon className="h-5 w-5 text-green-500"/>}
                             </div>
                             <div>
-                                <p className="text-sm text-dark">{log.description}</p>
-                                <p className="text-xs text-gray-400">{new Date(log.timestamp).toLocaleString()}</p>
+                                <p className="text-sm text-dark dark:text-light">{log.description}</p>
+                                <p className="text-xs text-gray-400 dark:text-gray-500">{new Date(log.timestamp).toLocaleString()}</p>
                             </div>
                         </div>
                     ))}

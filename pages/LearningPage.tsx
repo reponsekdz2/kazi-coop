@@ -20,7 +20,8 @@ const PersonalizedLearningPath: React.FC = () => {
 
     return (
         <Card className="mb-12 bg-gradient-to-r from-primary to-secondary text-white dark:from-gray-800 dark:to-dark">
-            <h2 className="text-2xl font-bold mb-2">{t('learning.yourPath')}</h2>
+            <h2 className="text-xl font-bold mb-1 opacity-80">{t('learning.yourPath')}</h2>
+            <h3 className="text-3xl font-bold mb-2">{path.title}</h3>
             <p className="opacity-90 mb-6">{path.description}</p>
             <div className="relative flex items-center py-4">
                 {/* Dashed line */}
@@ -64,17 +65,22 @@ const LearningPage: React.FC = () => {
       <PersonalizedLearningPath />
 
       <div className="space-y-12">
-        {categories.map(category => (
-          <div key={category}>
-            {/* FIX: The translation function `t` only accepts one argument. The second argument, intended as a fallback, has been removed to resolve the type error. */}
-            <h2 className="text-2xl font-bold text-dark dark:text-light mb-4 capitalize">{t(`learning.categories.${category.toLowerCase().replace(/[\s-]/g, '')}`)}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {LEARNING_MODULES.filter(m => m.category === category).map(module => (
-                <LearningModuleCard key={module.id} module={module} />
-              ))}
+        {categories.map(category => {
+          const translationKey = `learning.categories.${category.toLowerCase().replace(/[\s-]/g, '')}`;
+          const translatedCategory = t(translationKey);
+          const categoryDisplayName = translatedCategory === translationKey ? category : translatedCategory;
+          
+          return (
+            <div key={category}>
+              <h2 className="text-2xl font-bold text-dark dark:text-light mb-4 capitalize">{categoryDisplayName}</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {LEARNING_MODULES.filter(m => m.category === category).map(module => (
+                  <LearningModuleCard key={module.id} module={module} />
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
