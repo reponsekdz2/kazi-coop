@@ -1,26 +1,47 @@
 import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { Loan } from '../types';
-import { LOANS } from '../constants'; // Assuming LOANS are in constants
+import { LoanApplication } from '../types';
+import { LOAN_APPLICATIONS } from '../constants';
+import { useToast } from './ToastContext';
+import { useAuth } from './AuthContext';
 
 interface LoanContextType {
-  loans: Loan[];
-  applyForLoan: (amount: number, reason: string) => Promise<boolean>;
+  applications: LoanApplication[];
+  submitLoanApplication: (details: Omit<LoanApplication, 'id' | 'status' | 'userId'>) => void;
 }
 
 const LoanContext = createContext<LoanContextType | undefined>(undefined);
 
 export const LoanProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [loans, setLoans] = useState<Loan[]>(LOANS);
+  const { user } = useAuth();
+  const [applications, setApplications] = useState<LoanApplication[]>(LOAN_APPLICATIONS.filter(app => app.userId === user?.id));
+  const { addToast } = useToast();
 
-  const applyForLoan = async (amount: number, reason: string): Promise<boolean> => {
-    // Mock API call
-    console.log(`Applying for loan of ${amount} for ${reason}`);
-    // In a real app, you would add the new loan to state here after a successful API call.
-    return new Promise(resolve => setTimeout(() => resolve(true), 1000));
+  const submitLoanApplication = (details: Omit<LoanApplication, 'id' | 'status' | 'userId'>) => {
+    if (!user) return;
+
+    const newApplication: LoanApplication = {
+      id: `la-${new Date().getTime()}`,
+      userId: user.id,
+      ...details,
+      status: 'Pending',
+    };
+
+    setApplications(prev => [...prev, newApplication]);
+    addToast('Loan application submitted successfully!', 'success');
+
+    // Simulate approval process
+    setTimeout(() => {
+      setApplications(prev =>
+        prev.map(app =>
+          app.id === newApplication.id ? { ...app, status: 'Approved' } : app
+        )
+      );
+      addToast(`Your loan for RWF ${newApplication.amount.toLocaleString()} has been approved!`, 'info');
+    }, 5000);
   };
 
   return (
-    <LoanContext.Provider value={{ loans, applyForLoan }}>
+    <LoanContext.Provider value={{ applications, submitLoanApplication }}>
       {children}
     </LoanContext.Provider>
   );

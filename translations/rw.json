@@ -1,0 +1,96 @@
+{
+  "header": {
+    "profile": "Umwirondoro",
+    "logout": "Gusohoka"
+  },
+  "sidebar": {
+    "dashboard": "Imbonerahamwe",
+    "findJobs": "Shaka Akazi",
+    "interviews": "Ibibazo",
+    "cooperatives": "Amakoperative",
+    "wallet": "Ikofi yanjye",
+    "learningHub": "Aho kwigira",
+    "messages": "Ubutumwa",
+    "jobPostings": "Amatangazo y'akazi",
+    "talentPool": "Abashoboye",
+    "platformAnalytics": "Isesengura ry'urubuga",
+    "myProfile": "Umwirondoro wanjye",
+    "helpCenter": "Ubufasha"
+  },
+  "dashboard": {
+    "welcome": "Ikaze, {name}!",
+    "activeApplications": "Gusaba biriho",
+    "interviewsScheduled": "Ibibazo biteganyijwe",
+    "totalSavings": "Kuzigama kwose",
+    "profileViews": "Abarebye umwirondoro",
+    "careerJourney": "Urugendo rwawe rw'akazi",
+    "recommendedJobs": "Akazi tukugenera",
+    "view": "Reba",
+    "employerDashboard": "Imbonerahamwe y'umukoresha",
+    "activePostings": "Amatangazo ariho",
+    "newApplicants": "Abasabye bashya",
+    "interviewsToday": "Ibibazo uyu munsi",
+    "avgMatchScore": "Inota risanzwe",
+    "applicantsPerJob": "Abasabye kuri buri kazi",
+    "recentApplicants": "Abasabye vuba",
+    "appliedFor": "Yasabye {jobTitle}"
+  },
+  "login": {
+    "welcome": "Ikaze!",
+    "continue": "Injira ukomeze urugendo rwawe.",
+    "jobSeeker": "Ushaka akazi",
+    "employer": "Umukoresha",
+    "email": "Imeri",
+    "password": "Ijambobanga",
+    "loginAs": "Injira nka {role}",
+    "noAccount": "Nta konti ufite?",
+    "signUp": "Iyandikishe"
+  },
+  "wallet": {
+    "title": "Ikofi Yanjye",
+    "request": "Saba",
+    "send": "Ohereza amafaranga",
+    "totalBalance": "Amafaranga yose",
+    "recentTransactions": "Ibyaherukaga",
+    "income": "Amafaranga yinjiye",
+    "expenses": "Amafaranga yasohotse",
+    "savingsGoals": "Intego zo kuzigama",
+    "newGoal": "Intego nshya",
+    "overview": "Morusange",
+    "loanApplications": "Gusaba inguzanyo",
+    "loanAmountHeader": "Umubare",
+    "loanPurposeHeader": "Impamvu",
+    "loanPeriodHeader": "Igihe",
+    "loanStatusHeader": "Uko bihagaze",
+    "noLoanApplications": "Nta nguzanyo n'imwe urasaba."
+  },
+  "cooperatives": {
+    "title": "Amakoperative",
+    "create": "Kurema Koperative",
+    "exploreAll": "Reba zose",
+    "myCooperatives": "Amakoperative yanjye",
+    "notJoined": "Nta koperative n'imwe urimo.",
+    "explore": "Shakisha Amakoperative",
+    "createdBy": "Yaremwe na",
+    "members": "Abanyamuryango",
+    "totalSavings": "Azigamwe yose",
+    "loanPool": "Inguzanyo zihari",
+    "viewDashboard": "Reba Imbonerahamwe",
+    "requestLoan": "Saba inguzanyo",
+    "requestToJoin": "Saba kwinjira",
+    "loanRequestTitle": "Gusaba inguzanyo muri",
+    "loanAmountLabel": "Amafaranga y'inguzanyo (RWF)",
+    "purposeLabel": "Impamvu",
+    "repaymentPeriodLabel": "Igihe cyo kwishyura (mu mezi)"
+  },
+  "common": {
+    "submit": "Emeza",
+    "cancel": "Siba",
+    "months": "amezi"
+  },
+  "loanStatus": {
+    "pending": "Bitegereje",
+    "approved": "Byemejwe",
+    "rejected": "Byanzwe"
+  }
+}

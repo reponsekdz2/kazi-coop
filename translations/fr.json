@@ -1,0 +1,96 @@
+{
+  "header": {
+    "profile": "Profil",
+    "logout": "Déconnexion"
+  },
+  "sidebar": {
+    "dashboard": "Tableau de bord",
+    "findJobs": "Trouver un emploi",
+    "interviews": "Entretiens",
+    "cooperatives": "Coopératives",
+    "wallet": "Mon portefeuille",
+    "learningHub": "Centre d'apprentissage",
+    "messages": "Messages",
+    "jobPostings": "Offres d'emploi",
+    "talentPool": "Bassin de talents",
+    "platformAnalytics": "Analyses de la plateforme",
+    "myProfile": "Mon profil",
+    "helpCenter": "Centre d'aide"
+  },
+  "dashboard": {
+    "welcome": "Content de vous revoir, {name} !",
+    "activeApplications": "Candidatures actives",
+    "interviewsScheduled": "Entretiens prévus",
+    "totalSavings": "Épargne totale",
+    "profileViews": "Vues du profil",
+    "careerJourney": "Votre parcours professionnel",
+    "recommendedJobs": "Emplois recommandés pour vous",
+    "view": "Voir",
+    "employerDashboard": "Tableau de bord employeur",
+    "activePostings": "Annonces actives",
+    "newApplicants": "Nouveaux candidats",
+    "interviewsToday": "Entretiens aujourd'hui",
+    "avgMatchScore": "Score d'adéquation moy.",
+    "applicantsPerJob": "Candidats par offre d'emploi",
+    "recentApplicants": "Candidats récents",
+    "appliedFor": "A postulé pour {jobTitle}"
+  },
+  "login": {
+    "welcome": "Bon retour !",
+    "continue": "Connectez-vous pour continuer votre parcours.",
+    "jobSeeker": "Chercheur d'emploi",
+    "employer": "Employeur",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "loginAs": "Se connecter en tant que {role}",
+    "noAccount": "Vous n'avez pas de compte ?",
+    "signUp": "S'inscrire"
+  },
+  "wallet": {
+    "title": "Mon Portefeuille",
+    "request": "Demander",
+    "send": "Envoyer de l'argent",
+    "totalBalance": "Solde total",
+    "recentTransactions": "Transactions récentes",
+    "income": "Revenus",
+    "expenses": "Dépenses",
+    "savingsGoals": "Objectifs d'épargne",
+    "newGoal": "Nouvel objectif",
+    "overview": "Aperçu",
+    "loanApplications": "Mes demandes de prêt",
+    "loanAmountHeader": "Montant",
+    "loanPurposeHeader": "Objet",
+    "loanPeriodHeader": "Période",
+    "loanStatusHeader": "Statut",
+    "noLoanApplications": "Vous n'avez encore demandé aucun prêt."
+  },
+  "cooperatives": {
+    "title": "Coopératives",
+    "create": "Créer une coopérative",
+    "exploreAll": "Explorer tout",
+    "myCooperatives": "Mes coopératives",
+    "notJoined": "Vous n'avez rejoint aucune coopérative pour le moment.",
+    "explore": "Explorer les coopératives",
+    "createdBy": "Créée par",
+    "members": "Membres",
+    "totalSavings": "Épargne totale",
+    "loanPool": "Fonds de prêt",
+    "viewDashboard": "Voir le tableau de bord",
+    "requestLoan": "Demander un prêt",
+    "requestToJoin": "Demander à rejoindre",
+    "loanRequestTitle": "Demande de prêt de",
+    "loanAmountLabel": "Montant du prêt (RWF)",
+    "purposeLabel": "Objet du prêt",
+    "repaymentPeriodLabel": "Période de remboursement (en mois)"
+  },
+  "common": {
+    "submit": "Soumettre",
+    "cancel": "Annuler",
+    "months": "mois"
+  },
+  "loanStatus": {
+    "pending": "En attente",
+    "approved": "Approuvée",
+    "rejected": "Rejetée"
+  }
+}

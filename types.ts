@@ -1,7 +1,7 @@
 export enum UserRole {
   SEEKER = 'Job Seeker',
   EMPLOYER = 'Employer',
-  COOP_ADMIN = 'Co-op Admin',
+  ADMIN = 'Admin',
 }
 
 export interface User {
@@ -10,61 +10,65 @@ export interface User {
   email: string;
   role: UserRole;
   avatarUrl: string;
-  savingsBalance?: number;
-  cooperativeShare?: number;
-  careerProgress?: number;
   skills?: string[];
+  cooperativeIds?: string[];
+  careerProgress?: number;
 }
 
 export interface Job {
-  id: number;
+  id: string;
   title: string;
   company: string;
   location: string;
-  type: string; // e.g., 'Full-time', 'Part-time'
+  type: string; // e.g., Full-time, Part-time
   description: string;
   skills: string[];
   salary: string;
-  salaryMin?: number;
-  salaryMax?: number;
+  salaryMin: number;
+  salaryMax: number;
 }
 
 export interface Application {
-  id: number;
-  jobId: number;
+  id: string;
+  jobId: string;
   userId: string;
   status: 'Pending' | 'Reviewed' | 'Interviewing' | 'Offered' | 'Rejected';
-  matchScore: number;
+  matchScore: number; // Percentage
 }
 
 export interface Message {
-  id: number;
+  id: string;
   senderId: string;
   receiverId: string;
   text: string;
   timestamp: string;
 }
 
-export interface Notification {
-  id: number;
-  message: string;
-  date: string;
-  read: boolean;
+export interface LearningModule {
+  id: string;
+  title: string;
+  category: string;
+  type: 'video' | 'article';
+  duration: string;
+  coverImageUrl: string;
+  content: {
+    summary: string;
+    videoUrl?: string;
+    articleText?: string;
+    keyTakeaways: string[];
+  };
 }
 
-export interface Transaction {
-  id: number;
-  type: 'deposit' | 'withdrawal' | 'transfer' | 'loan_repayment' | 'contribution';
-  amount: number;
-  date: string;
-  description: string;
+export interface CooperativeJoinRequest {
+    userId: string;
+    status: 'pending';
 }
 
 export interface Contributor {
-  id: string;
-  name: string;
-  amount: number;
-  avatarUrl: string;
+    id: string;
+    name: string;
+    avatarUrl: string;
+    amount: number;
 }
 
 export interface Cooperative {
@@ -73,26 +77,54 @@ export interface Cooperative {
     members: number;
     totalSavings: number;
     loanPool: number;
-    logoUrl: string;
+    creator: string;
+    creatorId: string;
+    imageUrl: string;
+    joinRequests?: CooperativeJoinRequest[];
     communityGoal?: string;
     goalAmount?: number;
     goalProgress?: number;
     topContributors?: Contributor[];
+    loansDisbursed?: number;
+    profit?: number;
 }
 
-export interface Loan {
-    id: number;
-    userId: string;
+export interface CooperativeBudget {
+    id: string;
+    cooperativeId: string;
+    allocations: { category: string, amount: number }[];
+}
+
+export interface CooperativeTransaction {
+    id: string;
+    cooperativeId: string;
+    description: string;
     amount: number;
-    interestRate: number;
-    status: 'Pending' | 'Approved' | 'Paid';
-    repaymentProgress: number;
-    dueDate: string;
+    type: 'contribution' | 'loan_disbursement' | 'expense' | 'investment_return';
+    date: string;
 }
 
-export interface ActivityLog {
-  id: number;
-  type: 'NEW_MEMBER' | 'NEW_JOB' | 'SAVINGS_GOAL' | 'LARGE_DEPOSIT';
-  description: string;
-  timestamp: string;
+
+export interface Transaction {
+    id: string;
+    type: 'deposit' | 'withdrawal' | 'payment' | 'loan';
+    description: string;
+    amount: number;
+    date: string;
+}
+
+export interface SavingsGoal {
+    id: string;
+    name: string;
+    targetAmount: number;
+    currentAmount: number;
+}
+
+export interface LoanApplication {
+  id: string;
+  userId: string;
+  amount: number;
+  purpose: string;
+  repaymentPeriod: number; // in months
+  status: 'Pending' | 'Approved' | 'Rejected';
 }

@@ -1,0 +1,96 @@
+{
+  "header": {
+    "profile": "Profile",
+    "logout": "Logout"
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "findJobs": "Find Jobs",
+    "interviews": "Interviews",
+    "cooperatives": "Cooperatives",
+    "wallet": "My Wallet",
+    "learningHub": "Learning Hub",
+    "messages": "Messages",
+    "jobPostings": "Job Postings",
+    "talentPool": "Talent Pool",
+    "platformAnalytics": "Platform Analytics",
+    "myProfile": "My Profile",
+    "helpCenter": "Help Center"
+  },
+  "dashboard": {
+    "welcome": "Welcome back, {name}!",
+    "activeApplications": "Active Applications",
+    "interviewsScheduled": "Interviews Scheduled",
+    "totalSavings": "Total Savings",
+    "profileViews": "Profile Views",
+    "careerJourney": "Your Career Journey",
+    "recommendedJobs": "Recommended Jobs for You",
+    "view": "View",
+    "employerDashboard": "Employer Dashboard",
+    "activePostings": "Active Postings",
+    "newApplicants": "New Applicants",
+    "interviewsToday": "Interviews Today",
+    "avgMatchScore": "Avg. Match Score",
+    "applicantsPerJob": "Applicants per Job Posting",
+    "recentApplicants": "Recent Applicants",
+    "appliedFor": "Applied for {jobTitle}"
+  },
+  "login": {
+    "welcome": "Welcome Back!",
+    "continue": "Log in to continue your journey.",
+    "jobSeeker": "Job Seeker",
+    "employer": "Employer",
+    "email": "Email Address",
+    "password": "Password",
+    "loginAs": "Log In as {role}",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign up"
+  },
+  "wallet": {
+    "title": "My Wallet",
+    "request": "Request",
+    "send": "Send Money",
+    "totalBalance": "Total Balance",
+    "recentTransactions": "Recent Transactions",
+    "income": "Income",
+    "expenses": "Expenses",
+    "savingsGoals": "Savings Goals",
+    "newGoal": "New Goal",
+    "overview": "Overview",
+    "loanApplications": "My Loan Applications",
+    "loanAmountHeader": "Amount",
+    "loanPurposeHeader": "Purpose",
+    "loanPeriodHeader": "Period",
+    "loanStatusHeader": "Status",
+    "noLoanApplications": "You have not applied for any loans yet."
+  },
+  "cooperatives": {
+    "title": "Cooperatives",
+    "create": "Create a Cooperative",
+    "exploreAll": "Explore All",
+    "myCooperatives": "My Cooperatives",
+    "notJoined": "You haven't joined any cooperatives yet.",
+    "explore": "Explore Cooperatives",
+    "createdBy": "Created by",
+    "members": "Members",
+    "totalSavings": "Total Savings",
+    "loanPool": "Loan Pool",
+    "viewDashboard": "View Dashboard",
+    "requestLoan": "Request a Loan",
+    "requestToJoin": "Request to Join",
+    "loanRequestTitle": "Loan Request from",
+    "loanAmountLabel": "Loan Amount (RWF)",
+    "purposeLabel": "Purpose",
+    "repaymentPeriodLabel": "Repayment Period (in months)"
+  },
+  "common": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "months": "months"
+  },
+  "loanStatus": {
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected"
+  }
+}

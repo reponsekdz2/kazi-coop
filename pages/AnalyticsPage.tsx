@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Card from '../components/ui/Card';
 import StatCard from '../components/ui/StatCard';
+import Button from '../components/ui/Button';
 import { ACTIVITY_LOG, USERS, cooperativeFinancialsData } from '../constants';
 import { 
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, 
     PieChart, Pie, Cell, ComposedChart, Area, Line 
 } from 'recharts';
-import { UserPlusIcon, BriefcaseIcon, BanknotesIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
+import { UserPlusIcon, BriefcaseIcon, BanknotesIcon, ArrowTrendingUpIcon, SparklesIcon } from '@heroicons/react/24/outline';
+import { GoogleGenAI } from '@google/genai';
+import { useToast } from '../contexts/ToastContext';
 
 const userGrowthData = [
   { name: 'Jan', users: 40, jobs: 24 },
@@ -32,9 +35,87 @@ const memberRoleData = USERS.reduce((acc, user) => {
 const COLORS = ['#005A9C', '#10B981', '#5E96C3'];
 
 const AnalyticsPage: React.FC = () => {
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [summary, setSummary] = useState('');
+    const { addToast } = useToast();
+
+    const handleGenerateSummary = async () => {
+        setIsGenerating(true);
+        setSummary('');
+        try {
+            const ai = new GoogleGenAI({apiKey: process.env.API_KEY as string});
+            
+            const prompt = `
+You are a senior business analyst for KaziCoop, a platform in Rwanda that connects job seekers with employers and facilitates community savings cooperatives (Ikimina).
+
+Analyze the following platform metrics and generate a concise, insightful summary (2-3 paragraphs) for a management meeting. Highlight key trends, potential strengths, and areas for concern. The summary should be easy to understand for non-technical stakeholders. Format the output as markdown, starting with a clear headline.
+
+**Platform Data Snapshot:**
+
+**Key Metrics:**
+- Total Users: ${USERS.length}
+- Active Jobs: 4
+- Total Cooperative Savings: RWF 78.4M
+- Monthly User Growth: 5.2%
+
+**Cooperative Financials (YTD, in Millions RWF):**
+${JSON.stringify(cooperativeFinancialsData, null, 2)}
+
+**User Growth vs. Job Postings (Monthly):**
+${JSON.stringify(userGrowthData, null, 2)}
+
+**Member Demographics:**
+${JSON.stringify(memberRoleData, null, 2)}
+
+**Recent Platform Activity:**
+${ACTIVITY_LOG.slice(0, 4).map(log => `- ${log.description}`).join('\n')}
+`;
+            
+            const response = await ai.models.generateContent({ model: 'gemini-2.5-flash', contents: prompt });
+            setSummary(response.text);
+
+        } catch (error) {
+            console.error("Error generating AI summary:", error);
+            addToast("Failed to generate AI summary. Please try again.", "error");
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
   return (
     <div>
-      <h1 className="text-3xl font-bold text-dark mb-6">Platform Intelligence Dashboard</h1>
+      <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
+        <h1 className="text-3xl font-bold text-dark dark:text-light">Platform Intelligence Dashboard</h1>
+        <Button onClick={handleGenerateSummary} disabled={isGenerating}>
+            <SparklesIcon className={`h-5 w-5 mr-2 inline ${isGenerating ? 'animate-spin' : ''}`} />
+            {isGenerating ? 'Analyzing Data...' : 'Generate AI Summary'}
+        </Button>
+      </div>
+
+      {(isGenerating || summary) && (
+          <Card title="AI-Powered Analysis" className="mb-6">
+              {isGenerating ? (
+                   <div className="flex items-center justify-center py-8">
+                       <div className="animate-pulse flex flex-col items-center space-y-2">
+                           <SparklesIcon className="h-8 w-8 text-primary"/>
+                           <p className="text-gray-500">Generating insights from platform data...</p>
+                       </div>
+                   </div>
+              ) : (
+                <div className="prose prose-blue dark:prose-invert max-w-none">
+                    {summary.split('\n').map((paragraph, index) => {
+                         if (paragraph.startsWith('#')) {
+                            const level = paragraph.match(/^#+/)?.[0].length || 1;
+                            const text = paragraph.replace(/^#+\s*/, '');
+                            return React.createElement(`h${level > 6 ? 6 : level}`, { key: index, className: 'font-bold' }, text);
+                         }
+                         return <p key={index}>{paragraph}</p>;
+                    })}
+                </div>
+              )}
+          </Card>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <StatCard icon={UserPlusIcon} title="Total Users" value={USERS.length} trend={5} data={[15,18,20,22,25,26]}/>
         <StatCard icon={BriefcaseIcon} title="Active Jobs" value={4} trend={-1} data={[5,5,4,3,4,4]}/>

@@ -1,162 +1,199 @@
 import React, { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { COOPERATIVES, USERS } from '../constants';
-import { Loan, UserRole } from '../types';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import { useCooperatives } from '../contexts/CooperativeContext';
+import { Cooperative } from '../types';
+import { UserGroupIcon, ArrowTrendingUpIcon, BanknotesIcon } from '@heroicons/react/24/outline';
+import { useAuth } from '../contexts/AuthContext';
 import Modal from '../components/ui/Modal';
-import { useToast } from '../contexts/ToastContext';
-import { UserGroupIcon, BanknotesIcon, ArrowTrendingUpIcon, PlusIcon, ArrowUpOnSquareIcon } from '@heroicons/react/24/outline';
+import { useLoan } from '../contexts/LoanContext';
+import { useAppContext } from '../contexts/AppContext';
 
-const mockLoans: Loan[] = [
-    { id: 1, userId: 'user1', amount: 500000, interestRate: 5, status: 'Approved', repaymentProgress: 25, dueDate: '2024-12-31' },
-    { id: 2, userId: 'user4', amount: 200000, interestRate: 5, status: 'Pending', repaymentProgress: 0, dueDate: '2025-02-28' },
-];
-
-const MemberCooperativeView: React.FC = () => {
-    const { user } = useAuth();
-    const addToast = useToast().addToast;
-    const myCooperative = COOPERATIVES[0]; // Assume user is in the first one
-    const myLoans = mockLoans.filter(l => l.userId === user?.id);
+const CooperativesPage: React.FC = () => {
+    const { cooperatives, userCooperatives } = useCooperatives();
+    const { t } = useAppContext();
+    const [view, setView] = useState('all'); // 'all' or 'my'
     const [isLoanModalOpen, setIsLoanModalOpen] = useState(false);
-    const [loanAmount, setLoanAmount] = useState(0);
+    const [selectedCoop, setSelectedCoop] = useState<Cooperative | null>(null);
 
-    const handleApplyForLoan = (e: React.FormEvent) => {
-        e.preventDefault();
-        addToast(`Successfully applied for a loan of RWF ${loanAmount.toLocaleString()}`, 'success');
+    const cooperativesToShow = view === 'my' ? userCooperatives : cooperatives;
+
+    const openLoanModal = (coop: Cooperative) => {
+        setSelectedCoop(coop);
+        setIsLoanModalOpen(true);
+    };
+
+    const closeLoanModal = () => {
         setIsLoanModalOpen(false);
-        setLoanAmount(0);
-    }
-    
+        setSelectedCoop(null);
+    };
+
     return (
         <div>
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold text-dark">{myCooperative.name}</h1>
-                <Button onClick={() => setIsLoanModalOpen(true)}>Apply for Loan</Button>
+                <h1 className="text-3xl font-bold text-dark dark:text-light">{t('cooperatives.title')}</h1>
+                <Button>{t('cooperatives.create')}</Button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <Card title="Total Members"><p className="text-3xl font-bold">{myCooperative.members}</p></Card>
-                <Card title="Total Savings"><p className="text-3xl font-bold">RWF {myCooperative.totalSavings.toLocaleString()}</p></Card>
-                <Card title="Available for Loans"><p className="text-3xl font-bold">RWF {myCooperative.loanPool.toLocaleString()}</p></Card>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                 <Card title="Your Contribution">
-                     <div className="text-center">
-                        <p className="text-lg text-gray-500">Your Share</p>
-                        <p className="text-4xl font-bold text-primary my-2">RWF {(user?.cooperativeShare || 0).toLocaleString()}</p>
-                        <Button variant="secondary" className="mt-4"><ArrowUpOnSquareIcon className="h-5 w-5 mr-2 inline" />Make a Contribution</Button>
-                     </div>
-                 </Card>
-                 <Card title="Your Loans">
-                     {myLoans.length > 0 ? myLoans.map(loan => (
-                         <div key={loan.id} className="mb-4">
-                             <div className="flex justify-between items-center">
-                                 <p>Amount: RWF {loan.amount.toLocaleString()}</p>
-                                 <p className="text-sm font-semibold">{loan.status}</p>
-                             </div>
-                             <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-                                <div className="bg-primary h-2.5 rounded-full" style={{width: `${loan.repaymentProgress}%`}}></div>
-                            </div>
-                         </div>
-                     )) : <p className="text-gray-500">You have no active loans.</p>}
-                 </Card>
-            </div>
-
-            {myCooperative.communityGoal && myCooperative.goalAmount && myCooperative.goalProgress && (
-                <Card title="Community Goal" className="mt-6">
-                    <div>
-                        <div className="flex justify-between items-center mb-2">
-                            <p className="font-semibold text-dark">{myCooperative.communityGoal}</p>
-                            <p className="text-sm font-bold text-primary">
-                                {Math.round((myCooperative.goalProgress / myCooperative.goalAmount) * 100)}%
-                            </p>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-4">
-                            <div 
-                                className="bg-primary h-4 rounded-full transition-all duration-500" 
-                                style={{ width: `${(myCooperative.goalProgress / myCooperative.goalAmount) * 100}%` }}
-                            ></div>
-                        </div>
-                        <p className="text-xs text-gray-500 text-right mt-1">
-                            RWF {myCooperative.goalProgress.toLocaleString()} / RWF {myCooperative.goalAmount.toLocaleString()}
-                        </p>
-                    </div>
-                    <div className="mt-6">
-                        <h4 className="font-bold text-dark mb-3">Top Contributors</h4>
-                        <div className="space-y-3">
-                            {myCooperative.topContributors?.map((contributor) => (
-                                <div key={contributor.id} className="flex items-center justify-between p-2 rounded-md hover:bg-light">
-                                    <div className="flex items-center">
-                                        <img src={contributor.avatarUrl} alt={contributor.name} className="h-10 w-10 rounded-full mr-3" />
-                                        <div>
-                                            <p className="font-semibold text-dark">{contributor.name}</p>
-                                        </div>
-                                    </div>
-                                    <p className="font-bold text-green-600">+ RWF {contributor.amount.toLocaleString()}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </Card>
-            )}
             
-            <Modal isOpen={isLoanModalOpen} onClose={() => setIsLoanModalOpen(false)} title="Apply for a New Loan">
-                <form onSubmit={handleApplyForLoan} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Loan Amount (RWF)</label>
-                        <input 
-                            type="number" 
-                            value={loanAmount}
-                            onChange={(e) => setLoanAmount(Number(e.target.value))}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
-                            required
-                            min="10000"
-                        />
+            <Card className="!p-0 mb-6">
+                 <div className="flex border-b border-gray-200 dark:border-gray-700">
+                    <button 
+                        onClick={() => setView('all')}
+                        className={`px-4 py-3 text-sm font-semibold transition-colors ${view === 'all' ? 'text-primary border-b-2 border-primary' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                    >
+                        {t('cooperatives.exploreAll')}
+                    </button>
+                    <button 
+                        onClick={() => setView('my')}
+                        className={`px-4 py-3 text-sm font-semibold transition-colors ${view === 'my' ? 'text-primary border-b-2 border-primary' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                    >
+                        {t('cooperatives.myCooperatives')} ({userCooperatives.length})
+                    </button>
+                </div>
+            </Card>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {cooperativesToShow.map(coop => (
+                    <CooperativeCard key={coop.id} cooperative={coop} onLoanRequest={() => openLoanModal(coop)} />
+                ))}
+                 {cooperativesToShow.length === 0 && view === 'my' && (
+                    <div className="md:col-span-2 lg:col-span-3 text-center py-12">
+                        <p className="text-gray-500 dark:text-gray-400">{t('cooperatives.notJoined')}</p>
+                        <Button className="mt-4" onClick={() => setView('all')}>{t('cooperatives.explore')}</Button>
                     </div>
-                    <p className="text-xs text-gray-500">The standard interest rate is 5%. Your application will be reviewed by the cooperative committee.</p>
-                    <Button type="submit" className="w-full">Submit Application</Button>
-                </form>
-            </Modal>
+                )}
+            </div>
+
+            {selectedCoop && (
+                <LoanRequestModal
+                    isOpen={isLoanModalOpen}
+                    onClose={closeLoanModal}
+                    cooperativeName={selectedCoop.name}
+                />
+            )}
         </div>
     );
 };
 
-const AdminCooperativeView: React.FC = () => {
+
+const CooperativeCard: React.FC<{ cooperative: Cooperative, onLoanRequest: () => void }> = ({ cooperative, onLoanRequest }) => {
+    const { user } = useAuth();
+    const { t } = useAppContext();
+    const isMember = user?.cooperativeIds?.includes(cooperative.id);
+
     return (
-        <div>
-            <div className="flex justify-between items-center mb-6">
-                 <h1 className="text-3xl font-bold text-dark">Manage Cooperatives</h1>
-                 <Button><PlusIcon className="h-5 w-5 mr-2 inline" /> Create New Cooperative</Button>
+        <Card className="!p-0 overflow-hidden group flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1 dark:bg-dark">
+            <div className="relative h-40">
+                <img src={cooperative.imageUrl} alt={cooperative.name} className="w-full h-full object-cover"/>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <div className="absolute bottom-4 left-4">
+                    <h3 className="text-xl font-bold text-white">{cooperative.name}</h3>
+                    <p className="text-sm text-gray-200">{t('cooperatives.createdBy')} {cooperative.creator}</p>
+                </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {COOPERATIVES.map(coop => (
-                    <Card key={coop.id} className="flex items-center gap-4">
-                        <img src={coop.logoUrl} alt={coop.name} className="h-16 w-16" />
-                        <div>
-                            <h2 className="text-xl font-bold text-dark">{coop.name}</h2>
-                            <p className="text-gray-500">{coop.members} members</p>
-                            <p className="font-semibold text-primary">RWF {coop.totalSavings.toLocaleString()} saved</p>
-                        </div>
-                    </Card>
-                ))}
+            <div className="p-4 flex-grow flex flex-col">
+                <div className="grid grid-cols-3 gap-4 text-center mb-4 border-b pb-4 dark:border-gray-700">
+                    <div>
+                        <UserGroupIcon className="h-6 w-6 mx-auto text-primary mb-1"/>
+                        <p className="font-bold text-dark dark:text-light">{cooperative.members}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{t('cooperatives.members')}</p>
+                    </div>
+                    <div>
+                        <BanknotesIcon className="h-6 w-6 mx-auto text-primary mb-1"/>
+                        <p className="font-bold text-dark dark:text-light">RWF {cooperative.totalSavings.toLocaleString()}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{t('cooperatives.totalSavings')}</p>
+                    </div>
+                    <div>
+                        <ArrowTrendingUpIcon className="h-6 w-6 mx-auto text-primary mb-1"/>
+                        <p className="font-bold text-dark dark:text-light">RWF {cooperative.loanPool.toLocaleString()}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{t('cooperatives.loanPool')}</p>
+                    </div>
+                </div>
+                <div className="mt-auto pt-2 space-y-2">
+                    {isMember ? (
+                        <>
+                            <Button variant="secondary" className="w-full">{t('cooperatives.viewDashboard')}</Button>
+                            <Button onClick={onLoanRequest} className="w-full">{t('cooperatives.requestLoan')}</Button>
+                        </>
+                    ) : (
+                         <Button className="w-full">{t('cooperatives.requestToJoin')}</Button>
+                    )}
+                </div>
             </div>
-        </div>
-    );
+        </Card>
+    )
+};
+
+interface LoanRequestModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    cooperativeName: string;
 }
 
+const LoanRequestModal: React.FC<LoanRequestModalProps> = ({ isOpen, onClose, cooperativeName }) => {
+    const { submitLoanApplication } = useLoan();
+    const { t } = useAppContext();
+    const [amount, setAmount] = useState('');
+    const [purpose, setPurpose] = useState('');
+    const [period, setPeriod] = useState('');
 
-const CooperativesPage: React.FC = () => {
-  const { user } = useAuth();
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        submitLoanApplication({
+            amount: Number(amount),
+            purpose,
+            repaymentPeriod: Number(period),
+        });
+        onClose();
+        // Reset form
+        setAmount('');
+        setPurpose('');
+        setPeriod('');
+    };
 
-  if (!user) return null;
-
-  return (
-    <>
-      {user.role === UserRole.SEEKER && <MemberCooperativeView />}
-      {user.role === UserRole.COOP_ADMIN && <AdminCooperativeView />}
-    </>
-  );
+    return (
+        <Modal isOpen={isOpen} onClose={onClose} title={`${t('cooperatives.loanRequestTitle')} ${cooperativeName}`}>
+            <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('cooperatives.loanAmountLabel')}</label>
+                    <input
+                        type="number"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        placeholder="e.g. 500000"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        required
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('cooperatives.purposeLabel')}</label>
+                    <input
+                        type="text"
+                        value={purpose}
+                        onChange={(e) => setPurpose(e.target.value)}
+                        placeholder="e.g. Business equipment"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        required
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('cooperatives.repaymentPeriodLabel')}</label>
+                    <input
+                        type="number"
+                        value={period}
+                        onChange={(e) => setPeriod(e.target.value)}
+                        placeholder="e.g. 12"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        required
+                    />
+                </div>
+                <div className="flex justify-end gap-2 pt-4">
+                    <Button type="button" variant="secondary" onClick={onClose}>{t('common.cancel')}</Button>
+                    <Button type="submit">{t('common.submit')}</Button>
+                </div>
+            </form>
+        </Modal>
+    );
 };
 
 export default CooperativesPage;
