@@ -1,8 +1,6 @@
-// FIX: Defined UserRole enum to resolve circular dependency.
 export enum UserRole {
   SEEKER = 'Job Seeker',
   EMPLOYER = 'Employer',
-  ADMIN = 'Admin',
 }
 
 export interface User {
@@ -12,26 +10,28 @@ export interface User {
   role: UserRole;
   avatarUrl: string;
   skills?: string[];
-  careerProgress?: number; // A number from 0-5
-  companyDetails?: {
-    balance: number;
-    totalPayouts: number;
-    cooperativeInvestments: number;
-    operationalBudget: { category: string; amount: number }[];
-  }
+  careerProgress?: number; // From 1 to 5
+}
+
+export interface Company {
+    id: string;
+    name: string;
+    description: string;
+    industry: string;
+    location: string;
 }
 
 export interface Job {
   id: string;
-  title: string;
-  company: string;
-  location: string;
-  description: string;
-  type: 'Full-time' | 'Part-time' | 'Contract';
-  requirements: string[];
   employerId: string;
-  status?: 'Open' | 'Paused' | 'Closed';
-  isSaved?: boolean;
+  companyId: string; // Changed from company: string
+  title: string;
+  location: string;
+  type: 'Full-time' | 'Part-time' | 'Contract';
+  description: string;
+  requirements: string[];
+  isSaved: boolean;
+  status: 'Open' | 'Closed';
 }
 
 export interface Application {
@@ -42,36 +42,33 @@ export interface Application {
   status: 'Applied' | 'Reviewed' | 'Interviewing' | 'Interview Scheduled' | 'Offered' | 'Rejected';
 }
 
-export interface Interview {
-  id: string;
-  userId: string;
-  jobId: string;
-  date: string;
-  type: 'Phone Screen' | 'Technical' | 'On-site' | 'Final';
-  status: 'Scheduled' | 'Confirmed' | 'Completed' | 'Canceled';
-  details?: string;
-}
-
 export interface Contribution {
     userId: string;
     amount: number;
     date: string;
 }
 
+export interface RepaymentInstallment {
+    id: string;
+    dueDate: string;
+    amount: number;
+    status: 'pending' | 'paid';
+}
+
 export interface CooperativeLoan {
-  id: string;
-  cooperativeId: string;
-  userId: string;
-  amount: number;
-  purpose: string;
-  status: 'Pending' | 'Approved' | 'Rejected' | 'Repaid';
-  applicationDate: string;
-  approvalDate?: string;
-  repayments: Repayment[];
-  remainingAmount: number;
-  repaymentPeriod: number; // in months
-  interestRate: number; // annual percentage
-  repaymentSchedule: RepaymentInstallment[];
+    id: string;
+    cooperativeId: string;
+    userId: string;
+    amount: number;
+    purpose: string;
+    repaymentPeriod: number; // in months
+    interestRate: number; // annual percentage
+    status: 'Pending' | 'Approved' | 'Rejected' | 'Repaid';
+    applicationDate: string;
+    approvalDate?: string;
+    repayments: { date: string; amount: number }[];
+    remainingAmount: number;
+    repaymentSchedule: RepaymentInstallment[];
 }
 
 export interface Cooperative {
@@ -79,38 +76,23 @@ export interface Cooperative {
   name: string;
   description: string;
   creatorId: string;
-  members: string[]; // array of user IDs
-  joinRequests: string[]; // array of user IDs with pending requests
+  members: string[];
+  joinRequests: string[];
   totalSavings: number;
   totalLoans: number;
   contributionSettings: {
-      amount: number;
-      frequency: 'Weekly' | 'Monthly';
+    amount: number;
+    frequency: 'Weekly' | 'Monthly';
   };
   loanSettings: {
-    interestRate: number; // annual percentage rate
-    maxLoanPercentage: number; // max % of total savings that can be loaned out
+    interestRate: number; // annual percentage
+    maxLoanPercentage: number;
   };
   contributions: Contribution[];
   loans: CooperativeLoan[];
 }
 
-export type TransactionCategory =
-  | 'Income'
-  | 'Utilities'
-  | 'Groceries'
-  | 'Transport'
-  | 'Entertainment'
-  | 'Loan Repayment'
-  | 'Savings Contribution'
-  | 'Business'
-  | 'Payouts'
-  | 'Marketing'
-  | 'Operations'
-  | 'Investments'
-  | 'Cooperative Contribution'
-  // FIX: Added 'Withdrawal' to support withdrawal transactions and resolve the type error in WithdrawModal.tsx.
-  | 'Withdrawal';
+export type TransactionCategory = 'Income' | 'Withdrawal' | 'Loan Repayment' | 'Savings' | 'Groceries' | 'Utilities' | 'Transport' | 'Transfer';
 
 export interface Transaction {
   id: string;
@@ -121,72 +103,77 @@ export interface Transaction {
   category: TransactionCategory;
 }
 
-export interface Repayment {
-  date: string;
-  amount: number;
-}
-
-export interface RepaymentInstallment {
-  id: string;
-  dueDate: string;
-  amount: number;
-  status: 'pending' | 'paid';
-}
-
-export interface LoanApplication {
-  id: string;
-  userId: string;
-  amount: number;
-  purpose: string;
-  repaymentPeriod: number; // in months
-  status: 'Pending' | 'Approved' | 'Rejected' | 'Fully Repaid';
-  remainingAmount: number;
-  repaymentSchedule: RepaymentInstallment[];
-  repayments: Repayment[];
-}
-
 export interface SavingsGoal {
-  id: string;
-  userId: string;
-  name: string;
-  targetAmount: number;
-  currentAmount: number;
-  targetDate: string;
+    id: string;
+    userId: string;
+    name: string;
+    targetAmount: number;
+    currentAmount: number;
 }
 
 export interface Budget {
-  id:string;
-  userId: string;
-  category: TransactionCategory;
-  budgetAmount: number;
+    id: string;
+    userId: string;
+    category: TransactionCategory;
+    budgetAmount: number;
 }
 
-export interface Message {
-  id: string;
-  senderId: string;
-  receiverId: string;
-  text: string;
-  timestamp: string;
+export interface LoanApplication {
+    id: string;
+    userId: string;
+    amount: number;
+    purpose: string;
+    repaymentPeriod: number; // in months
+    status: 'Pending' | 'Approved' | 'Rejected' | 'Fully Repaid';
+    remainingAmount: number;
+    repaymentSchedule: RepaymentInstallment[];
+    repayments: { amount: number; date: string }[];
 }
 
-export interface LearningModule {
-  id: string;
-  title: string;
-  category: string;
-  type: 'video' | 'article';
-  duration: string;
-  progress: number;
-  content: {
-    summary: string;
-    videoUrl?: string;
-    articleText?: string;
-    keyTakeaways: string[];
-  };
+export interface Interview {
+    id: string;
+    userId: string;
+    jobId: string;
+    date: string;
+    type: 'Phone Screen' | 'Technical' | 'On-site' | 'Final' | 'Video Call';
+    status: 'Scheduled' | 'Completed' | 'Canceled' | 'Confirmed';
+    details?: string;
 }
 
 export interface ActivityLog {
+    id: string;
+    type: 'NEW_MEMBER' | 'NEW_JOB' | 'SAVINGS_GOAL' | 'LARGE_DEPOSIT';
+    description: string;
+    timestamp: string;
+}
+
+export interface Message {
+    id: string;
+    senderId: string;
+    receiverId: string;
+    text: string;
+    timestamp: string;
+}
+
+export interface LearningModule {
+    id: string;
+    title: string;
+    category: string;
+    type: 'video' | 'article';
+    duration: string;
+    progress: number;
+    content: {
+        summary: string;
+        videoUrl?: string;
+        articleText?: string;
+        keyTakeaways: string[];
+    };
+}
+
+export interface Testimonial {
   id: string;
-  timestamp: string;
-  type: 'NEW_MEMBER' | 'NEW_JOB' | 'SAVINGS_GOAL' | 'LARGE_DEPOSIT';
-  description: string;
+  name: string;
+  role: string;
+  quote: string;
+  avatarUrl: string;
 }

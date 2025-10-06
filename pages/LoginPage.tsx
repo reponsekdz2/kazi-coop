@@ -1,11 +1,12 @@
 
+
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { UserRole } from '../types';
 import Card from '../components/ui/Card';
 import Button from '../components/layout/Button';
-// FIX: Changed import to 'react-router' to resolve module export errors.
-import { Link, Navigate } from 'react-router';
+// FIX: Changed import to 'react-router-dom' to resolve module export errors.
+import { Link, Navigate } from 'react-router-dom';
 
 const LoginPage: React.FC = () => {
   const { login, user } = useAuth();

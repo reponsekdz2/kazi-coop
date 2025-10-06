@@ -1,5 +1,6 @@
 
 
+
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Application, UserRole } from '../types';
@@ -7,37 +8,54 @@ import Card from '../components/ui/Card';
 import StatCard from '../components/ui/StatCard';
 import Button from '../components/layout/Button';
 import CareerProgressTracker from '../components/ui/CareerProgressTracker';
-import { APPLICATIONS, JOBS, USERS, INTERVIEWS } from '../constants';
-import { ArrowTrendingUpIcon, BanknotesIcon, BriefcaseIcon, CalendarDaysIcon, UserGroupIcon, UserPlusIcon } from '@heroicons/react/24/outline';
+// FIX: Property 'company' does not exist on type 'Job'. Use companyId to find company name from COMPANIES.
+import { APPLICATIONS, JOBS, USERS, INTERVIEWS, COMPANIES } from '../constants';
+import { ArrowTrendingUpIcon, BanknotesIcon, BriefcaseIcon, CalendarDaysIcon, UserGroupIcon, UserPlusIcon, WalletIcon, AcademicCapIcon } from '@heroicons/react/24/outline';
 import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, Pie, PieChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-// FIX: Changed import to 'react-router' to resolve module export errors.
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAppContext } from '../contexts/AppContext';
-import RingProgress from '../components/layout/RingProgress';
+import RingHub from '../components/layout/RingHub';
 
 const SeekerDashboard: React.FC = () => {
     const { user } = useAuth();
+    const navigate = useNavigate();
+
+    const hubItems = [
+      { id: 'jobs', label: 'Find Jobs', imageUrl: `https://i.pravatar.cc/150?u=jobs-icon`},
+      { id: 'wallet', label: 'My Wallet', imageUrl: `https://i.pravatar.cc/150?u=wallet-icon` },
+      { id: 'cooperatives', label: 'Ikimina', imageUrl: `https://i.pravatar.cc/150?u=coop-icon` },
+      { id: 'learning', label: 'Learning Hub', imageUrl: `https://i.pravatar.cc/150?u=learn-icon` }
+    ];
+
+    const handleHubSelect = (id: string) => {
+      navigate(`/${id}`);
+    };
+
     return (
         <div>
             <h1 className="text-3xl font-bold text-dark dark:text-light mb-6">{`Welcome back, ${user?.name.split(' ')[0] || ''}!`}</h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                <StatCard icon={BriefcaseIcon} title="Active Applications" value={3} trend={1} data={[1,2,2,3]}/>
-                <StatCard icon={UserGroupIcon} title="Scheduled Interviews" value={1} trend={1} data={[0,0,1,1]}/>
-                <StatCard icon={BanknotesIcon} title="Cooperative Savings" value="RWF 550k" trend={10} data={[200, 300, 450, 550]}/>
-                <Card className="flex flex-col items-center justify-center p-4 dark:bg-dark">
-                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Profile Strength</h3>
-                    <RingProgress percentage={Math.round((user?.careerProgress || 0) / 5 * 100)} size={90} strokeWidth={8} />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                <Card className="lg:col-span-2 flex items-center justify-center p-4">
+                     <RingHub items={hubItems} onSelect={handleHubSelect}>
+                        <div className="text-center">
+                            <img src={user?.avatarUrl} className="h-16 w-16 rounded-full mx-auto border-2 border-primary" alt="user"/>
+                            <p className="font-bold text-dark mt-2 text-sm">Main Menu</p>
+                        </div>
+                    </RingHub>
+                </Card>
+
+                <Card title="Your Career Journey">
+                    <CareerProgressTracker currentStep={user?.careerProgress || 0} />
                 </Card>
             </div>
-            <Card title="Your Career Journey" className="mb-6 dark:bg-dark">
-                <CareerProgressTracker currentStep={user?.careerProgress || 0} />
-            </Card>
+           
             <Card title="Jobs Recommended For You" className="dark:bg-dark">
                 {JOBS.slice(0, 3).map(job => (
                     <div key={job.id} className="flex justify-between items-center p-3 border-b dark:border-gray-700 last:border-b-0">
                         <div>
                             <p className="font-bold text-dark dark:text-light">{job.title}</p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">{job.company} - {job.location}</p>
+                            {/* FIX: Property 'company' does not exist on type 'Job'. Use companyId to find company name. */}
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{COMPANIES.find(c => c.id === job.companyId)?.name} - {job.location}</p>
                         </div>
                         <Link to="/jobs"><Button variant="secondary">View Details</Button></Link>
                     </div>

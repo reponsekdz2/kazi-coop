@@ -1,7 +1,7 @@
 
 import React from 'react';
-// FIX: Changed import to 'react-router' to resolve module export errors.
-import { Outlet, Link } from 'react-router';
+// FIX: Changed import to 'react-router-dom' to resolve module export errors.
+import { Outlet, Link } from 'react-router-dom';
 import Button from './Button';
 
 const PublicLayout: React.FC = () => {

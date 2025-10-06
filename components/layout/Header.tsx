@@ -1,13 +1,14 @@
 import React, { Fragment } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { ChevronDownIcon, BellIcon, SparklesIcon, MagnifyingGlassIcon } from '@heroicons/react/24/solid';
-// FIX: Changed import to 'react-router' to resolve module export errors.
-import { Link } from 'react-router';
+// FIX: Changed import to 'react-router-dom' to resolve module export errors.
+import { Link } from 'react-router-dom';
 import { Menu, Transition } from '@headlessui/react';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { UserPlusIcon, BriefcaseIcon, ArrowTrendingUpIcon, BanknotesIcon } from '@heroicons/react/24/outline';
+import { ActivityLog } from '../../types';
 
-const notificationIcons: { [key: string]: React.ElementType } = {
+const notificationIcons: { [key in ActivityLog['type'] | 'default']: React.ElementType } = {
     NEW_MEMBER: UserPlusIcon,
     NEW_JOB: BriefcaseIcon,
     SAVINGS_GOAL: ArrowTrendingUpIcon,

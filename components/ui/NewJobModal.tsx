@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Modal from '../layout/Modal';
 import Button from '../layout/Button';
 import { Job } from '../../types';
+import { COMPANIES } from '../../constants';
 
 interface NewJobModalProps {
     isOpen: boolean;
@@ -23,9 +24,11 @@ const NewJobModal: React.FC<NewJobModalProps> = ({ isOpen, onClose, onSave, job 
     
     useEffect(() => {
         if(job) {
+            // FIX: Property 'company' does not exist on type 'Job'. Find company name from companyId.
+            const companyName = COMPANIES.find(c => c.id === job.companyId)?.name || '';
             setFormData({
                 title: job.title,
-                company: job.company,
+                company: companyName,
                 location: job.location,
                 type: job.type,
                 description: job.description,
@@ -52,9 +55,24 @@ const NewJobModal: React.FC<NewJobModalProps> = ({ isOpen, onClose, onSave, job 
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        // FIX: Construct a valid jobData object with companyId to satisfy the onSave prop type.
+        const foundCompany = COMPANIES.find(c => c.name.toLowerCase() === formData.company.toLowerCase());
+        
+        let companyId: string;
+        if (job) { // Editing
+            companyId = foundCompany ? foundCompany.id : job.companyId;
+        } else { // Creating
+            companyId = foundCompany ? foundCompany.id : COMPANIES[0].id; // Default to first company
+        }
+
         const jobData = {
-            ...formData,
+            title: formData.title,
+            companyId,
+            location: formData.location,
+            type: formData.type,
+            description: formData.description,
             requirements: formData.requirements.split(',').map(req => req.trim()),
+            status: formData.status,
         };
         onSave(jobData);
         onClose();

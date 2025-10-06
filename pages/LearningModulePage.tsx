@@ -1,7 +1,8 @@
 
+
 import React from 'react';
-// FIX: Changed import to 'react-router' to resolve module export errors.
-import { useParams, Link } from 'react-router';
+// FIX: Changed import to 'react-router-dom' to resolve module export errors.
+import { useParams, Link } from 'react-router-dom';
 import { LEARNING_MODULES } from '../constants';
 import Card from '../components/ui/Card';
 import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
@@ -47,7 +48,7 @@ const LearningModulePage: React.FC = () => {
                             </div>
                         )}
 
-                        <div className="prose max-w-none text-gray-700">
+                        <div className="prose max-w-none text-gray-700 dark:prose-invert">
                              <p className="lead text-lg mb-4">{module.content.summary}</p>
                              {module.type === 'article' && module.content.articleText?.split('\n\n').map((paragraph, index) => (
                                 <p key={index} className="mb-4">{paragraph}</p>
@@ -61,7 +62,7 @@ const LearningModulePage: React.FC = () => {
                             {module.content.keyTakeaways.map((takeaway, index) => (
                                 <li key={index} className="flex items-start gap-3">
                                     <CheckCircleIcon className="h-5 w-5 text-green-500 mt-1 flex-shrink-0" />
-                                    <span className="text-gray-700">{takeaway}</span>
+                                    <span className="text-gray-700 dark:text-gray-300">{takeaway}</span>
                                 </li>
                             ))}
                         </ul>

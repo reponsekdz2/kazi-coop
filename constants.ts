@@ -1,275 +1,242 @@
-import { User, UserRole, Job, Application, Interview, Cooperative, Transaction, LoanApplication, SavingsGoal, Budget, Message, LearningModule, ActivityLog } from './types';
+import { User, UserRole, Job, Application, Interview, Cooperative, Transaction, SavingsGoal, Budget, LoanApplication, Message, LearningModule, ActivityLog, Testimonial, Company } from './types';
 
-// Mock Users
+// USERS
 export const USERS: User[] = [
   {
-    id: 'user-1',
+    id: 'user-seeker-1',
     name: 'Aline Umutoni',
     email: 'aline@example.com',
     role: UserRole.SEEKER,
-    avatarUrl: 'https://randomuser.me/api/portraits/women/1.jpg',
+    avatarUrl: `https://i.pravatar.cc/150?u=user-seeker-1`,
     skills: ['React', 'TypeScript', 'Node.js', 'Project Management'],
     careerProgress: 3,
   },
   {
-    id: 'user-2',
-    name: 'Jean Mugabo',
-    email: 'jean@example.com',
-    role: UserRole.EMPLOYER,
-    avatarUrl: 'https://randomuser.me/api/portraits/men/1.jpg',
-    companyDetails: {
-        balance: 25000000,
-        totalPayouts: 15750000,
-        cooperativeInvestments: 3000000,
-        operationalBudget: [
-            { category: 'Payouts', amount: 16000000 },
-            { category: 'Marketing', amount: 4000000 },
-            { category: 'Operations', amount: 5000000 },
-        ]
-    }
-  },
-   {
-    id: 'user-3',
-    name: 'Chris K.',
-    email: 'chris@example.com',
+    id: 'user-seeker-2',
+    name: 'Peter Mugabo',
+    email: 'peter@example.com',
     role: UserRole.SEEKER,
-    avatarUrl: 'https://randomuser.me/api/portraits/men/2.jpg',
-    skills: ['SQL', 'Python', 'Data Analysis'],
-    careerProgress: 1,
+    avatarUrl: `https://i.pravatar.cc/150?u=user-seeker-2`,
+    skills: ['UX/UI Design', 'Figma', 'Agile Methodologies'],
+    careerProgress: 2,
   },
   {
-    id: 'user-4',
-    name: 'Diane Ishimwe',
-    email: 'diane@example.com',
-    role: UserRole.ADMIN,
-    avatarUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
-  }
+    id: 'user-employer-1',
+    name: 'Jean Habimana',
+    email: 'jean@example.com',
+    role: UserRole.EMPLOYER,
+    avatarUrl: `https://i.pravatar.cc/150?u=user-employer-1`,
+  },
 ];
 
-// Mock Jobs
+// COMPANIES
+export const COMPANIES: Company[] = [
+    { id: 'comp-1', name: 'TechSolutions Ltd.', description: 'A leading innovator in the tech industry, focusing on creating cutting-edge solutions for the African market. We are committed to fostering a collaborative and inclusive work environment.', industry: 'Technology', location: 'Kigali, Rwanda' },
+    { id: 'comp-2', name: 'Kigali Creatives', description: 'A design agency that brings creative ideas to life. We specialize in branding, web design, and digital marketing.', industry: 'Creative Arts', location: 'Kigali, Rwanda' },
+    { id: 'comp-3', name: 'Innovate Rwanda', description: 'A non-profit organization dedicated to fostering innovation and entrepreneurship in Rwanda through mentorship and funding.', industry: 'Non-profit', location: 'Kigali, Rwanda' },
+];
+
+// JOBS
 export const JOBS: Job[] = [
   {
     id: 'job-1',
+    employerId: 'user-employer-1',
+    companyId: 'comp-1',
     title: 'Frontend Developer',
-    company: 'TechSolutions Ltd.',
     location: 'Kigali, Rwanda',
-    description: 'We are looking for a skilled Frontend Developer to join our team. You will be responsible for building the client-side of our web applications.',
     type: 'Full-time',
-    requirements: ['2+ years of experience with React', 'Strong proficiency in TypeScript', 'Experience with state management libraries like Redux or Zustand'],
-    employerId: 'user-2',
+    description: 'We are looking for a skilled Frontend Developer to join our team...',
+    requirements: ['3+ years of React experience', 'Strong proficiency in TypeScript', 'Experience with state management libraries'],
+    isSaved: true,
     status: 'Open',
-    isSaved: false,
   },
   {
     id: 'job-2',
+    employerId: 'user-employer-1',
+    companyId: 'comp-2',
     title: 'UX/UI Designer',
-    company: 'Innovate Rwanda',
     location: 'Remote',
-    description: 'Join our creative team to design intuitive and engaging user interfaces for our mobile and web products.',
     type: 'Contract',
-    requirements: ['Portfolio of design projects', 'Proficiency in Figma, Sketch, or Adobe XD', 'Understanding of user-centered design principles'],
-    employerId: 'user-2',
+    description: 'Seeking a creative UX/UI designer for a 3-month contract...',
+    requirements: ['Portfolio of design projects', 'Proficiency in Figma and Adobe XD', 'Understanding of user-centered design principles'],
+    isSaved: false,
     status: 'Open',
-    isSaved: true,
   },
   {
     id: 'job-3',
+    employerId: 'user-employer-1',
+    companyId: 'comp-3',
     title: 'Project Manager',
-    company: 'Kigali Hub',
     location: 'Kigali, Rwanda',
-    description: 'We need an organized and experienced Project Manager to lead our software development projects from conception to launch.',
     type: 'Full-time',
-    requirements: ['PMP certification is a plus', 'Experience with Agile methodologies', 'Excellent communication skills'],
-    employerId: 'user-2',
+    description: 'We need an experienced Project Manager to lead our development team...',
+    requirements: ['5+ years in project management', 'Agile/Scrum certification', 'Excellent communication skills'],
+    isSaved: true,
     status: 'Closed',
-    isSaved: false,
-  },
-   {
-    id: 'job-4',
-    title: 'Data Analyst',
-    company: 'Rwanda Insights',
-    location: 'Kigali, Rwanda',
-    description: 'Analyze large datasets to identify trends, develop charts and reports, and provide actionable insights for our clients.',
-    type: 'Part-time',
-    requirements: ['Proficiency in SQL and Python (Pandas)', 'Experience with data visualization tools like Tableau or Power BI', 'Strong analytical skills'],
-    employerId: 'another-employer-id',
-    status: 'Open',
-    isSaved: false,
   },
 ];
 
-// Mock Applications
+// APPLICATIONS
 export const APPLICATIONS: Application[] = [
-  { id: 'app-1', userId: 'user-1', jobId: 'job-1', submissionDate: new Date(Date.now() - 2 * 86400000).toISOString(), status: 'Interviewing' },
-  { id: 'app-2', userId: 'user-3', jobId: 'job-4', submissionDate: new Date(Date.now() - 5 * 86400000).toISOString(), status: 'Reviewed' },
-  { id: 'app-3', userId: 'user-1', jobId: 'job-3', submissionDate: new Date().toISOString(), status: 'Applied' },
-  { id: 'app-4', userId: 'user-1', jobId: 'job-2', submissionDate: new Date(Date.now() - 10 * 86400000).toISOString(), status: 'Interview Scheduled' },
+  { id: 'app-1', userId: 'user-seeker-1', jobId: 'job-1', submissionDate: new Date(Date.now() - 2 * 86400000).toISOString(), status: 'Interviewing' },
+  { id: 'app-2', userId: 'user-seeker-2', jobId: 'job-2', submissionDate: new Date(Date.now() - 5 * 86400000).toISOString(), status: 'Reviewed' },
+  { id: 'app-3', userId: 'user-seeker-1', jobId: 'job-3', submissionDate: new Date(Date.now() - 10 * 86400000).toISOString(), status: 'Rejected' },
+  { id: 'app-4', userId: 'user-seeker-2', jobId: 'job-1', submissionDate: new Date().toISOString(), status: 'Applied' },
 ];
 
-// Mock Interviews
+// INTERVIEWS
 export const INTERVIEWS: Interview[] = [
-  { id: 'int-1', userId: 'user-1', jobId: 'job-1', date: new Date(Date.now() + 3 * 86400000).toISOString(), type: 'Technical', status: 'Confirmed', details: 'Google Meet: https://meet.google.com/xyz-abc-def' },
-  { id: 'int-2', userId: 'user-1', jobId: 'job-2', date: new Date(Date.now() + 7 * 86400000).toISOString(), type: 'On-site', status: 'Scheduled', details: 'Kigali Heights, 4th Floor' },
+    { id: 'int-1', userId: 'user-seeker-1', jobId: 'job-1', date: new Date(Date.now() + 3 * 86400000).toISOString(), type: 'Technical', status: 'Scheduled', details: 'Google Meet Link: ...' },
+    { id: 'int-2', userId: 'user-seeker-2', jobId: 'job-2', date: new Date(Date.now() - 2 * 86400000).toISOString(), type: 'Phone Screen', status: 'Completed' },
+    { id: 'int-3', userId: 'user-seeker-1', jobId: 'job-1', date: new Date(Date.now() + 5 * 86400000).toISOString(), type: 'Video Call', status: 'Scheduled', details: 'platform-call-link' },
 ];
 
-// Mock Cooperatives
+// COOPERATIVES
 export const COOPERATIVES: Cooperative[] = [
-  { 
-    id: 'coop-1', 
-    name: 'TechSolutions Innovators Circle', 
-    description: 'A savings group for employees of TechSolutions Ltd. focused on technology and innovation investments.', 
-    creatorId: 'user-2', 
-    members: ['user-1', 'user-2', 'user-3'], 
-    joinRequests: [], 
-    totalSavings: 12500000, 
-    totalLoans: 3000000, 
+  {
+    id: 'coop-1',
+    name: 'TechSolutions Innovators Circle',
+    description: 'A savings group for employees of TechSolutions to foster financial growth and community.',
+    creatorId: 'user-employer-1',
+    members: ['user-employer-1', 'user-seeker-1'],
+    joinRequests: ['user-seeker-2'],
+    totalSavings: 5800000,
+    totalLoans: 1200000,
     contributionSettings: { amount: 50000, frequency: 'Monthly' },
     loanSettings: { interestRate: 10, maxLoanPercentage: 80 },
     contributions: [
-      { userId: 'user-1', amount: 50000, date: new Date(Date.now() - 10 * 86400000).toISOString() },
-      { userId: 'user-2', amount: 50000, date: new Date(Date.now() - 12 * 86400000).toISOString() }
+        { userId: 'user-seeker-1', amount: 50000, date: new Date(Date.now() - 30 * 86400000).toISOString() }
     ],
     loans: [
-      {
-        id: 'coop-loan-1',
-        cooperativeId: 'coop-1',
-        userId: 'user-3',
-        amount: 3000000,
-        purpose: 'Business expansion',
-        status: 'Approved',
-        applicationDate: new Date(Date.now() - 20 * 86400000).toISOString(),
-        approvalDate: new Date(Date.now() - 18 * 86400000).toISOString(),
-        repayments: [],
-        remainingAmount: 3000000,
-        repaymentPeriod: 12,
-        interestRate: 10,
-        repaymentSchedule: [],
-      },
-      {
-        id: 'coop-loan-2',
-        cooperativeId: 'coop-1',
-        userId: 'user-1',
-        amount: 200000,
-        purpose: 'Emergency fund',
-        status: 'Pending',
-        applicationDate: new Date(Date.now() - 1 * 86400000).toISOString(),
-        repayments: [],
-        remainingAmount: 200000,
-        repaymentPeriod: 6,
-        interestRate: 10,
-        repaymentSchedule: [],
-      }
-    ]
-  },
-  { 
-    id: 'coop-2', 
-    name: 'Kigali Freelancers Fund', 
-    description: 'A cooperative for freelance designers, developers, and writers in Kigali to support each other financially.', 
-    creatorId: 'another-employer-id', 
-    members: ['user-3'], 
-    joinRequests: [], 
-    totalSavings: 4800000, 
-    totalLoans: 1200000, 
-    contributionSettings: { amount: 15000, frequency: 'Weekly' },
-    loanSettings: { interestRate: 12, maxLoanPercentage: 75 },
-    contributions: [],
-    loans: [
-       {
-        id: 'coop-loan-3',
-        cooperativeId: 'coop-2',
-        userId: 'user-3',
-        amount: 1200000,
-        purpose: 'Education',
-        status: 'Approved',
-        applicationDate: new Date(Date.now() - 30 * 86400000).toISOString(),
-        approvalDate: new Date(Date.now() - 28 * 86400000).toISOString(),
-        repayments: [],
-        remainingAmount: 1200000,
-        repaymentPeriod: 24,
-        interestRate: 12,
-        repaymentSchedule: [],
-      },
-    ]
+        { 
+            id: 'coop-loan-1', cooperativeId: 'coop-1', userId: 'user-seeker-1', amount: 250000, purpose: 'School fees', interestRate: 10, repaymentPeriod: 6, status: 'Approved', applicationDate: new Date().toISOString(), remainingAmount: 250000, repayments: [],
+            repaymentSchedule: Array.from({ length: 6 }, (_, i) => ({
+                id: `coop-loan-1-inst-${i}`,
+                dueDate: new Date(new Date().setMonth(new Date().getMonth() + i + 1)).toISOString(),
+                amount: 43750,
+                status: 'pending'
+            }))
+        }
+    ],
   },
 ];
 
-// Mock Transactions
+// TRANSACTIONS
 export const TRANSACTIONS: Transaction[] = [
-  { id: 'txn-1', userId: 'user-1', date: new Date(Date.now() - 1 * 86400000).toISOString(), description: 'Salary Deposit', amount: 800000, category: 'Income' },
-  { id: 'txn-2', userId: 'user-1', date: new Date(Date.now() - 2 * 86400000).toISOString(), description: 'Groceries', amount: -25000, category: 'Groceries' },
-  { id: 'txn-3', userId: 'user-1', date: new Date(Date.now() - 3 * 86400000).toISOString(), description: 'MTN Airtime', amount: -5000, category: 'Utilities' },
-  { id: 'txn-4', userId: 'user-1', date: new Date(Date.now() - 4 * 86400000).toISOString(), description: 'Ikimina Contribution', amount: -50000, category: 'Cooperative Contribution' },
-  { id: 'txn-5', userId: 'user-1', date: new Date(Date.now() - 5 * 86400000).toISOString(), description: 'Moto Fare', amount: -1500, category: 'Transport' },
+    { id: 'txn-1', userId: 'user-seeker-1', date: new Date().toISOString(), description: 'Mobile Money Deposit', amount: 200000, category: 'Income' },
+    { id: 'txn-2', userId: 'user-seeker-1', date: new Date(Date.now() - 1 * 86400000).toISOString(), description: 'Groceries', amount: -25000, category: 'Groceries' },
+    { id: 'txn-3', userId: 'user-seeker-1', date: new Date(Date.now() - 2 * 86400000).toISOString(), description: 'Co-op Contribution', amount: -50000, category: 'Savings' },
+    { id: 'txn-4', userId: 'user-seeker-2', date: new Date().toISOString(), description: 'Figma Subscription', amount: -15000, category: 'Utilities' },
 ];
 
-// Mock Loan Applications
-export const LOAN_APPLICATIONS: LoanApplication[] = [
-  { id: 'la-1', userId: 'user-1', amount: 500000, purpose: 'Laptop Purchase', repaymentPeriod: 6, status: 'Approved', remainingAmount: 416667, repaymentSchedule: [], repayments: [{ date: new Date().toISOString(), amount: 83333 }] },
-];
-
-// Mock Savings Goals
+// SAVINGS GOALS
 export const SAVINGS_GOALS: SavingsGoal[] = [
-  { id: 'sg-1', userId: 'user-1', name: 'New Smartphone', targetAmount: 400000, currentAmount: 150000, targetDate: new Date(new Date().setMonth(new Date().getMonth() + 4)).toISOString() },
+    { id: 'sg-1', userId: 'user-seeker-1', name: 'New Laptop', targetAmount: 1500000, currentAmount: 450000 },
 ];
 
-// Mock Budgets
+// BUDGETS
 export const BUDGETS: Budget[] = [
-  { id: 'b-1', userId: 'user-1', category: 'Groceries', budgetAmount: 100000 },
-  { id: 'b-2', userId: 'user-1', category: 'Transport', budgetAmount: 40000 },
-  { id: 'b-3', userId: 'user-1', category: 'Entertainment', budgetAmount: 50000 },
+    { id: 'b-1', userId: 'user-seeker-1', category: 'Groceries', budgetAmount: 100000 },
 ];
 
-// Mock Messages
+// LOAN APPLICATIONS
+export const LOAN_APPLICATIONS: LoanApplication[] = [];
+
+// MESSAGES
 export const MESSAGES: Message[] = [
-  { id: 'msg-1', senderId: 'user-2', receiverId: 'user-1', text: 'Hi Aline, your profile looks great. Are you available for a quick chat about the Frontend role?', timestamp: new Date(Date.now() - 600000).toISOString() },
-  { id: 'msg-2', senderId: 'user-1', receiverId: 'user-2', text: 'Hi Jean, thank you! Yes, I am. When works for you?', timestamp: new Date(Date.now() - 300000).toISOString() },
+    { id: 'msg-1', senderId: 'user-employer-1', receiverId: 'user-seeker-1', text: 'Hi Aline, we were impressed with your application. Are you available for an interview next week?', timestamp: new Date(Date.now() - 86400000).toISOString() },
+    { id: 'msg-2', senderId: 'user-seeker-1', receiverId: 'user-employer-1', text: 'Hello Jean, thank you! Yes, I am available. What time works for you?', timestamp: new Date().toISOString() },
 ];
 
-// Mock Learning Modules
+// LEARNING MODULES
 export const LEARNING_MODULES: LearningModule[] = [
-  {
-    id: 'lm-1',
-    title: 'Mastering React Hooks',
-    category: 'Web Development',
-    type: 'video',
-    duration: '45 min',
-    progress: 60,
-    content: {
-      summary: 'Go in-depth with React Hooks and learn how to write cleaner, more efficient functional components.',
-      videoUrl: 'https://www.youtube.com/embed/TNhaISOUy6Q',
-      keyTakeaways: ['Understand useState and useEffect', 'Learn about custom hooks', 'Manage complex state with useReducer'],
+    {
+        id: 'lm-1',
+        title: 'Mastering React Hooks',
+        category: 'Web Development',
+        type: 'video',
+        duration: '45 min',
+        progress: 60,
+        content: {
+            summary: 'Deep dive into React Hooks and learn how to manage state and side effects in your functional components effectively.',
+            videoUrl: 'https://www.youtube.com/embed/TNhaISOUy6Q',
+            keyTakeaways: ['Understand useState and useEffect', 'Learn about custom hooks', 'State management patterns'],
+        }
     },
-  },
-  {
-    id: 'lm-2',
-    title: 'CV Writing for Tech Roles',
-    category: 'Career Development',
-    type: 'article',
-    duration: '15 min read',
-    progress: 0,
-    content: {
-      summary: 'Learn how to craft a compelling CV that stands out to tech recruiters and hiring managers.',
-      articleText: 'Start with a strong summary...\n\nTailor your skills section to the job description...',
-      keyTakeaways: ['Highlight key achievements with metrics', 'Use keywords from the job description', 'Keep it concise and readable'],
-    },
-  }
+    {
+        id: 'lm-2',
+        title: 'Effective Interview Techniques',
+        category: 'Career Growth',
+        type: 'article',
+        duration: '15 min read',
+        progress: 0,
+        content: {
+            summary: 'Learn the best strategies to ace your next job interview, from preparation to follow-up.',
+            articleText: "Preparation is key to a successful interview. Start by researching the company...",
+            keyTakeaways: ['STAR method for answering questions', 'Importance of body language', 'How to ask insightful questions'],
+        }
+    }
 ];
 
-// Mock Activity Log for Analytics
+// ACTIVITY LOG
 export const ACTIVITY_LOG: ActivityLog[] = [
-    { id: 'al-1', timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), type: 'NEW_JOB', description: 'TechSolutions Ltd. posted a new job: Frontend Developer.' },
-    { id: 'al-2', timestamp: new Date(Date.now() - 2 * 86400000).toISOString(), type: 'NEW_MEMBER', description: 'Chris K. joined the platform.' },
-    { id: 'al-3', timestamp: new Date(Date.now() - 3 * 86400000).toISOString(), type: 'SAVINGS_GOAL', description: 'Aline Umutoni reached a savings goal: New Smartphone.' },
-    { id: 'al-4', timestamp: new Date(Date.now() - 4 * 86400000).toISOString(), type: 'LARGE_DEPOSIT', description: 'A deposit of RWF 500,000 was made to the Kigali Freelancers Fund.' },
+    { id: 'al-1', type: 'NEW_JOB', description: 'TechSolutions Ltd. posted a new job: Frontend Developer', timestamp: new Date(Date.now() - 3600000).toISOString() },
+    { id: 'al-2', type: 'NEW_MEMBER', description: 'Peter Mugabo requested to join TechSolutions Innovators Circle.', timestamp: new Date(Date.now() - 2 * 3600000).toISOString() },
+    { id: 'al-3', type: 'LARGE_DEPOSIT', description: 'Aline Umutoni deposited RWF 200,000 to their wallet.', timestamp: new Date(Date.now() - 5 * 3600000).toISOString() },
+    { id: 'al-4', type: 'SAVINGS_GOAL', description: 'Aline Umutoni reached 30% of their "New Laptop" savings goal.', timestamp: new Date(Date.now() - 8 * 3600000).toISOString() },
 ];
 
-// Mock Data for Charts
 export const cooperativeFinancialsData = [
-  { name: 'Jan', "Total Savings": 40.1, "Loans Disbursed": 10 },
-  { name: 'Feb', "Total Savings": 45.3, "Loans Disbursed": 12 },
-  { name: 'Mar', "Total Savings": 52.5, "Loans Disbursed": 15 },
-  { name: 'Apr', "Total Savings": 58.8, "Loans Disbursed": 18 },
-  { name: 'May', "Total Savings": 65.2, "Loans Disbursed": 20 },
-  { name: 'Jun', "Total Savings": 71.9, "Loans Disbursed": 22 },
-  { name: 'Jul', "Total Savings": 78.4, "Loans Disbursed": 25 },
+  { name: 'Jan', "Total Savings": 40.1, "Loans Disbursed": 10.5 },
+  { name: 'Feb', "Total Savings": 45.3, "Loans Disbursed": 12.0 },
+  { name: 'Mar', "Total Savings": 52.5, "Loans Disbursed": 15.2 },
+  { name: 'Apr', "Total Savings": 58.8, "Loans Disbursed": 18.9 },
+  { name: 'May', "Total Savings": 65.2, "Loans Disbursed": 22.1 },
+  { name: 'Jun', "Total Savings": 71.9, "Loans Disbursed": 25.0 },
+  { name: 'Jul', "Total Savings": 78.4, "Loans Disbursed": 28.3 },
+];
+
+export const TESTIMONIALS: Testimonial[] = [
+    {
+        id: 'test-1',
+        name: 'Aline U.',
+        role: 'Frontend Developer',
+        quote: 'KaziCoop helped me find a great job and the Ikimina feature is helping me save for a new laptop. It’s a game-changer!',
+        avatarUrl: `https://i.pravatar.cc/150?u=test-1`,
+    },
+    {
+        id: 'test-2',
+        name: 'Peter M.',
+        role: 'UX/UI Designer',
+        quote: 'The platform is so easy to use. I got three interview requests within the first week of completing my profile.',
+        avatarUrl: `https://i.pravatar.cc/150?u=test-2`,
+    },
+    {
+        id: 'test-3',
+        name: 'Jean H.',
+        role: 'Employer, TechSolutions Ltd.',
+        quote: 'We found our best candidate through KaziCoop. The talent pool is excellent and the management tools are very efficient.',
+        avatarUrl: `https://i.pravatar.cc/150?u=test-3`,
+    },
+    {
+        id: 'test-4',
+        name: 'Grace N.',
+        role: 'Project Manager',
+        quote: 'Joining a cooperative with my colleagues has been amazing for team morale and our financial discipline.',
+        avatarUrl: `https://i.pravatar.cc/150?u=test-4`,
+    },
+    {
+        id: 'test-5',
+        name: 'Samuel K.',
+        role: 'Student',
+        quote: 'The learning hub provided me with the skills I needed to land my first internship. Invaluable resource!',
+        avatarUrl: `https://i.pravatar.cc/150?u=test-5`,
+    },
+     {
+        id: 'test-6',
+        name: 'Fatima Z.',
+        role: 'Accountant',
+        quote: 'The digital wallet makes everything so simple, from receiving my salary to managing my Ikimina contributions.',
+        avatarUrl: `https://i.pravatar.cc/150?u=test-6`,
+    }
 ];

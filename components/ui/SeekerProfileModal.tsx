@@ -7,8 +7,8 @@ import Card from './Card';
 import RingProgress from '../layout/RingProgress';
 import { CheckBadgeIcon } from '@heroicons/react/24/solid';
 import Button from '../layout/Button';
-// FIX: Changed import to 'react-router' to resolve module export errors.
-import { Link } from 'react-router';
+// FIX: Changed import to 'react-router-dom' to resolve module export errors.
+import { Link } from 'react-router-dom';
 
 interface SeekerProfileModalProps {
   isOpen: boolean;
