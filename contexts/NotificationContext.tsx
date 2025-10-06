@@ -1,10 +1,7 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { ACTIVITY_LOG } from '../constants';
-import { ActivityLog } from '../types';
-
-interface Notification extends ActivityLog {
-    read: boolean;
-}
+// FIX: Added missing imports for ActivityLog and Notification types.
+import { ActivityLog, Notification } from '../types';
 
 interface NotificationContextType {
   notifications: Notification[];
@@ -17,7 +14,7 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     // In a real app, 'read' status would be persisted
     const [notifications, setNotifications] = useState<Notification[]>(() => 
-        ACTIVITY_LOG.map(log => ({ ...log, read: false }))
+        ACTIVITY_LOG.map((log): Notification => ({ ...log, read: false }))
     );
 
     const [unreadCount, setUnreadCount] = useState(notifications.filter(n => !n.read).length);

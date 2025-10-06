@@ -1,34 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { MESSAGES, USERS } from '../constants';
+import { MESSAGES } from '../constants';
 import { Message, User } from '../types';
 import Card from '../components/ui/Card';
 import { PaperAirplaneIcon, EllipsisVerticalIcon } from '@heroicons/react/24/solid';
 
 const MessagesPage: React.FC = () => {
-    const { user } = useAuth();
+    const { user, users: allUsers } = useAuth();
     const [messages, setMessages] = useState<Message[]>(MESSAGES);
     const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
+    const [isTyping, setIsTyping] = useState(false);
 
-    // Get all unique conversation partners
-    const partnerIds = React.useMemo(() => {
-        if (!user) return [];
-        const ids = messages
-            .filter(m => m.senderId === user.id || m.receiverId === user.id)
-            .map(m => m.senderId === user.id ? m.receiverId : m.senderId);
-        return [...new Set(ids)];
-    }, [user, messages]);
-
-    // List all users except the current one
-    const contactList = USERS.filter(u => u.id !== user?.id);
+    const contactList = allUsers.filter(u => u.id !== user?.id);
 
     useEffect(() => {
-        if (!selectedConversation && partnerIds.length > 0) {
-            setSelectedConversation(partnerIds[0]);
-        } else if (!selectedConversation && contactList.length > 0) {
+        if (!selectedConversation && contactList.length > 0) {
             setSelectedConversation(contactList[0].id);
         }
-    }, [partnerIds, contactList, selectedConversation]);
+    }, [contactList, selectedConversation]);
 
     const getConversationMessages = () => {
         if (!user || !selectedConversation) return [];
@@ -60,6 +49,20 @@ const MessagesPage: React.FC = () => {
             timestamp: new Date().toISOString(),
         };
         setMessages(prev => [...prev, newMessage]);
+        
+        // Simulate a reply and typing indicator
+        setIsTyping(true);
+        setTimeout(() => {
+            setIsTyping(false);
+            const replyMessage: Message = {
+                id: `msg-${Date.now() + 1}`,
+                senderId: selectedConversation,
+                receiverId: user.id,
+                text: "Thanks for your message! I'll get back to you shortly.",
+                timestamp: new Date().toISOString(),
+            };
+            setMessages(prev => [...prev, replyMessage]);
+        }, 2000);
     };
 
     if (!user) {
@@ -74,7 +77,7 @@ const MessagesPage: React.FC = () => {
                     {/* Conversations List */}
                     <div className="w-1/3 border-r dark:border-gray-700 overflow-y-auto">
                         <div className="p-4 border-b dark:border-gray-700">
-                            <input type="text" placeholder="Search contacts..." className="w-full px-3 py-2 border dark:border-gray-600 dark:bg-dark rounded-md text-sm"/>
+                            <input type="text" placeholder="Search contacts..." className="input-field w-full text-sm"/>
                         </div>
                         {contactList.map(contact => {
                             const lastMessage = getLastMessage(contact.id);
@@ -97,8 +100,8 @@ const MessagesPage: React.FC = () => {
                     <div className="w-2/3 flex flex-col">
                         {selectedConversation ? (
                             <>
-                                <ChatHeader user={USERS.find(u => u.id === selectedConversation)} />
-                                <ChatBody messages={getConversationMessages()} currentUser={user} />
+                                <ChatHeader user={allUsers.find(u => u.id === selectedConversation)} />
+                                <ChatBody messages={getConversationMessages()} currentUser={user} isTyping={isTyping} typingUser={allUsers.find(u => u.id === selectedConversation)} />
                                 <ChatInput onSendMessage={handleSendMessage} />
                             </>
                         ) : (
@@ -131,25 +134,38 @@ const ChatHeader: React.FC<{ user: User | undefined }> = ({ user }) => {
     );
 };
 
-const ChatBody: React.FC<{ messages: Message[], currentUser: User | null }> = ({ messages, currentUser }) => {
+const ChatBody: React.FC<{ messages: Message[], currentUser: User, isTyping: boolean, typingUser?: User }> = ({ messages, currentUser, isTyping, typingUser }) => {
     const endOfMessagesRef = useRef<HTMLDivElement>(null);
     useEffect(() => {
         endOfMessagesRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
+    }, [messages, isTyping]);
 
     return (
         <div className="flex-1 p-6 overflow-y-auto bg-gray-50 dark:bg-gray-800">
             <div className="space-y-4">
             {messages.map(msg => (
-                <div key={msg.id} className={`flex items-end gap-2 ${msg.senderId === currentUser?.id ? 'justify-end' : ''}`}>
-                    {msg.senderId !== currentUser?.id && (
-                        <img src={USERS.find(u => u.id === msg.senderId)?.avatarUrl} className="h-8 w-8 rounded-full" alt="avatar" />
+                <div key={msg.id} className={`flex items-end gap-2 ${msg.senderId === currentUser.id ? 'justify-end' : ''}`}>
+                    {msg.senderId !== currentUser.id && (
+                        <img src={typingUser?.avatarUrl} className="h-8 w-8 rounded-full" alt="avatar" />
                     )}
-                    <div className={`px-4 py-2 rounded-xl max-w-lg ${msg.senderId === currentUser?.id ? 'bg-primary text-white rounded-br-none' : 'bg-white dark:bg-dark text-dark dark:text-light rounded-bl-none'}`}>
+                    <div className={`px-4 py-2 rounded-xl max-w-lg ${msg.senderId === currentUser.id ? 'bg-primary text-white rounded-br-none' : 'bg-white dark:bg-dark text-dark dark:text-light rounded-bl-none'}`}>
                         <p>{msg.text}</p>
+                        <p className={`text-xs mt-1 opacity-70 ${msg.senderId === currentUser.id ? 'text-right' : 'text-left'}`}>{new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
                     </div>
                 </div>
             ))}
+            {isTyping && typingUser && (
+                <div className="flex items-end gap-2">
+                    <img src={typingUser.avatarUrl} className="h-8 w-8 rounded-full" alt="avatar" />
+                    <div className="px-4 py-3 rounded-xl bg-white dark:bg-dark text-dark dark:text-light rounded-bl-none">
+                        <div className="flex items-center gap-1">
+                            <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce delay-75"></span>
+                            <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce delay-150"></span>
+                            <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce delay-300"></span>
+                        </div>
+                    </div>
+                </div>
+            )}
             </div>
             <div ref={endOfMessagesRef} />
         </div>

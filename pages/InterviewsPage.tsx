@@ -1,111 +1,101 @@
 
-
 import React, { useState } from 'react';
+import { useInterviews } from '../contexts/InterviewContext';
+import { useJobs } from '../contexts/JobContext';
+import { useAuth } from '../contexts/AuthContext';
+import { USERS, COMPANIES } from '../constants';
 import Card from '../components/ui/Card';
 import Button from '../components/layout/Button';
-import { useInterviews } from '../contexts/InterviewContext';
-import { useAuth } from '../contexts/AuthContext';
-// FIX: Property 'company' does not exist on type 'Job'. Use companyId to find company name from COMPANIES.
-import { JOBS, USERS, COMPANIES } from '../constants';
-import { CalendarDaysIcon, VideoCameraIcon } from '@heroicons/react/24/solid';
+import { CalendarIcon, ClockIcon, UserIcon, VideoCameraIcon } from '@heroicons/react/24/solid';
 import VideoCallModal from '../components/ui/VideoCallModal';
+import { UserRole } from '../types';
 
 const InterviewsPage: React.FC = () => {
     const { interviews } = useInterviews();
     const { user } = useAuth();
-    const [isCallModalOpen, setIsCallModalOpen] = useState(false);
-    const [selectedParticipant, setSelectedParticipant] = useState('');
+    const { jobs } = useJobs();
+    const [isVideoCallOpen, setIsVideoCallOpen] = useState(false);
+    const [selectedParticipantName, setSelectedParticipantName] = useState('');
 
-    const upcomingInterviews = interviews
-        .filter(i => new Date(i.date) >= new Date())
-        .sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-    
-    const pastInterviews = interviews
-        .filter(i => new Date(i.date) < new Date())
-        .sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    const upcomingInterviews = interviews.filter(i => new Date(i.date) >= new Date() && i.status === 'Scheduled');
+    const pastInterviews = interviews.filter(i => new Date(i.date) < new Date() || i.status !== 'Scheduled');
 
-    const handleJoinCall = (interviewId: string) => {
-        const interview = interviews.find(i => i.id === interviewId);
-        if(!interview || !user) return;
-
-        const otherUserId = user.role === 'Employer' ? interview.userId : JOBS.find(j => j.id === interview.jobId)?.employerId;
-        const otherUser = USERS.find(u => u.id === otherUserId);
+    const handleJoinCall = (interview: typeof interviews[0]) => {
+        const participant = user?.role === UserRole.SEEKER 
+            ? USERS.find(u => u.role === UserRole.EMPLOYER) // Simplified for demo
+            : USERS.find(u => u.id === interview.userId);
         
-        setSelectedParticipant(otherUser?.name || 'Participant');
-        setIsCallModalOpen(true);
-    }
+        setSelectedParticipantName(participant?.name || 'Participant');
+        setIsVideoCallOpen(true);
+    };
 
     return (
         <div>
             <h1 className="text-3xl font-bold text-dark dark:text-light mb-6">My Interviews</h1>
             
-            <Card title="Upcoming Interviews" className="mb-6">
+            <section>
+                <h2 className="text-xl font-semibold text-dark dark:text-light mb-4">Upcoming Interviews</h2>
                 {upcomingInterviews.length > 0 ? (
-                    <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {upcomingInterviews.map(interview => {
-                            const job = JOBS.find(j => j.id === interview.jobId);
-                            const applicant = USERS.find(u => u.id === interview.userId);
-                            if (!job || !applicant) return null;
-                            const company = COMPANIES.find(c => c.id === job.companyId);
-                            
+                            const job = jobs.find(j => j.id === interview.jobId);
+                            const company = COMPANIES.find(c => c.id === job?.companyId);
+                            const participant = user?.role === UserRole.SEEKER
+                                ? company?.name
+                                : USERS.find(u => u.id === interview.userId)?.name;
+
                             return (
-                                <div key={interview.id} className="p-4 rounded-lg bg-light dark:bg-gray-700/50 flex flex-col md:flex-row justify-between md:items-center gap-4">
-                                    <div className="flex items-center gap-4">
-                                        <div className="text-center w-16 flex-shrink-0">
-                                            <p className="text-lg font-bold text-primary">{new Date(interview.date).toLocaleDateString('en-US', { day: '2-digit' })}</p>
-                                            <p className="text-sm text-gray-500">{new Date(interview.date).toLocaleDateString('en-US', { month: 'short' })}</p>
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-dark dark:text-light">{job.title}</p>
-                                            {/* FIX: Property 'company' does not exist on type 'Job'. Use companyId to find company name. */}
-                                            <p className="text-sm text-gray-500 dark:text-gray-400">{user?.role === 'Employer' ? `With: ${applicant.name}` : `At: ${company?.name}`}</p>
-                                            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{`${interview.type} | ${new Date(interview.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`}</p>
-                                        </div>
+                                <Card key={interview.id}>
+                                    <p className="font-bold text-primary text-lg">{job?.title}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">with {participant}</p>
+                                    
+                                    <div className="space-y-2 text-sm text-dark dark:text-light">
+                                        <p className="flex items-center"><CalendarIcon className="h-4 w-4 mr-2 text-primary" />{new Date(interview.date).toLocaleDateString()}</p>
+                                        <p className="flex items-center"><ClockIcon className="h-4 w-4 mr-2 text-primary" />{new Date(interview.date).toLocaleTimeString()}</p>
+                                        <p className="flex items-center"><UserIcon className="h-4 w-4 mr-2 text-primary" />{interview.type} Interview</p>
                                     </div>
-                                    <div className="flex items-center gap-2 self-end md:self-center">
-                                         <Button variant="secondary" onClick={() => handleJoinCall(interview.id)}>
+
+                                    <div className="mt-4 pt-4 border-t dark:border-gray-700">
+                                        <Button onClick={() => handleJoinCall(interview)}>
                                             <VideoCameraIcon className="h-5 w-5 mr-2 inline" />
-                                            Join Call
+                                            Join Video Call
                                         </Button>
                                     </div>
-                                </div>
+                                </Card>
                             );
                         })}
                     </div>
                 ) : (
-                    <p className="text-center text-gray-500 dark:text-gray-400 py-8">No upcoming interviews scheduled.</p>
+                    <p className="text-gray-500">No upcoming interviews scheduled.</p>
                 )}
-            </Card>
-
-            <Card title="Past Interviews">
+            </section>
+            
+            <section className="mt-8">
+                <h2 className="text-xl font-semibold text-dark dark:text-light mb-4">Past Interviews</h2>
                 {pastInterviews.length > 0 ? (
-                    <div className="space-y-4">
-                        {pastInterviews.map(interview => {
-                             const job = JOBS.find(j => j.id === interview.jobId);
-                             const applicant = USERS.find(u => u.id === interview.userId);
-                             if (!job || !applicant) return null;
-                             const company = COMPANIES.find(c => c.id === job.companyId);
-
-                             return (
-                                <div key={interview.id} className="p-4 rounded-lg bg-light dark:bg-gray-700/50 opacity-70">
-                                    {/* FIX: Property 'company' does not exist on type 'Job'. Use companyId to find company name. */}
-                                    <p className="font-semibold text-dark dark:text-light">{job.title} at {company?.name}</p>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        {`Completed on ${new Date(interview.date).toLocaleDateString()}`}
-                                    </p>
+                     <Card>
+                         <div className="divide-y dark:divide-gray-700">
+                            {pastInterviews.map(interview => {
+                                const job = jobs.find(j => j.id === interview.jobId);
+                                return (
+                                <div key={interview.id} className="p-3">
+                                    <p className="font-semibold text-dark dark:text-light">{job?.title}</p>
+                                    <p className="text-xs text-gray-500">{new Date(interview.date).toLocaleString()}</p>
+                                    <p className="text-xs mt-1">Status: <span className="font-bold">{interview.status}</span></p>
                                 </div>
-                             )
-                        })}
-                    </div>
+                                )
+                            })}
+                         </div>
+                    </Card>
                 ) : (
-                     <p className="text-center text-gray-500 dark:text-gray-400 py-8">No past interviews.</p>
+                    <p className="text-gray-500">No past interviews.</p>
                 )}
-            </Card>
-
+            </section>
+            
             <VideoCallModal 
-                isOpen={isCallModalOpen}
-                onClose={() => setIsCallModalOpen(false)}
-                participantName={selectedParticipant}
+                isOpen={isVideoCallOpen} 
+                onClose={() => setIsVideoCallOpen(false)} 
+                participantName={selectedParticipantName}
             />
         </div>
     );

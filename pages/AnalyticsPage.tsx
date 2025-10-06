@@ -1,5 +1,6 @@
 
 
+
 import React, { useState } from 'react';
 import Card from '../components/ui/Card';
 import StatCard from '../components/ui/StatCard';
@@ -90,9 +91,9 @@ ${JSON.stringify(memberRoleData, null, 2)}
 ${ACTIVITY_LOG.slice(0, 4).map(log => `- ${log.description}`).join('\n')}
 `;
             
-            // Correct API call to generateContent
+            // FIX: Correct API call to generateContent
             const response = await ai.models.generateContent({ model: 'gemini-2.5-flash', contents: prompt });
-            // Correct way to extract text from response
+            // FIX: Correct way to extract text from response
             setSummary(response.text);
 
         } catch (error) {

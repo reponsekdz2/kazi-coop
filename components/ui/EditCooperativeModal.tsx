@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import Modal from '../layout/Modal';
 import Button from '../layout/Button';
@@ -43,6 +45,7 @@ const EditCooperativeModal: React.FC<EditCooperativeModalProps> = ({ isOpen, onC
             ...details,
             contributionFrequency: details.contributionFrequency as 'Weekly' | 'Monthly'
         });
+        onClose();
     }
 
     return (

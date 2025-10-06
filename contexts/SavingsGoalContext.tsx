@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 import { SavingsGoal } from '../types';
 import { SAVINGS_GOALS } from '../constants';
@@ -7,8 +6,10 @@ import { useAuth } from './AuthContext';
 
 interface SavingsGoalContextType {
   goals: SavingsGoal[];
-  addGoal: (details: Omit<SavingsGoal, 'id' | 'userId' | 'currentAmount'>) => void;
+  addGoal: (details: Omit<SavingsGoal, 'id' | 'userId' | 'currentAmount' | 'status'>) => void;
   addContribution: (goalId: string, amount: number) => void;
+  deleteGoal: (goalId: string) => void;
+  completeGoal: (goalId: string) => void;
 }
 
 const SavingsGoalContext = createContext<SavingsGoalContextType | undefined>(undefined);
@@ -18,12 +19,13 @@ export const SavingsGoalProvider: React.FC<{ children: ReactNode }> = ({ childre
   const [goals, setGoals] = useState<SavingsGoal[]>(() => SAVINGS_GOALS.filter(g => g.userId === user?.id));
   const { addToast } = useToast();
 
-  const addGoal = (details: Omit<SavingsGoal, 'id' | 'userId' | 'currentAmount'>) => {
+  const addGoal = (details: Omit<SavingsGoal, 'id' | 'userId' | 'currentAmount' | 'status'>) => {
     if (!user) return;
     const newGoal: SavingsGoal = {
       id: `sg-${new Date().getTime()}`,
       userId: user.id,
       currentAmount: 0,
+      status: 'active',
       ...details,
     };
 
@@ -38,15 +40,26 @@ export const SavingsGoalProvider: React.FC<{ children: ReactNode }> = ({ childre
         addToast(`Added RWF ${amount.toLocaleString()} to your goal: ${goal.name}`, 'success');
         if (newAmount >= goal.targetAmount) {
              addToast(`Congratulations! You've reached your savings goal: ${goal.name}!`, 'info');
+             return { ...goal, currentAmount: newAmount, status: 'completed' };
         }
         return { ...goal, currentAmount: newAmount };
       }
       return goal;
     }));
   };
+  
+  const deleteGoal = (goalId: string) => {
+      setGoals(prev => prev.filter(g => g.id !== goalId));
+      addToast('Savings goal removed.', 'info');
+  };
+  
+  const completeGoal = (goalId: string) => {
+      setGoals(prev => prev.map(g => g.id === goalId ? {...g, status: 'completed'} : g));
+       addToast('Goal marked as complete!', 'success');
+  }
 
   return (
-    <SavingsGoalContext.Provider value={{ goals, addGoal, addContribution }}>
+    <SavingsGoalContext.Provider value={{ goals, addGoal, addContribution, deleteGoal, completeGoal }}>
       {children}
     </SavingsGoalContext.Provider>
   );

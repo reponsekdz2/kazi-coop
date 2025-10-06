@@ -1,167 +1,142 @@
+
+
 import React, { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
 import Card from '../components/ui/Card';
 import Button from '../components/layout/Button';
-import { LEARNING_MODULES, JOBS } from '../constants';
-import { User, LearningModule, Job } from '../types';
-import { ArrowTrendingUpIcon, SparklesIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
 import { GoogleGenAI } from '@google/genai';
 import { useToast } from '../contexts/ToastContext';
+import { useAuth } from '../contexts/AuthContext';
+import { LEARNING_MODULES, JOBS } from '../constants';
+import { SparklesIcon, LightBulbIcon } from '@heroicons/react/24/solid';
 import { Link } from 'react-router-dom';
 
-interface AIResponse {
-    next_role: string;
-    skills_to_learn: string[];
-    advice: string;
+interface CareerPath {
+    currentRole: string;
+    nextRole: string;
+    skillsToDevelop: string[];
+    suggestedModules: string[];
 }
 
 const CareerPathPage: React.FC = () => {
     const { user } = useAuth();
     const { addToast } = useToast();
-    const [aiResponse, setAiResponse] = useState<AIResponse | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [careerPath, setCareerPath] = useState<CareerPath | null>(null);
+    const [currentRole, setCurrentRole] = useState('Junior Frontend Developer');
+    const [targetRole, setTargetRole] = useState('Senior Frontend Developer');
 
-    const handleGenerateAdvice = async () => {
-        if (!user) return;
-        setIsLoading(true);
-        setAiResponse(null);
-
+    const handleGeneratePath = async () => {
+        setIsGenerating(true);
+        setCareerPath(null);
         try {
-            const ai = new GoogleGenAI({apiKey: process.env.API_KEY as string});
-            const prompt = `
-                Based on the user profile below, provide a concise and actionable career plan.
-                - Current Skills: ${user.skills?.join(', ') || 'Not specified'}
-                - Career Goal: ${user.careerGoal || 'Not specified'}
-                - Current Role: ${user.role}
+            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
-                Return a JSON object with the following structure:
+            const prompt = `
+                Generate a concise career path plan for a user on the KaziCoop platform.
+                Current Role: ${currentRole}
+                Target Role: ${targetRole}
+                User's current skills: ${user?.skills?.join(', ') || 'React, JavaScript'}
+                
+                Available learning modules on platform: ${LEARNING_MODULES.map(m => m.title).join(', ')}
+
+                Provide the output in a JSON object with the following structure:
                 {
-                  "next_role": "A suggested next job title.",
-                  "skills_to_learn": ["A list of 3 key skills to learn for that role."],
-                  "advice": "A short paragraph (2-3 sentences) of personalized advice."
+                  "currentRole": "The user's current role",
+                  "nextRole": "The user's target role",
+                  "skillsToDevelop": ["A list of 3-5 key skills to develop, including both technical and soft skills."],
+                  "suggestedModules": ["A list of 2-3 relevant titles from the available learning modules."]
                 }
             `;
 
-            const response = await ai.models.generateContent({ model: 'gemini-2.5-flash', contents: prompt });
-            // Gemini can return the JSON wrapped in markdown, so we need to clean it
-            const cleanedText = response.text.replace(/```json/g, '').replace(/```/g, '').trim();
-            const parsedResponse: AIResponse = JSON.parse(cleanedText);
-            setAiResponse(parsedResponse);
-            addToast("AI career advice generated!", "success");
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: prompt,
+                config: { responseMimeType: 'application/json' },
+            });
+            
+            // FIX: Use response.text to get the JSON string from the response.
+            const jsonText = response.text.trim();
+            const parsedPath = JSON.parse(jsonText);
+            setCareerPath(parsedPath);
+            addToast("Your personalized career path is ready!", "success");
 
         } catch (error) {
-            console.error("Error generating AI advice:", error);
-            addToast("Failed to get AI advice. Please try again.", "error");
+            console.error("Error generating career path:", error);
+            addToast("Failed to generate career path. Please try again.", "error");
         } finally {
-            setIsLoading(false);
+            setIsGenerating(false);
         }
     };
-
-    const recommendedModules = aiResponse ? LEARNING_MODULES.filter(module => 
-        aiResponse.skills_to_learn.some(skill => 
-            module.title.toLowerCase().includes(skill.toLowerCase()) || 
-            module.content.summary.toLowerCase().includes(skill.toLowerCase())
-        )
-    ) : [];
     
-    const recommendedJobs = aiResponse ? JOBS.filter(job => 
-        job.title.toLowerCase().includes(aiResponse.next_role.toLowerCase())
-    ) : [];
+    const relevantJobs = JOBS.filter(job => job.title.toLowerCase().includes(targetRole.split(' ')[0].toLowerCase()));
+
 
     return (
         <div>
-            <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
-                 <div>
-                    <h1 className="text-3xl font-bold text-dark dark:text-light">My Career Path</h1>
-                    <p className="text-gray-500 dark:text-gray-400">Your personalized roadmap to success.</p>
+            <h1 className="text-3xl font-bold text-dark dark:text-light mb-2">AI-Powered Career Path</h1>
+            <p className="text-gray-500 dark:text-gray-400 mb-6">Get a personalized roadmap to achieve your career goals.</p>
+
+            <Card className="mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                    <div>
+                        <label className="label-text">Your Current Role</label>
+                        <input type="text" value={currentRole} onChange={e => setCurrentRole(e.target.value)} className="input-field" placeholder="e.g., Junior Developer"/>
+                    </div>
+                     <div>
+                        <label className="label-text">Your Target Role</label>
+                        <input type="text" value={targetRole} onChange={e => setTargetRole(e.target.value)} className="input-field" placeholder="e.g., Senior Developer"/>
+                    </div>
                 </div>
-                <Button onClick={handleGenerateAdvice} disabled={isLoading}>
-                     <SparklesIcon className={`h-5 w-5 mr-2 inline ${isLoading ? 'animate-spin' : ''}`} />
-                    {isLoading ? 'Generating...' : 'Get AI Next Step'}
-                </Button>
-            </div>
-
-            <Card>
-                {isLoading && <LoadingState />}
-                
-                {!isLoading && !aiResponse && <InitialState />}
-
-                {!isLoading && aiResponse && (
-                    <ResultsState 
-                        response={aiResponse} 
-                        modules={recommendedModules}
-                        jobs={recommendedJobs}
-                    />
-                )}
+                <div className="mt-4 text-center">
+                    <Button onClick={handleGeneratePath} disabled={isGenerating}>
+                        <SparklesIcon className={`h-5 w-5 mr-2 inline ${isGenerating ? 'animate-spin' : ''}`} />
+                        {isGenerating ? 'Generating Your Path...' : 'Generate My Career Path'}
+                    </Button>
+                </div>
             </Card>
+
+            {(isGenerating || careerPath) && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {isGenerating ? (
+                        <Card title="Building Your Roadmap..." className="lg:col-span-2 flex items-center justify-center py-16">
+                             <div className="animate-pulse flex flex-col items-center space-y-2">
+                                <LightBulbIcon className="h-10 w-10 text-primary"/>
+                                <p className="text-gray-500">Analyzing roles and skills...</p>
+                            </div>
+                        </Card>
+                    ) : careerPath && (
+                        <>
+                            <Card title="Skills to Develop">
+                                <ul className="list-disc list-inside space-y-2">
+                                    {careerPath.skillsToDevelop.map(skill => <li key={skill}>{skill}</li>)}
+                                </ul>
+                            </Card>
+                            <Card title="Suggested Learning">
+                                <div className="space-y-2">
+                                {LEARNING_MODULES.filter(m => careerPath.suggestedModules.includes(m.title)).map(module => (
+                                    <Link key={module.id} to={`/learning/${module.id}`} className="block p-3 bg-light dark:bg-dark rounded-md hover:bg-primary/10">
+                                        <p className="font-semibold text-dark dark:text-light">{module.title}</p>
+                                        <p className="text-xs text-primary">{module.category}</p>
+                                    </Link>
+                                ))}
+                                </div>
+                            </Card>
+                             <Card title={`Relevant Jobs for a ${careerPath.nextRole}`} className="lg:col-span-2">
+                                <div className="space-y-2">
+                                    {relevantJobs.map(job => (
+                                         <Link key={job.id} to="/jobs" className="block p-3 bg-light dark:bg-dark rounded-md hover:bg-primary/10">
+                                            <p className="font-semibold text-dark dark:text-light">{job.title}</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">{job.location}</p>
+                                        </Link>
+                                    ))}
+                                </div>
+                            </Card>
+                        </>
+                    )}
+                </div>
+            )}
         </div>
     );
 };
-
-const InitialState = () => (
-    <div className="text-center py-12">
-        <ArrowTrendingUpIcon className="h-16 w-16 text-primary mx-auto mb-4"/>
-        <h2 className="text-xl font-bold text-dark dark:text-light">Ready to Discover Your Next Career Move?</h2>
-        <p className="text-gray-500 dark:text-gray-400 mt-2 max-w-lg mx-auto">Click the "Get AI Next Step" button to receive personalized advice, suggested skills, and job recommendations based on your profile and goals.</p>
-    </div>
-);
-
-const LoadingState = () => (
-    <div className="flex items-center justify-center py-12">
-       <div className="animate-pulse flex flex-col items-center space-y-3">
-           <SparklesIcon className="h-12 w-12 text-primary"/>
-           <p className="text-gray-500 dark:text-gray-400 font-semibold">Our AI is analyzing your profile to craft your personalized career plan...</p>
-       </div>
-   </div>
-);
-
-const ResultsState: React.FC<{ response: AIResponse, modules: LearningModule[], jobs: Job[] }> = ({ response, modules, jobs }) => (
-    <div className="space-y-8">
-        <div>
-            <p className="text-sm font-semibold uppercase text-primary">Your Next Role</p>
-            <h2 className="text-3xl font-bold text-dark dark:text-light mt-1">{response.next_role}</h2>
-        </div>
-        <div>
-            <h3 className="text-xl font-bold text-dark dark:text-light mb-3">Personalized Advice</h3>
-            <p className="text-gray-600 dark:text-gray-300 bg-light dark:bg-dark p-4 rounded-lg">{response.advice}</p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-1">
-                <h3 className="text-xl font-bold text-dark dark:text-light mb-3">Skills to Learn</h3>
-                <ul className="space-y-2">
-                    {response.skills_to_learn.map(skill => (
-                        <li key={skill} className="flex items-center gap-2">
-                            <CheckCircleIcon className="h-5 w-5 text-accent"/>
-                            <span className="text-dark dark:text-light">{skill}</span>
-                        </li>
-                    ))}
-                </ul>
-            </div>
-            <div className="lg:col-span-2">
-                <h3 className="text-xl font-bold text-dark dark:text-light mb-3">Recommended Learning</h3>
-                 <div className="space-y-3">
-                    {modules.length > 0 ? modules.map(m => (
-                        <Link to={`/learning/${m.id}`} key={m.id} className="block p-3 bg-light dark:bg-dark rounded-lg hover:bg-primary/10">
-                            <p className="font-semibold text-dark dark:text-light">{m.title}</p>
-                            <p className="text-xs text-primary">{m.category}</p>
-                        </Link>
-                    )) : <p className="text-gray-500">No specific modules found. Explore the Learning Hub!</p>}
-                </div>
-            </div>
-        </div>
-         <div>
-            <h3 className="text-xl font-bold text-dark dark:text-light mb-3">Suggested Jobs</h3>
-            <div className="space-y-3">
-                {jobs.length > 0 ? jobs.map(j => (
-                     <Link to="/jobs" key={j.id} className="block p-3 bg-light dark:bg-dark rounded-lg hover:bg-primary/10">
-                        <p className="font-semibold text-dark dark:text-light">{j.title}</p>
-                        <p className="text-xs text-gray-500">{j.location}</p>
-                    </Link>
-                )): <p className="text-gray-500">No direct job matches found right now. Keep an eye on the jobs page!</p>}
-            </div>
-        </div>
-    </div>
-);
-
 
 export default CareerPathPage;

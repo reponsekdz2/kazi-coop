@@ -1,5 +1,6 @@
 
 
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider } from './contexts/AppContext';
@@ -14,6 +15,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import JobsPage from './pages/JobsPage';
+// FIX: Added missing import for CooperativesPage.
 import CooperativesPage from './pages/CooperativesPage';
 import WalletPage from './pages/WalletPage';
 import AnalyticsPage from './pages/AnalyticsPage';
@@ -26,6 +28,7 @@ import UserAnalyticsPage from './pages/UserAnalyticsPage';
 import LearningModulePage from './pages/LearningModulePage';
 import HelpCenterPage from './pages/HelpCenterPage';
 import CareerPathPage from './pages/CareerPathPage'; // Import the new page
+// FIX: Added missing import for UserRole.
 import { UserRole } from './types';
 
 const PrivateRoute: React.FC<{ allowedRoles?: UserRole[] }> = ({ allowedRoles }) => {

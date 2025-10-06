@@ -1,18 +1,8 @@
 
-// FIX: Defined UserRole enum directly in this file to resolve export errors across the app.
+// FIX: Created types.ts to define all shared TypeScript interfaces and types.
 export enum UserRole {
   SEEKER = 'Job Seeker',
   EMPLOYER = 'Employer',
-}
-
-export interface SeekerProfileData {
-  dateOfBirth: string;
-  gender: 'Male' | 'Female' | 'Other' | 'Prefer not to say';
-  educationLevel: 'High School' | 'Diploma' | 'Bachelors' | 'Masters' | 'PhD';
-  fieldOfStudy: string;
-  yearsOfExperience: number;
-  resumeUrl: string;
-  profileImage: string;
 }
 
 export interface User {
@@ -23,18 +13,16 @@ export interface User {
   avatarUrl: string;
   skills?: string[];
   careerProgress?: number;
-  careerGoal?: string;
-  profileData?: SeekerProfileData;
   notificationSettings?: {
     jobAlerts: boolean;
     messageAlerts: boolean;
     coopUpdates: boolean;
-  };
+  }
 }
 
 export interface Company {
   id: string;
-  name: string;
+  name:string;
   description: string;
   industry: string;
   location: string;
@@ -42,41 +30,93 @@ export interface Company {
 
 export interface Job {
   id: string;
-  title: string;
-  companyId: string;
   employerId: string;
+  companyId: string;
+  title: string;
   location: string;
   type: 'Full-time' | 'Part-time' | 'Contract';
   description: string;
   requirements: string[];
-  status: 'Open' | 'Closed';
   isSaved: boolean;
+  status?: 'Open' | 'Closed';
   salary?: number;
   workersNeeded?: number;
   rating?: number;
   imageUrl?: string;
 }
 
+export interface ApplicantInfo {
+  educationLevel: string;
+  fieldOfStudy: string;
+  yearsOfExperience: number;
+  resumeUrl: string | null;
+}
+
 export interface Application {
   id: string;
-  userId: string;
   jobId: string;
+  userId: string;
+  status: 'Pending Review' | 'Applied' | 'Reviewed' | 'Interviewing' | 'Interview Scheduled' | 'Offered' | 'Rejected';
   submissionDate: string;
-  status: 'Applied' | 'Reviewed' | 'Interviewing' | 'Interview Scheduled' | 'Offered' | 'Rejected';
-  applicantInfo: SeekerProfileData;
+  applicantInfo: ApplicantInfo;
 }
 
 export interface Interview {
   id: string;
-  userId: string;
   jobId: string;
+  userId: string;
   date: string;
   type: 'Phone Screen' | 'Technical' | 'On-site' | 'Final';
   status: 'Scheduled' | 'Completed' | 'Canceled';
   details?: string;
 }
 
-export type TransactionCategory = 'Income' | 'Withdrawal' | 'Transfer' | 'Cooperative' | 'Groceries' | 'Utilities' | 'Loan Repayment';
+export interface Loan {
+  id: string;
+  memberId: string;
+  amount: number;
+  interestRate: number;
+  status: 'Pending' | 'Approved' | 'Rejected' | 'Repaid';
+  requestDate: string;
+  approvalDate?: string;
+}
+export interface CooperativeMember {
+    userId: string;
+    joinDate: string;
+    status: 'pending_approval' | 'awaiting_agreement' | 'active' | 'inactive';
+    totalContribution: number;
+    lastContributionDate: string | null;
+    penalties: number;
+}
+export interface Cooperative {
+  id: string;
+  name: string;
+  description: string;
+  creatorId: string;
+  members: CooperativeMember[];
+  contributionAmount: number;
+  contributionFrequency: 'Weekly' | 'Monthly';
+  nextContributionDate: string;
+  initialContribution: number;
+  totalSavings: number;
+  totalLoans: number;
+  rulesAndRegulations: string;
+  loans: Loan[];
+  announcements: { id: string, message: string, date: string }[];
+}
+
+export type TransactionCategory =
+  | 'Income'
+  | 'Transfer'
+  | 'Withdrawal'
+  | 'Savings'
+  | 'Loan Repayment'
+  | 'Groceries'
+  | 'Transport'
+  | 'Utilities'
+  | 'Entertainment'
+  | 'Other';
+
 export type PaymentProvider = 'Mobile Money' | 'PayPal' | 'Bank Transfer';
 
 export interface Transaction {
@@ -95,7 +135,7 @@ export interface SavingsGoal {
   name: string;
   targetAmount: number;
   currentAmount: number;
-  deadline: string;
+  status: 'active' | 'completed';
 }
 
 export interface Budget {
@@ -103,42 +143,6 @@ export interface Budget {
   userId: string;
   category: TransactionCategory;
   budgetAmount: number;
-}
-
-export interface CooperativeMember {
-  userId: string;
-  joinDate: string;
-  totalContribution: number;
-  lastContributionDate?: string;
-}
-
-export interface Loan {
-  id: string;
-  memberId: string;
-  amount: number;
-  requestDate: string;
-  status: 'Pending' | 'Approved' | 'Rejected' | 'Repaid';
-  repaymentDueDate: string;
-}
-
-export interface Cooperative {
-  id: string;
-  name: string;
-  creatorId: string;
-  description: string;
-  contributionAmount: number;
-  contributionFrequency: 'Weekly' | 'Monthly';
-  members: CooperativeMember[];
-  walletBalance: number;
-  loans: Loan[];
-  rulesAndRegulations: string;
-  announcements: { id: string, message: string, date: string }[];
-  joinRequests: { userId: string, date: string }[];
-}
-
-export interface Repayment {
-  amount: number;
-  date: string;
 }
 
 export interface RepaymentInstallment {
@@ -158,7 +162,18 @@ export interface LoanApplication {
   status: 'Pending' | 'Approved' | 'Rejected' | 'Fully Repaid';
   remainingAmount: number;
   repaymentSchedule: RepaymentInstallment[];
-  repayments: Repayment[];
+  repayments: { amount: number, date: string }[];
+}
+
+export interface ActivityLog {
+  id: string;
+  type: 'NEW_MEMBER' | 'NEW_JOB' | 'SAVINGS_GOAL' | 'LARGE_DEPOSIT';
+  description: string;
+  timestamp: string;
+}
+
+export interface Notification extends ActivityLog {
+    read: boolean;
 }
 
 export interface Message {
@@ -169,32 +184,32 @@ export interface Message {
   timestamp: string;
 }
 
-export interface LearningModule {
-    id: string;
-    title: string;
-    category: string;
-    type: 'video' | 'article';
-    duration: string;
-    progress: number;
-    content: {
-        summary: string;
-        videoUrl?: string;
-        articleText?: string;
-        keyTakeaways: string[];
-    };
+export interface QuizQuestion {
+    question: string;
+    options: string[];
+    correctAnswerIndex: number;
 }
 
-export interface ActivityLog {
-    id: string;
-    type: 'NEW_MEMBER' | 'NEW_JOB' | 'SAVINGS_GOAL' | 'LARGE_DEPOSIT';
-    description: string;
-    timestamp: string;
+export interface LearningModule {
+  id: string;
+  title: string;
+  category: string;
+  type: 'video' | 'article';
+  duration: string;
+  progress: number;
+  content: {
+    summary: string;
+    videoUrl?: string;
+    articleText?: string;
+    keyTakeaways: string[];
+  };
+  quiz?: QuizQuestion[];
 }
 
 export interface Testimonial {
-    id: string;
-    name: string;
-    role: string;
-    quote: string;
-    avatarUrl: string;
+  id: string;
+  name: string;
+  role: string;
+  avatarUrl: string;
+  quote: string;
 }

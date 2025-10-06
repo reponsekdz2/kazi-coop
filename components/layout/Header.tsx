@@ -6,7 +6,8 @@ import { Link } from 'react-router-dom';
 import { Menu, Transition } from '@headlessui/react';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { UserPlusIcon, BriefcaseIcon, ArrowTrendingUpIcon, BanknotesIcon } from '@heroicons/react/24/outline';
-import { ActivityLog } from '../../types';
+// FIX: Imported Notification type to resolve type errors.
+import { ActivityLog, Notification } from '../../types';
 
 const notificationIcons: { [key in ActivityLog['type'] | 'default']: React.ElementType } = {
     NEW_MEMBER: UserPlusIcon,
@@ -80,7 +81,7 @@ const Header: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
                     {unreadCount > 0 && <button onClick={markAllAsRead} className="text-xs text-primary hover:underline">Mark all as read</button>}
                 </div>
                 <div className="py-1 max-h-96 overflow-y-auto">
-                    {notifications.length > 0 ? notifications.map(notif => {
+                    {notifications.length > 0 ? notifications.map((notif: Notification) => {
                        const Icon = notificationIcons[notif.type] || notificationIcons.default;
                        return (
                         <Menu.Item key={notif.id}>
