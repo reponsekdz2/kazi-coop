@@ -12,15 +12,19 @@ const LandingPage: React.FC = () => {
   return (
     <div className="bg-light dark:bg-gray-800">
       {/* Hero Section */}
-      <section className="bg-light dark:bg-gray-900 py-20">
-        <div className="container mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-6xl font-extrabold text-dark dark:text-light leading-tight mb-4">
+      <section 
+        className="bg-light dark:bg-gray-900 py-20 relative bg-cover bg-center"
+        style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1521737711867-e3b97375f902?q=80&w=2574&auto=format&fit=crop)' }}
+      >
+        <div className="absolute inset-0 bg-black/60 z-0"></div>
+        <div className="container mx-auto px-6 text-center relative z-10">
+          <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-4">
             Unlock Your Potential with KaziCoop
           </h1>
-          <div className="text-lg md:text-2xl text-primary font-semibold mb-8 h-8 md:h-10">
+          <div className="text-lg md:text-2xl text-secondary font-semibold mb-8 h-8 md:h-10">
             <Typewriter strings={['Find Jobs.', 'Save Together.', 'Build Your Future.']} />
           </div>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-10">
+          <p className="text-lg text-gray-200 max-w-2xl mx-auto mb-10">
             The all-in-one platform for job seekers and employers in Rwanda, integrated with powerful community savings tools (Ikimina).
           </p>
           <div className="flex justify-center gap-4">

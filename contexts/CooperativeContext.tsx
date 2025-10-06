@@ -23,6 +23,7 @@ interface CooperativeContextType {
   requestToJoin: (cooperativeId: string) => void;
   approveJoinRequest: (cooperativeId: string, userId: string) => void;
   denyJoinRequest: (cooperativeId: string, userId: string) => void;
+  removeMember: (cooperativeId: string, userId: string) => void;
   makeContribution: (cooperativeId: string, amount: number) => void;
   applyForLoan: (cooperativeId: string, details: { amount: number, purpose: string, repaymentPeriod: number }) => void;
   approveLoan: (cooperativeId: string, loanId: string) => void;
@@ -103,6 +104,23 @@ export const CooperativeProvider: React.FC<{ children: ReactNode }> = ({ childre
         return {
           ...coop,
           joinRequests: coop.joinRequests.filter(id => id !== userId),
+        };
+      }
+      return coop;
+    }));
+  };
+  
+  const removeMember = (cooperativeId: string, userId: string) => {
+    setAllCooperatives(prev => prev.map(coop => {
+      if (coop.id === cooperativeId && coop.creatorId === user?.id) {
+        if (userId === coop.creatorId) {
+          addToast("You cannot remove yourself as the creator.", "error");
+          return coop;
+        }
+        addToast("Member has been removed from the cooperative.", "success");
+        return {
+          ...coop,
+          members: coop.members.filter(id => id !== userId),
         };
       }
       return coop;
@@ -282,7 +300,7 @@ export const CooperativeProvider: React.FC<{ children: ReactNode }> = ({ childre
 
 
   return (
-    <CooperativeContext.Provider value={{ cooperatives, createCooperative, requestToJoin, approveJoinRequest, denyJoinRequest, makeContribution, applyForLoan, approveLoan, rejectLoan, makeLoanRepayment, updateCooperativeSettings }}>
+    <CooperativeContext.Provider value={{ cooperatives, createCooperative, requestToJoin, approveJoinRequest, denyJoinRequest, removeMember, makeContribution, applyForLoan, approveLoan, rejectLoan, makeLoanRepayment, updateCooperativeSettings }}>
       {children}
     </CooperativeContext.Provider>
   );

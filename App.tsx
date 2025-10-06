@@ -1,8 +1,7 @@
 
 
 import React from 'react';
-// FIX: Changed import to 'react-router-dom' and switched BrowserRouter to MemoryRouter to resolve module export errors.
-import { MemoryRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider } from './contexts/AppContext';
 import { useAuth } from './contexts/AuthContext';
 
@@ -97,7 +96,7 @@ const App: React.FC = () => {
 
   return (
     <AppProvider>
-      <Router>
+      <Router basename={basename}>
         <AuthRoutes />
       </Router>
     </AppProvider>

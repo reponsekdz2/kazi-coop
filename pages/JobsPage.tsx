@@ -52,16 +52,28 @@ const SeekerJobsView: React.FC = () => {
     const { jobs, toggleSaveJob } = useJobs();
     const { user } = useAuth();
     const { applications, applyForJob } = useApplications();
-    const [selectedJob, setSelectedJob] = useState<Job | null>(jobs[0] || null);
+    const [selectedJob, setSelectedJob] = useState<Job | null>(null);
     const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
     const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
-    
+    const [activeTab, setActiveTab] = useState<'all' | 'saved'>('all');
+
     const jobsWithCompany = useMemo(() => {
-        return jobs.map(job => {
+        const jobsToFilter = activeTab === 'saved' ? jobs.filter(j => j.isSaved) : jobs;
+        return jobsToFilter.map(job => {
             const company = COMPANIES.find(c => c.id === job.companyId);
             return { ...job, companyName: company?.name || 'Unknown Company' };
         });
-    }, [jobs]);
+    }, [jobs, activeTab]);
+
+    // Set initial selected job
+    React.useEffect(() => {
+        if (jobsWithCompany.length > 0) {
+            setSelectedJob(jobsWithCompany[0]);
+        } else {
+            setSelectedJob(null);
+        }
+    }, [jobsWithCompany]);
+
 
     const userApplicationForSelectedJob = useMemo(() => {
         if (!user || !selectedJob) return null;
@@ -89,8 +101,18 @@ const SeekerJobsView: React.FC = () => {
         <>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-1">
-                <Card title="Job Listings" className="max-h-[calc(100vh-200px)] overflow-y-auto">
-                    {jobsWithCompany.map(job => (
+                 <div className="mb-4 border-b border-gray-200 dark:border-gray-700">
+                    <nav className="-mb-px flex space-x-4">
+                         <button onClick={() => setActiveTab('all')} className={`whitespace-nowrap pb-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'all' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
+                            All Jobs
+                         </button>
+                         <button onClick={() => setActiveTab('saved')} className={`whitespace-nowrap pb-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'saved' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
+                            Saved Jobs
+                         </button>
+                    </nav>
+                </div>
+                <Card className="max-h-[calc(100vh-260px)] overflow-y-auto">
+                    {jobsWithCompany.length > 0 ? jobsWithCompany.map(job => (
                         <div key={job.id} onClick={() => setSelectedJob(job)} className={`p-4 rounded-lg cursor-pointer mb-2 ${selectedJob?.id === job.id ? 'bg-primary/10 dark:bg-primary/20' : 'hover:bg-light dark:hover:bg-dark'}`}>
                             <div className="flex justify-between">
                                 <h3 className="font-bold text-dark dark:text-light">{job.title}</h3>
@@ -100,7 +122,12 @@ const SeekerJobsView: React.FC = () => {
                             </div>
                             <p className="text-sm text-gray-500 dark:text-gray-400">{job.companyName}</p>
                         </div>
-                    ))}
+                    )) : (
+                        <div className="text-center py-12 text-gray-500">
+                            <BriefcaseIcon className="h-12 w-12 mx-auto mb-2"/>
+                            {activeTab === 'saved' ? 'You have no saved jobs.' : 'No jobs available at the moment.'}
+                        </div>
+                    )}
                 </Card>
             </div>
             <div className="lg:col-span-2">

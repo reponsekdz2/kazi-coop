@@ -5,7 +5,7 @@ import Card from '../components/ui/Card';
 import Button from '../components/layout/Button';
 import { useCooperatives } from '../contexts/CooperativeContext';
 import { Cooperative, User, Contribution, CooperativeLoan, RepaymentInstallment } from '../types';
-import { UserGroupIcon, Cog6ToothIcon, ArrowUpRightIcon, CheckIcon, XMarkIcon, CalendarDaysIcon, CurrencyDollarIcon, ChevronDownIcon, InformationCircleIcon } from '@heroicons/react/24/solid';
+import { UserGroupIcon, Cog6ToothIcon, ArrowUpRightIcon, CheckIcon, XMarkIcon, CalendarDaysIcon, CurrencyDollarIcon, ChevronDownIcon, InformationCircleIcon, UserMinusIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../contexts/AuthContext';
 import { UserRole } from '../types';
 import Modal from '../components/layout/Modal';
@@ -460,8 +460,9 @@ const RepaymentScheduleTable: React.FC<{ schedule: RepaymentInstallment[], coope
 
 
 const ManagementTab: React.FC<{ cooperative: Cooperative }> = ({ cooperative }) => {
-    const { approveJoinRequest, denyJoinRequest, approveLoan, rejectLoan } = useCooperatives();
+    const { approveJoinRequest, denyJoinRequest, approveLoan, rejectLoan, removeMember } = useCooperatives();
     const pendingRequests = USERS.filter(u => cooperative.joinRequests.includes(u.id));
+    const members = USERS.filter(u => cooperative.members.includes(u.id));
     const pendingLoans = cooperative.loans.filter(l => l.status === 'Pending');
     const availableForLoan = cooperative.totalSavings - cooperative.totalLoans;
     const [viewingUser, setViewingUser] = useState<User | null>(null);
@@ -470,15 +471,16 @@ const ManagementTab: React.FC<{ cooperative: Cooperative }> = ({ cooperative }) 
 
     return (
         <div className="space-y-6">
+            <div className="flex justify-between items-center">
+                <h3 className="text-xl font-bold text-dark dark:text-light">Admin Dashboard</h3>
+                <Button variant="secondary" onClick={() => setIsSettingsOpen(true)}>
+                    <Cog6ToothIcon className="h-5 w-5 mr-2 inline"/>
+                    Cooperative Settings
+                </Button>
+            </div>
             <Card>
-                <div className="flex justify-between items-center mb-4">
-                    <h4 className="font-bold text-lg text-dark dark:text-light">{`Pending Join Requests (${pendingRequests.length})`}</h4>
-                    <Button variant="secondary" onClick={() => setIsSettingsOpen(true)}>
-                        <Cog6ToothIcon className="h-5 w-5 mr-2 inline"/>
-                        Cooperative Settings
-                    </Button>
-                </div>
-                <div className="space-y-3 max-h-96 overflow-y-auto">
+                <h4 className="font-bold text-lg text-dark dark:text-light mb-4">{`Pending Join Requests (${pendingRequests.length})`}</h4>
+                <div className="space-y-3 max-h-60 overflow-y-auto">
                     {pendingRequests.length > 0 ? pendingRequests.map(requestUser => (
                         <div key={requestUser.id} className="flex items-center justify-between p-2 rounded-lg bg-light dark:bg-gray-700/50">
                             <div className="flex items-center">
@@ -502,7 +504,7 @@ const ManagementTab: React.FC<{ cooperative: Cooperative }> = ({ cooperative }) 
             </Card>
              <Card>
                 <h4 className="font-bold text-lg text-dark dark:text-light mb-4">{`Loan Requests (${pendingLoans.length})`}</h4>
-                 <div className="space-y-3 max-h-96 overflow-y-auto">
+                 <div className="space-y-3 max-h-60 overflow-y-auto">
                     {pendingLoans.length > 0 ? pendingLoans.map(loan => {
                         const loanUser = USERS.find(u => u.id === loan.userId);
                         const canAfford = loan.amount <= availableForLoan;
@@ -532,6 +534,27 @@ const ManagementTab: React.FC<{ cooperative: Cooperative }> = ({ cooperative }) 
                     }) : (
                          <p className="text-gray-500 dark:text-gray-400 text-center py-4">There are no pending loan requests.</p>
                     )}
+                </div>
+            </Card>
+             <Card>
+                <h4 className="font-bold text-lg text-dark dark:text-light mb-4">{`Manage Members (${members.length})`}</h4>
+                <div className="space-y-3 max-h-60 overflow-y-auto">
+                    {members.map(member => (
+                        <div key={member.id} className="flex items-center justify-between p-2 rounded-lg bg-light dark:bg-gray-700/50">
+                            <div className="flex items-center">
+                                <img src={member.avatarUrl} alt={member.name} className="h-10 w-10 rounded-full mr-4" />
+                                <div>
+                                    <p className="font-bold text-dark dark:text-light">{member.name}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">{member.role}</p>
+                                </div>
+                            </div>
+                            {member.id !== cooperative.creatorId && (
+                                <Button variant="danger" onClick={() => removeMember(cooperative.id, member.id)} title="Remove Member">
+                                    <UserMinusIcon className="h-5 w-5"/>
+                                </Button>
+                            )}
+                        </div>
+                    ))}
                 </div>
             </Card>
 

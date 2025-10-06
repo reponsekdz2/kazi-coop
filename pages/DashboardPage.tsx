@@ -1,6 +1,7 @@
 
 
 
+
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Application, UserRole } from '../types';
@@ -19,6 +20,7 @@ import RingHub from '../components/layout/RingHub';
 const SeekerDashboard: React.FC = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
+    const { theme } = useAppContext();
 
     const hubItems = [
       { id: 'jobs', label: 'Find Jobs', imageUrl: `https://i.pravatar.cc/150?u=jobs-icon`},
@@ -30,6 +32,23 @@ const SeekerDashboard: React.FC = () => {
     const handleHubSelect = (id: string) => {
       navigate(`/${id}`);
     };
+
+    const userApplications = APPLICATIONS.filter(app => app.userId === user?.id);
+    const appStatusColors: { [key in Application['status']]: string } = {
+        Applied: '#5E96C3',
+        Reviewed: '#F59E0B',
+        Interviewing: '#10B981',
+        'Interview Scheduled': '#005A9C',
+        Offered: '#8B5CF6',
+        Rejected: '#EF4444',
+    };
+    const applicationStatusData = Object.entries(
+        userApplications.reduce((acc, app) => {
+            acc[app.status] = (acc[app.status] || 0) + 1;
+            return acc;
+        }, {} as Record<Application['status'], number>)
+    ).map(([name, value]) => ({ name, value, fill: appStatusColors[name as Application['status']] }));
+
 
     return (
         <div>
@@ -44,9 +63,41 @@ const SeekerDashboard: React.FC = () => {
                     </RingHub>
                 </Card>
 
-                <Card title="Your Career Journey">
-                    <CareerProgressTracker currentStep={user?.careerProgress || 0} />
-                </Card>
+                <div className="lg:col-span-1 space-y-6">
+                    <Card title="Your Career Journey">
+                        <CareerProgressTracker currentStep={user?.careerProgress || 0} />
+                    </Card>
+                    <Card title="Application Status">
+                        {userApplications.length > 0 ? (
+                             <ResponsiveContainer width="100%" height={200}>
+                                <PieChart>
+                                    <Pie
+                                        data={applicationStatusData}
+                                        dataKey="value"
+                                        nameKey="name"
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={50}
+                                        outerRadius={70}
+                                        paddingAngle={3}
+                                    >
+                                        {applicationStatusData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.fill} />)}
+                                    </Pie>
+                                    <Tooltip formatter={(value) => `${value} application(s)`} />
+                                    <Legend iconType="circle" layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{fontSize: '12px'}}/>
+                                </PieChart>
+                            </ResponsiveContainer>
+                        ) : (
+                             <div className="flex items-center justify-center h-full text-center text-gray-500">
+                                <div>
+                                    <BriefcaseIcon className="h-10 w-10 mx-auto text-gray-400 mb-2"/>
+                                    <p>You haven't applied to any jobs yet.</p>
+                                </div>
+                            </div>
+                        )}
+                       
+                    </Card>
+                </div>
             </div>
            
             <Card title="Jobs Recommended For You" className="dark:bg-dark">
@@ -120,12 +171,27 @@ const EmployerDashboard: React.FC = () => {
                 </Card>
                 <Card title="Applicant Pipeline" className="lg:col-span-1">
                     <ResponsiveContainer width="100%" height={300}>
-                        <PieChart>
-                            {/* FIX: The 'percent' property from recharts can be a non-numeric type, causing a TypeScript error. Explicitly casting it to a Number ensures the multiplication is safe. */}
-                            <Pie data={applicationStatusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} labelLine={false} label={({ name, percent }) => `${name} ${(Number(percent ?? 0) * 100).toFixed(0)}%`}>
+                         <PieChart>
+                            <Pie 
+                                data={applicationStatusData} 
+                                dataKey="value" 
+                                nameKey="name" 
+                                cx="50%" 
+                                cy="50%" 
+                                innerRadius={70}
+                                outerRadius={100} 
+                                paddingAngle={5}
+                            >
                                 {applicationStatusData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.fill} />)}
                             </Pie>
-                            <Tooltip />
+                            <Tooltip formatter={(value) => `${value} applicant(s)`} />
+                            <Legend iconType="circle" />
+                            <text x="50%" y="50%" textAnchor="middle" dominantBaseline="central" className="text-3xl font-bold fill-dark dark:fill-light">
+                                {APPLICATIONS.length}
+                            </text>
+                            <text x="50%" y="50%" dy={25} textAnchor="middle" className="text-sm fill-gray-500 dark:fill-gray-400">
+                                Applicants
+                            </text>
                         </PieChart>
                     </ResponsiveContainer>
                 </Card>
