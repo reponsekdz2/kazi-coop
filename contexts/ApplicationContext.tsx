@@ -1,11 +1,11 @@
 import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { Application } from '../types';
+import { Application, SeekerProfileData } from '../types';
 import { APPLICATIONS } from '../constants';
 import { useToast } from './ToastContext';
 
 interface ApplicationContextType {
   applications: Application[];
-  applyForJob: (jobId: string, userId: string) => void;
+  applyForJob: (jobId: string, userId: string, applicantInfo: SeekerProfileData) => void;
   updateApplicationStatus: (applicationId: string, status: Application['status']) => void;
 }
 
@@ -15,13 +15,14 @@ export const ApplicationProvider: React.FC<{ children: ReactNode }> = ({ childre
   const [applications, setApplications] = useState<Application[]>(APPLICATIONS);
   const { addToast } = useToast();
 
-  const applyForJob = (jobId: string, userId: string) => {
+  const applyForJob = (jobId: string, userId: string, applicantInfo: SeekerProfileData) => {
     const newApplication: Application = {
         id: `app-${new Date().getTime()}`,
         userId,
         jobId,
         submissionDate: new Date().toISOString(),
         status: 'Applied',
+        applicantInfo,
     };
     setApplications(prev => [...prev, newApplication]);
     addToast("Application submitted successfully!", "success");

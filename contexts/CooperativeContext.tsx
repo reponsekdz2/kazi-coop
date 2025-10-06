@@ -19,7 +19,7 @@ type CooperativeSettingsPayload = {
 
 interface CooperativeContextType {
   cooperatives: Cooperative[];
-  createCooperative: (details: Omit<Cooperative, 'id' | 'creatorId' | 'members' | 'totalSavings' | 'totalLoans' | 'joinRequests' | 'contributions' | 'loans' | 'loanSettings'>) => void;
+  createCooperative: (details: Omit<Cooperative, 'id' | 'creatorId' | 'members' | 'totalSavings' | 'totalLoans' | 'joinRequests' | 'contributions'|'loans' | 'loanSettings' | 'announcements'>) => void;
   requestToJoin: (cooperativeId: string) => void;
   approveJoinRequest: (cooperativeId: string, userId: string) => void;
   denyJoinRequest: (cooperativeId: string, userId: string) => void;
@@ -30,6 +30,9 @@ interface CooperativeContextType {
   rejectLoan: (cooperativeId: string, loanId: string) => void;
   makeLoanRepayment: (cooperativeId: string, loanId: string, installmentId: string) => void;
   updateCooperativeSettings: (cooperativeId: string, settings: CooperativeSettingsPayload) => void;
+  broadcastMessage: (cooperativeId: string, text: string) => void;
+  sendReminder: (userId: string, text: string) => void;
+  distributeShares: (cooperativeId: string, totalAmount: number) => void;
 }
 
 const CooperativeContext = createContext<CooperativeContextType | undefined>(undefined);
@@ -47,7 +50,7 @@ export const CooperativeProvider: React.FC<{ children: ReactNode }> = ({ childre
       return allCooperatives;
   }, [user, allCooperatives]);
   
-  const createCooperative = (details: Omit<Cooperative, 'id' | 'creatorId' | 'members' | 'totalSavings' | 'totalLoans' | 'joinRequests' | 'contributions'| 'loans' | 'loanSettings'>) => {
+  const createCooperative = (details: Omit<Cooperative, 'id' | 'creatorId' | 'members' | 'totalSavings' | 'totalLoans' | 'joinRequests' | 'contributions'| 'loans' | 'loanSettings' | 'announcements'>) => {
       if (!user || user.role !== UserRole.EMPLOYER) {
           addToast("Only employers can create cooperatives.", "error");
           return;
@@ -61,6 +64,7 @@ export const CooperativeProvider: React.FC<{ children: ReactNode }> = ({ childre
           totalLoans: 0,
           contributions: [],
           loans: [],
+          announcements: [],
           loanSettings: { interestRate: 10, maxLoanPercentage: 80 }, // Default settings
           ...details,
       };
@@ -84,17 +88,42 @@ export const CooperativeProvider: React.FC<{ children: ReactNode }> = ({ childre
   };
   
   const approveJoinRequest = (cooperativeId: string, userId: string) => {
-    setAllCooperatives(prev => prev.map(coop => {
-      if (coop.id === cooperativeId && coop.creatorId === user?.id) {
-        addToast("Member approved successfully.", "success");
-        return {
-          ...coop,
-          members: [...coop.members, userId],
-          joinRequests: coop.joinRequests.filter(id => id !== userId),
+    setAllCooperatives(prev => {
+        const coop = prev.find(c => c.id === cooperativeId && c.creatorId === user?.id);
+        if (!coop) return prev;
+
+        const contributionAmount = coop.contributionSettings.amount;
+        
+        // Simulate deducting from user's wallet via TransactionContext
+        addTransaction({
+            userId: userId,
+            date: new Date().toISOString(),
+            description: `Initial contribution to ${coop.name}`,
+            amount: -contributionAmount,
+            category: 'Savings'
+        });
+
+        const newContribution: Contribution = {
+            userId: userId,
+            amount: contributionAmount,
+            date: new Date().toISOString(),
         };
-      }
-      return coop;
-    }));
+
+        addToast("Member approved. Initial contribution processed.", "success");
+
+        return prev.map(c => {
+            if (c.id === cooperativeId) {
+                return {
+                    ...c,
+                    members: [...c.members, userId],
+                    joinRequests: c.joinRequests.filter(id => id !== userId),
+                    totalSavings: c.totalSavings + contributionAmount,
+                    contributions: [newContribution, ...c.contributions],
+                };
+            }
+            return c;
+        });
+    });
   };
 
   const denyJoinRequest = (cooperativeId: string, userId: string) => {
@@ -297,10 +326,62 @@ export const CooperativeProvider: React.FC<{ children: ReactNode }> = ({ childre
       return coop;
     }));
   };
+  
+  const broadcastMessage = (cooperativeId: string, text: string) => {
+      setAllCooperatives(prev => prev.map(coop => {
+          if (coop.id === cooperativeId) {
+              const newAnnouncement = { text, date: new Date().toISOString() };
+              return { ...coop, announcements: [newAnnouncement, ...coop.announcements] };
+          }
+          return coop;
+      }));
+      addToast("Announcement sent to all members.", "success");
+  };
+
+  const sendReminder = (userId: string, text: string) => {
+      // In a real app, this would trigger a push notification or email.
+      // Here, we'll just show a toast to the admin for confirmation.
+      addToast(`Reminder sent to user.`, "success");
+  };
+
+  const distributeShares = (cooperativeId: string, totalAmount: number) => {
+      setAllCooperatives(prev => {
+          const coop = prev.find(c => c.id === cooperativeId);
+          if (!coop) return prev;
+          if (totalAmount > coop.totalSavings) {
+              addToast("Distribution amount cannot exceed total savings.", "error");
+              return prev;
+          }
+          if (coop.members.length === 0) {
+              addToast("No members to distribute shares to.", "error");
+              return prev;
+          }
+
+          const sharePerMember = totalAmount / coop.members.length;
+
+          // Add income transaction for each member
+          coop.members.forEach(memberId => {
+              addTransaction({
+                  userId: memberId,
+                  date: new Date().toISOString(),
+                  description: `Share distribution from ${coop.name}`,
+                  amount: sharePerMember,
+                  category: 'Income',
+              });
+          });
+
+          addToast(`Successfully distributed RWF ${totalAmount.toLocaleString()} among ${coop.members.length} members.`, 'success');
+
+          // Update cooperative savings
+          return prev.map(c => 
+              c.id === cooperativeId ? { ...c, totalSavings: c.totalSavings - totalAmount } : c
+          );
+      });
+  };
 
 
   return (
-    <CooperativeContext.Provider value={{ cooperatives, createCooperative, requestToJoin, approveJoinRequest, denyJoinRequest, removeMember, makeContribution, applyForLoan, approveLoan, rejectLoan, makeLoanRepayment, updateCooperativeSettings }}>
+    <CooperativeContext.Provider value={{ cooperatives, createCooperative, requestToJoin, approveJoinRequest, denyJoinRequest, removeMember, makeContribution, applyForLoan, approveLoan, rejectLoan, makeLoanRepayment, updateCooperativeSettings, broadcastMessage, sendReminder, distributeShares }}>
       {children}
     </CooperativeContext.Provider>
   );

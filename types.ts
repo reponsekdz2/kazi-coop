@@ -1,8 +1,20 @@
+
 // FIX: Removed a circular import of `UserRole` from this file, which conflicted with the enum declaration below.
 export enum UserRole {
   SEEKER = 'Job Seeker',
   EMPLOYER = 'Employer',
 }
+
+export interface SeekerProfileData {
+    dateOfBirth?: string;
+    gender?: 'Male' | 'Female' | 'Other' | 'Prefer not to say';
+    educationLevel?: 'High School' | 'Diploma' | 'Bachelors' | 'Masters' | 'PhD';
+    fieldOfStudy?: string;
+    yearsOfExperience?: number;
+    resumeUrl?: string; // a simulated URL to a PDF/image
+    profileImage?: string; // a simulated URL
+}
+
 
 export interface User {
   id: string;
@@ -13,6 +25,10 @@ export interface User {
   skills?: string[];
   careerProgress?: number; // From 1 to 5
   careerGoal?: string; // New field for AI suggestions
+  // Seeker specific
+  profileData?: SeekerProfileData;
+  // Employer specific
+  companyId?: string;
 }
 
 export interface Company {
@@ -42,6 +58,7 @@ export interface Application {
   jobId: string;
   submissionDate: string;
   status: 'Applied' | 'Reviewed' | 'Interviewing' | 'Interview Scheduled' | 'Offered' | 'Rejected';
+  applicantInfo?: SeekerProfileData;
 }
 
 export interface Contribution {
@@ -92,6 +109,7 @@ export interface Cooperative {
   };
   contributions: Contribution[];
   loans: CooperativeLoan[];
+  announcements: { text: string; date: string; }[];
 }
 
 export type TransactionCategory = 'Income' | 'Withdrawal' | 'Loan Repayment' | 'Savings' | 'Groceries' | 'Utilities' | 'Transport' | 'Transfer';

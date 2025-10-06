@@ -4,14 +4,17 @@ import Card from '../components/ui/Card';
 import Button from '../components/layout/Button';
 import { useJobs } from '../contexts/JobContext';
 import { useAuth } from '../contexts/AuthContext';
-import { UserRole, Job, Application, Company } from '../types';
-import { BriefcaseIcon, MapPinIcon, ClockIcon, BookmarkIcon, PlusIcon, PencilIcon, TrashIcon, ChevronDownIcon } from '@heroicons/react/24/solid';
+import { UserRole, Job, Application, Company, User } from '../types';
+import { BriefcaseIcon, MapPinIcon, ClockIcon, BookmarkIcon, PlusIcon, PencilIcon, TrashIcon, ChevronDownIcon, CheckCircleIcon, XCircleIcon, EnvelopeIcon } from '@heroicons/react/24/solid';
 import { useApplications } from '../contexts/ApplicationContext';
 import { USERS, COMPANIES } from '../constants';
 import NewJobModal from '../components/ui/NewJobModal';
 import ApplicationStatusTracker from '../components/ui/ApplicationStatusTracker';
 import ScheduleInterviewModal from '../components/ui/ScheduleInterviewModal';
 import CompanyProfileModal from '../components/ui/CompanyProfileModal';
+import ApplicationFormModal from '../components/ui/ApplicationFormModal';
+import ApplicantDetailsModal from '../components/ui/ApplicantDetailsModal';
+
 
 const JobsPage: React.FC = () => {
     const { user } = useAuth();
@@ -51,9 +54,10 @@ const NewJobButton: React.FC = () => {
 const SeekerJobsView: React.FC = () => {
     const { jobs, toggleSaveJob } = useJobs();
     const { user } = useAuth();
-    const { applications, applyForJob } = useApplications();
+    const { applications } = useApplications();
     const [selectedJob, setSelectedJob] = useState<Job | null>(null);
     const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
+    const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
     const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
     const [activeTab, setActiveTab] = useState<'all' | 'saved'>('all');
 
@@ -80,9 +84,9 @@ const SeekerJobsView: React.FC = () => {
         return applications.find(app => app.userId === user.id && app.jobId === selectedJob.id);
     }, [applications, user, selectedJob]);
 
-    const handleApply = () => {
+    const handleApplyClick = () => {
         if (user && selectedJob && !userApplicationForSelectedJob) {
-            applyForJob(selectedJob.id, user.id);
+            setIsApplyModalOpen(true);
         }
     }
 
@@ -148,7 +152,7 @@ const SeekerJobsView: React.FC = () => {
                         {userApplicationForSelectedJob ? (
                             <ApplicationStatusTracker status={userApplicationForSelectedJob.status} />
                         ) : (
-                             <Button onClick={handleApply} className="w-full">Apply Now</Button>
+                             <Button onClick={handleApplyClick} className="w-full">Apply Now</Button>
                         )}
                        
                     </Card>
@@ -165,6 +169,14 @@ const SeekerJobsView: React.FC = () => {
                 onClose={() => setIsCompanyModalOpen(false)}
                 company={selectedCompany}
                 jobs={jobs.filter(j => j.companyId === selectedCompany.id)}
+            />
+        )}
+        {user && selectedJob && (
+             <ApplicationFormModal 
+                isOpen={isApplyModalOpen}
+                onClose={() => setIsApplyModalOpen(false)}
+                user={user}
+                job={selectedJob}
             />
         )}
         </>
@@ -224,9 +236,13 @@ const JobPostingCard: React.FC<{
     onStatusChange: (status: Job['status']) => void;
 }> = ({ job, applications, onEdit, onStatusChange }) => {
     const [expanded, setExpanded] = useState(false);
-    const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
-    const [selectedApp, setSelectedApp] = useState<Application | null>(null);
-    const { updateApplicationStatus } = useApplications();
+    const [isApplicantModalOpen, setIsApplicantModalOpen] = useState(false);
+    const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
+
+    const handleViewApplicant = (application: Application) => {
+        setSelectedApplication(application);
+        setIsApplicantModalOpen(true);
+    };
 
     return (
         <Card>
@@ -259,8 +275,7 @@ const JobPostingCard: React.FC<{
                                         </div>
                                     </div>
                                     <div className="flex gap-2">
-                                        {app.status === 'Reviewed' && <Button onClick={() => { setSelectedApp(app); setIsScheduleModalOpen(true); }}>Schedule Interview</Button>}
-                                        {app.status === 'Applied' && <Button variant="secondary" onClick={() => updateApplicationStatus(app.id, 'Reviewed')}>Mark as Reviewed</Button>}
+                                        <Button onClick={() => handleViewApplicant(app)}>View Details</Button>
                                     </div>
                                 </div>
                             )
@@ -268,7 +283,13 @@ const JobPostingCard: React.FC<{
                      </div>
                  </div>
             )}
-            {selectedApp && <ScheduleInterviewModal isOpen={isScheduleModalOpen} onClose={() => setIsScheduleModalOpen(false)} application={selectedApp} />}
+            {selectedApplication && (
+                <ApplicantDetailsModal 
+                    isOpen={isApplicantModalOpen}
+                    onClose={() => setIsApplicantModalOpen(false)}
+                    application={selectedApplication}
+                />
+            )}
         </Card>
     );
 }

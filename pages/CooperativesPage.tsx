@@ -1,11 +1,9 @@
-
-
 import React, { useState, useMemo, useEffect } from 'react';
 import Card from '../components/ui/Card';
 import Button from '../components/layout/Button';
 import { useCooperatives } from '../contexts/CooperativeContext';
 import { Cooperative, User, Contribution, CooperativeLoan, RepaymentInstallment } from '../types';
-import { UserGroupIcon, Cog6ToothIcon, ArrowUpRightIcon, CheckIcon, XMarkIcon, CalendarDaysIcon, CurrencyDollarIcon, ChevronDownIcon, InformationCircleIcon, UserMinusIcon } from '@heroicons/react/24/solid';
+import { UserGroupIcon, Cog6ToothIcon, ArrowUpRightIcon, CheckIcon, XMarkIcon, CalendarDaysIcon, CurrencyDollarIcon, ChevronDownIcon, InformationCircleIcon, UserMinusIcon, MegaphoneIcon, ShareIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../contexts/AuthContext';
 import { UserRole } from '../types';
 import Modal from '../components/layout/Modal';
@@ -13,7 +11,7 @@ import { USERS } from '../constants';
 import RingProgress from '../components/layout/RingProgress';
 import SeekerProfileModal from '../components/ui/SeekerProfileModal';
 
-type CooperativeTab = 'overview' | 'members' | 'management' | 'finance';
+type CooperativeTab = 'overview' | 'members' | 'announcements' | 'management' | 'finance';
 
 const loanStatusColors: { [key: string]: string } = {
   Pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300',
@@ -172,9 +170,16 @@ const CooperativeDetailsModal: React.FC<{ isOpen: boolean; onClose: () => void; 
     const isCreator = user?.id === cooperative.creatorId;
     const isMember = user ? cooperative.members.includes(user.id) : false;
 
+    useEffect(() => {
+        // Reset to overview tab when cooperative changes
+        setActiveTab('overview');
+    }, [cooperative]);
+
+
     const tabs: {id: CooperativeTab, label: string}[] = [
         { id: 'overview', label: 'Overview' },
         { id: 'members', label: 'Members' },
+        { id: 'announcements', label: 'Announcements' },
     ];
     if (isMember) {
         tabs.push({ id: 'finance', label: 'My Finances' });
@@ -204,6 +209,7 @@ const CooperativeDetailsModal: React.FC<{ isOpen: boolean; onClose: () => void; 
             </div>
             {activeTab === 'overview' && <OverviewTab cooperative={cooperative} />}
             {activeTab === 'members' && <MembersTab cooperative={cooperative} />}
+            {activeTab === 'announcements' && <AnnouncementsTab cooperative={cooperative} />}
             {activeTab === 'finance' && isMember && <FinanceTab cooperative={cooperative} onRequestLoan={onRequestLoan} />}
             {activeTab === 'management' && isCreator && <ManagementTab cooperative={cooperative} />}
         </Modal>
@@ -257,6 +263,24 @@ const OverviewTab: React.FC<{ cooperative: Cooperative }> = ({ cooperative }) =>
         </div>
     );
 };
+
+const AnnouncementsTab: React.FC<{ cooperative: Cooperative }> = ({ cooperative }) => {
+    return (
+        <Card>
+             <h4 className="font-bold text-lg text-dark dark:text-light mb-4">Announcements</h4>
+            <div className="space-y-4 max-h-96 overflow-y-auto">
+                {cooperative.announcements.length > 0 ? cooperative.announcements.map((item, index) => (
+                    <div key={index} className="p-4 rounded-lg bg-light dark:bg-gray-700/50">
+                        <p className="text-sm text-dark dark:text-light">{item.text}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-right">{new Date(item.date).toLocaleString()}</p>
+                    </div>
+                )) : (
+                    <p className="text-center text-gray-500 dark:text-gray-400 py-8">No announcements yet.</p>
+                )}
+            </div>
+        </Card>
+    );
+}
 
 
 const MembersTab: React.FC<{ cooperative: Cooperative }> = ({ cooperative }) => {
@@ -348,290 +372,309 @@ const FinanceTab: React.FC<{ cooperative: Cooperative, onRequestLoan: () => void
                         </Button>
                     </div>
                 </Card>
-                <Card title="Contribution History">
+                <Card title="My Contribution History">
                     <div className="space-y-3 max-h-60 overflow-y-auto">
-                        {cooperative.contributions.length > 0 ? cooperative.contributions.map((c, i) => {
-                            const contributor = USERS.find(u => u.id === c.userId);
+                        {user && cooperative.contributions.filter(c => c.userId === user.id).length > 0 ? cooperative.contributions.filter(c => c.userId === user.id).map((c, i) => {
                             return (
                                 <div key={i} className="flex justify-between items-center text-sm">
-                                    <div className="flex items-center">
-                                        <img src={contributor?.avatarUrl} alt={contributor?.name} className="h-8 w-8 rounded-full mr-3"/>
-                                        <p className="font-medium text-dark dark:text-light">{contributor?.name}</p>
-                                    </div>
                                     <div>
-                                        <p className="font-semibold text-green-600">RWF {c.amount.toLocaleString()}</p>
-                                        <p className="text-xs text-gray-400 text-right">{new Date(c.date).toLocaleDateString()}</p>
+                                        <p className="font-medium text-dark dark:text-light">Contribution</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">{new Date(c.date).toLocaleDateString()}</p>
                                     </div>
+                                    <p className="font-semibold text-green-600">+RWF {c.amount.toLocaleString()}</p>
                                 </div>
                             )
-                        }) : <p className="text-center text-gray-500 py-8">No contributions have been made yet.</p>}
+                        }) : (
+                            <p className="text-center text-gray-500 dark:text-gray-400 py-8">No contributions made yet.</p>
+                        )}
                     </div>
                 </Card>
             </div>
              <Card title="My Loans">
-                <div className="space-y-3 max-h-[400px] overflow-y-auto">
+                <div className="space-y-3 max-h-60 overflow-y-auto">
                     {myLoans.length > 0 ? myLoans.map(loan => (
                         <div key={loan.id} className="p-3 rounded-lg bg-light dark:bg-gray-700/50">
-                            <div className="flex justify-between items-center">
+                            <div className="flex justify-between items-center cursor-pointer" onClick={() => toggleLoanDetails(loan.id)}>
                                 <div>
-                                    <p className="font-bold text-dark dark:text-light">RWF {loan.amount.toLocaleString()}</p>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">{loan.purpose}</p>
+                                    <p className="font-bold text-dark dark:text-light">RWF {loan.amount.toLocaleString()} <span className="text-sm font-normal text-gray-500">- for {loan.purpose}</span></p>
+                                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${loanStatusColors[loan.status]}`}>{loan.status}</span>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <span className={`px-3 py-1 text-xs font-semibold rounded-full ${loanStatusColors[loan.status]}`}>
-                                        {loan.status}
-                                    </span>
-                                    {loan.status === 'Approved' && (
-                                         <Button variant="secondary" onClick={() => toggleLoanDetails(loan.id)} className="!p-2">
-                                            <ChevronDownIcon className={`h-4 w-4 transition-transform ${expandedLoanId === loan.id ? 'rotate-180' : ''}`} />
-                                        </Button>
-                                    )}
-                                </div>
+                                <ChevronDownIcon className={`h-5 w-5 text-gray-500 transition-transform ${expandedLoanId === loan.id ? 'rotate-180' : ''}`}/>
                             </div>
-                            {expandedLoanId === loan.id && loan.status === 'Approved' && loan.repaymentSchedule.length > 0 && (
-                                <RepaymentScheduleTable 
-                                    schedule={loan.repaymentSchedule}
-                                    cooperativeId={cooperative.id}
-                                    loanId={loan.id}
-                                />
-                            )}
+                            {expandedLoanId === loan.id && <LoanRepaymentDetails loan={loan} cooperativeId={cooperative.id} />}
                         </div>
                     )) : (
-                        <p className="text-center text-gray-500 dark:text-gray-400 py-4">You have no active or pending loans with this cooperative.</p>
+                        <p className="text-center text-gray-500 dark:text-gray-400 py-8">You have no active loans in this cooperative.</p>
                     )}
                 </div>
-                <Button onClick={onRequestLoan} className="w-full !mt-6">
-                    Apply for a Loan
-                </Button>
+                 <Button onClick={onRequestLoan} className="w-full !mt-6">Request a New Loan</Button>
             </Card>
         </div>
     );
 };
 
-const RepaymentScheduleTable: React.FC<{ schedule: RepaymentInstallment[], cooperativeId: string, loanId: string }> = ({ schedule, cooperativeId, loanId }) => {
+const LoanRepaymentDetails: React.FC<{ loan: CooperativeLoan, cooperativeId: string }> = ({ loan, cooperativeId }) => {
     const { makeLoanRepayment } = useCooperatives();
-
+    if (loan.status !== 'Approved') return <p className="text-sm text-gray-500 mt-2">Repayment schedule will be available upon loan approval.</p>;
+    
     return (
-        <div className="mt-4 border-t pt-3 dark:border-gray-600">
-            <h4 className="font-semibold text-sm mb-2 text-dark dark:text-light">Repayment Schedule</h4>
-            <table className="w-full text-sm text-left">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-800 dark:text-gray-400">
-                    <tr>
-                        <th className="px-4 py-2">Due Date</th>
-                        <th className="px-4 py-2">Amount</th>
-                        <th className="px-4 py-2">Status</th>
-                        <th className="px-4 py-2"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {schedule.map((item) => {
-                        const isOverdue = item.status === 'pending' && new Date() > new Date(item.dueDate);
-                        const statusText = isOverdue ? 'Overdue' : item.status;
-                        
-                        let statusClasses = 'dark:bg-gray-900/50';
-                        if (isOverdue) {
-                            statusClasses = 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300';
-                        } else if (item.status === 'paid') {
-                            statusClasses = 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300';
-                        } else {
-                            statusClasses = 'bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-gray-200';
-                        }
-
-                        return (
-                            <tr key={item.id} className="border-b dark:border-gray-600">
-                               <td className="px-4 py-2">{new Date(item.dueDate).toLocaleDateString()}</td>
-                               <td className="px-4 py-2">RWF {item.amount.toLocaleString()}</td>
-                               <td className="px-4 py-2 capitalize">
-                                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusClasses}`}>
-                                        {statusText}
-                                    </span>
-                               </td>
-                               <td className="px-4 py-2 text-right">
-                                   {item.status === 'pending' && <Button onClick={() => makeLoanRepayment(cooperativeId, loanId, item.id)} variant="secondary" className="!py-1 !px-2 !text-xs">Pay</Button>}
-                               </td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
+        <div className="mt-4 border-t dark:border-gray-600 pt-3">
+            <h5 className="font-semibold text-dark dark:text-light mb-2">Repayment Schedule</h5>
+            <ul className="space-y-2 max-h-40 overflow-y-auto">
+                {loan.repaymentSchedule.map(installment => (
+                    <li key={installment.id} className="flex justify-between items-center text-sm">
+                        <div>
+                            <p className="text-dark dark:text-light">Due: {new Date(installment.dueDate).toLocaleDateString()}</p>
+                            <p className={`font-semibold ${installment.status === 'paid' ? 'text-green-600' : 'text-yellow-600'}`}>RWF {installment.amount.toLocaleString()}</p>
+                        </div>
+                        {installment.status === 'pending' ? (
+                            <Button variant="secondary" className="!py-1 !px-2 !text-xs" onClick={() => makeLoanRepayment(cooperativeId, loan.id, installment.id)}>Pay Now</Button>
+                        ) : (
+                            <CheckIcon className="h-5 w-5 text-green-500"/>
+                        )}
+                    </li>
+                ))}
+            </ul>
         </div>
     )
 }
 
-
 const ManagementTab: React.FC<{ cooperative: Cooperative }> = ({ cooperative }) => {
-    const { approveJoinRequest, denyJoinRequest, approveLoan, rejectLoan, removeMember } = useCooperatives();
-    const pendingRequests = USERS.filter(u => cooperative.joinRequests.includes(u.id));
+    const { approveJoinRequest, denyJoinRequest, removeMember, approveLoan, rejectLoan, broadcastMessage, sendReminder, distributeShares } = useCooperatives();
+    const joinRequestUsers = USERS.filter(u => cooperative.joinRequests.includes(u.id));
     const members = USERS.filter(u => cooperative.members.includes(u.id));
     const pendingLoans = cooperative.loans.filter(l => l.status === 'Pending');
-    const availableForLoan = cooperative.totalSavings - cooperative.totalLoans;
-    const [viewingUser, setViewingUser] = useState<User | null>(null);
-    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
+    const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
+    const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
+    const [isSharesModalOpen, setIsSharesModalOpen] = useState(false);
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
+    const handleViewProfile = (user: User) => {
+        setSelectedUser(user);
+        setIsProfileModalOpen(true);
+    };
 
     return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <h3 className="text-xl font-bold text-dark dark:text-light">Admin Dashboard</h3>
-                <Button variant="secondary" onClick={() => setIsSettingsOpen(true)}>
-                    <Cog6ToothIcon className="h-5 w-5 mr-2 inline"/>
-                    Cooperative Settings
-                </Button>
-            </div>
-            <Card>
-                <h4 className="font-bold text-lg text-dark dark:text-light mb-4">{`Pending Join Requests (${pendingRequests.length})`}</h4>
-                <div className="space-y-3 max-h-60 overflow-y-auto">
-                    {pendingRequests.length > 0 ? pendingRequests.map(requestUser => (
-                        <div key={requestUser.id} className="flex items-center justify-between p-2 rounded-lg bg-light dark:bg-gray-700/50">
-                            <div className="flex items-center">
-                                <img src={requestUser.avatarUrl} alt={requestUser.name} className="h-10 w-10 rounded-full mr-4" />
-                                <p className="font-bold text-dark dark:text-light">{requestUser.name}</p>
-                            </div>
-                            <div className="flex gap-2">
-                                <Button variant="secondary" onClick={() => setViewingUser(requestUser)}>Profile</Button>
-                                <Button onClick={() => approveJoinRequest(cooperative.id, requestUser.id)} className="!p-2">
-                                    <CheckIcon className="h-5 w-5"/>
-                                </Button>
-                                <Button onClick={() => denyJoinRequest(cooperative.id, requestUser.id)} variant="danger" className="!p-2">
-                                    <XMarkIcon className="h-5 w-5"/>
-                                </Button>
-                            </div>
-                        </div>
-                    )) : (
-                        <p className="text-gray-500 dark:text-gray-400 text-center py-4">There are no pending join requests.</p>
-                    )}
-                </div>
-            </Card>
-             <Card>
-                <h4 className="font-bold text-lg text-dark dark:text-light mb-4">{`Loan Requests (${pendingLoans.length})`}</h4>
-                 <div className="space-y-3 max-h-60 overflow-y-auto">
-                    {pendingLoans.length > 0 ? pendingLoans.map(loan => {
-                        const loanUser = USERS.find(u => u.id === loan.userId);
-                        const canAfford = loan.amount <= availableForLoan;
-                        return (
-                            <div key={loan.id} className="flex flex-col md:flex-row justify-between md:items-center p-3 rounded-lg bg-light dark:bg-gray-700/50 gap-3">
-                                <div className="flex items-center">
-                                    <img src={loanUser?.avatarUrl} alt={loanUser?.name} className="h-10 w-10 rounded-full mr-4" />
-                                    <div>
-                                        <p className="font-bold text-dark dark:text-light">{loanUser?.name}</p>
-                                        <p className="font-semibold text-primary">RWF {loan.amount.toLocaleString()}</p>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">{loan.purpose} ({loan.repaymentPeriod} mo.)</p>
-                                    </div>
+        <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card title={`Join Requests (${joinRequestUsers.length})`}>
+                    <div className="space-y-3 max-h-60 overflow-y-auto">
+                        {joinRequestUsers.length > 0 ? joinRequestUsers.map(user => (
+                            <div key={user.id} className="flex items-center justify-between p-2 bg-light dark:bg-gray-700/50 rounded-md">
+                                <div className="flex items-center gap-2">
+                                    <img src={user.avatarUrl} alt={user.name} className="h-8 w-8 rounded-full" />
+                                    <p className="font-semibold text-dark dark:text-light">{user.name}</p>
                                 </div>
-                                <div className="flex flex-col items-end gap-2">
-                                     <div className="flex gap-2">
-                                        <Button onClick={() => approveLoan(cooperative.id, loan.id)} className="!p-2" disabled={!canAfford} title={canAfford ? 'Approve' : 'Insufficient funds to approve.'}>
-                                            <CheckIcon className="h-5 w-5"/>
-                                        </Button>
-                                        <Button onClick={() => rejectLoan(cooperative.id, loan.id)} variant="danger" className="!p-2" title="Reject">
-                                            <XMarkIcon className="h-5 w-5"/>
-                                        </Button>
-                                    </div>
-                                    {!canAfford && <p className="text-xs text-red-500">Insufficient funds to approve.</p>}
+                                <div className="flex gap-2">
+                                    <button onClick={() => approveJoinRequest(cooperative.id, user.id)} className="p-1.5 bg-green-100 text-green-700 rounded-full hover:bg-green-200"><CheckIcon className="h-4 w-4"/></button>
+                                    <button onClick={() => denyJoinRequest(cooperative.id, user.id)} className="p-1.5 bg-red-100 text-red-700 rounded-full hover:bg-red-200"><XMarkIcon className="h-4 w-4"/></button>
                                 </div>
                             </div>
-                        )
-                    }) : (
-                         <p className="text-gray-500 dark:text-gray-400 text-center py-4">There are no pending loan requests.</p>
-                    )}
-                </div>
-            </Card>
-             <Card>
-                <h4 className="font-bold text-lg text-dark dark:text-light mb-4">{`Manage Members (${members.length})`}</h4>
-                <div className="space-y-3 max-h-60 overflow-y-auto">
-                    {members.map(member => (
-                        <div key={member.id} className="flex items-center justify-between p-2 rounded-lg bg-light dark:bg-gray-700/50">
-                            <div className="flex items-center">
-                                <img src={member.avatarUrl} alt={member.name} className="h-10 w-10 rounded-full mr-4" />
-                                <div>
-                                    <p className="font-bold text-dark dark:text-light">{member.name}</p>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">{member.role}</p>
-                                </div>
-                            </div>
-                            {member.id !== cooperative.creatorId && (
-                                <Button variant="danger" onClick={() => removeMember(cooperative.id, member.id)} title="Remove Member">
-                                    <UserMinusIcon className="h-5 w-5"/>
-                                </Button>
-                            )}
-                        </div>
-                    ))}
-                </div>
-            </Card>
+                        )) : <p className="text-sm text-gray-500 text-center">No pending requests.</p>}
+                    </div>
+                </Card>
 
-            {viewingUser && (
+                <Card title={`Pending Loans (${pendingLoans.length})`}>
+                    <div className="space-y-3 max-h-60 overflow-y-auto">
+                        {pendingLoans.length > 0 ? pendingLoans.map(loan => {
+                            const applicant = USERS.find(u => u.id === loan.userId);
+                            return (
+                               <div key={loan.id} className="flex items-center justify-between p-2 bg-light dark:bg-gray-700/50 rounded-md">
+                                    <div className="flex items-center gap-2">
+                                        <img src={applicant?.avatarUrl} alt={applicant?.name} className="h-8 w-8 rounded-full" />
+                                        <div>
+                                            <p className="font-semibold text-dark dark:text-light">{applicant?.name}</p>
+                                            <p className="text-xs text-gray-500">RWF {loan.amount.toLocaleString()}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button onClick={() => approveLoan(cooperative.id, loan.id)} className="p-1.5 bg-green-100 text-green-700 rounded-full hover:bg-green-200"><CheckIcon className="h-4 w-4"/></button>
+                                        <button onClick={() => rejectLoan(cooperative.id, loan.id)} className="p-1.5 bg-red-100 text-red-700 rounded-full hover:bg-red-200"><XMarkIcon className="h-4 w-4"/></button>
+                                    </div>
+                                </div>
+                            );
+                        }) : <p className="text-sm text-gray-500 text-center">No pending loan applications.</p>}
+                    </div>
+                </Card>
+
+                <Card title="Manage Members" className="md:col-span-2">
+                    <div className="space-y-3 max-h-60 overflow-y-auto">
+                        {members.map(member => (
+                             <div key={member.id} className="flex items-center justify-between p-2 bg-light dark:bg-gray-700/50 rounded-md">
+                                <div className="flex items-center gap-3">
+                                    <img src={member.avatarUrl} alt={member.name} className="h-10 w-10 rounded-full" />
+                                    <div>
+                                        <p className="font-bold text-dark dark:text-light">{member.name}</p>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">{member.role}</p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-2 items-center">
+                                    <Button variant="secondary" className="!py-1 !px-2 !text-xs" onClick={() => handleViewProfile(member)}>View Profile</Button>
+                                    <Button variant="secondary" className="!py-1 !px-2 !text-xs" onClick={() => setIsReminderModalOpen(true)}>Send Reminder</Button>
+                                    {member.id !== cooperative.creatorId && <button onClick={() => removeMember(cooperative.id, member.id)} className="p-1.5 bg-red-100 text-red-700 rounded-full hover:bg-red-200"><UserMinusIcon className="h-4 w-4"/></button>}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </Card>
+
+                <Card title="Communication & Finance" className="md:col-span-2">
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <Button onClick={() => setIsBroadcastModalOpen(true)} className="flex-1">
+                            <MegaphoneIcon className="h-5 w-5 mr-2 inline"/>
+                            Broadcast Message
+                        </Button>
+                        <Button onClick={() => setIsSharesModalOpen(true)} variant="secondary" className="flex-1">
+                            <ShareIcon className="h-5 w-5 mr-2 inline"/>
+                            Distribute Shares
+                        </Button>
+                    </div>
+                </Card>
+            </div>
+            {/* Modals */}
+            <ActionModal
+                isOpen={isReminderModalOpen}
+                onClose={() => setIsReminderModalOpen(false)}
+                title="Send Reminder"
+                actionText="Send"
+                onAction={(text) => sendReminder('user-id', text)} // In a real app, you'd need the specific user ID
+            />
+             <ActionModal
+                isOpen={isBroadcastModalOpen}
+                onClose={() => setIsBroadcastModalOpen(false)}
+                title="Broadcast Announcement"
+                actionText="Broadcast"
+                onAction={(text) => broadcastMessage(cooperative.id, text)}
+            />
+            <DistributeSharesModal 
+                isOpen={isSharesModalOpen}
+                onClose={() => setIsSharesModalOpen(false)}
+                onDistribute={(amount) => distributeShares(cooperative.id, amount)}
+                cooperative={cooperative}
+            />
+             {selectedUser && (
                 <SeekerProfileModal
-                    isOpen={!!viewingUser}
-                    onClose={() => setViewingUser(null)}
-                    user={viewingUser}
+                    isOpen={isProfileModalOpen}
+                    onClose={() => setIsProfileModalOpen(false)}
+                    user={selectedUser}
                 />
             )}
-            {isSettingsOpen && (
-                <CooperativeSettingsModal
-                    isOpen={isSettingsOpen}
-                    onClose={() => setIsSettingsOpen(false)}
-                    cooperative={cooperative}
-                />
-            )}
-        </div>
+        </>
     );
 };
 
-const NewCooperativeModal: React.FC<{ 
-    isOpen: boolean; 
-    onClose: () => void; 
-    onCreate: (details: Omit<Cooperative, 'id' | 'creatorId' | 'members' | 'joinRequests' | 'totalSavings' | 'totalLoans' | 'contributions'|'loans' | 'loanSettings'>) => void;
-}> = ({ isOpen, onClose, onCreate }) => {
-    const [formData, setFormData] = useState({
-        name: '',
-        description: '',
-        contributionSettings: { amount: 5000, frequency: 'Monthly' as 'Monthly' | 'Weekly' },
-    });
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-        if (name === 'amount' || name === 'frequency') {
-            setFormData(prev => ({
-                ...prev,
-                contributionSettings: {
-                    ...prev.contributionSettings,
-                    [name]: name === 'amount' ? parseInt(value) : value
-                }
-            }))
-        } else {
-             setFormData(prev => ({ ...prev, [name]: value }));
-        }
-    };
-
+const ActionModal: React.FC<{ isOpen: boolean, onClose: () => void, title: string, actionText: string, onAction: (text: string) => void }> = ({ isOpen, onClose, title, actionText, onAction }) => {
+    const [text, setText] = useState('');
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onCreate(formData);
+        onAction(text);
+        setText('');
         onClose();
-        setFormData({ name: '', description: '', contributionSettings: { amount: 5000, frequency: 'Monthly' } });
-    };
-
+    }
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Create a New Cooperative">
+        <Modal isOpen={isOpen} onClose={onClose} title={title}>
+            <form onSubmit={handleSubmit}>
+                <textarea
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                    rows={4}
+                    required
+                    className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+                    placeholder="Type your message here..."
+                />
+                <div className="flex justify-end gap-2 pt-4">
+                    <Button type="button" variant="secondary" onClick={onClose}>Cancel</Button>
+                    <Button type="submit">{actionText}</Button>
+                </div>
+            </form>
+        </Modal>
+    );
+};
+
+const DistributeSharesModal: React.FC<{ isOpen: boolean, onClose: () => void, cooperative: Cooperative, onDistribute: (amount: number) => void }> = ({ isOpen, onClose, cooperative, onDistribute }) => {
+    const [amount, setAmount] = useState<number | ''>('');
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (typeof amount === 'number' && amount > 0) {
+            onDistribute(amount);
+            setAmount('');
+            onClose();
+        }
+    }
+    return (
+         <Modal isOpen={isOpen} onClose={onClose} title="Distribute Shares">
+            <form onSubmit={handleSubmit}>
+                <p className="text-sm text-gray-500 mb-2">Total savings available for distribution: RWF {cooperative.totalSavings.toLocaleString()}</p>
+                <input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value ? parseInt(e.target.value) : '')}
+                    max={cooperative.totalSavings}
+                    required
+                    className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+                    placeholder="Enter total amount to distribute"
+                />
+                 <div className="flex justify-end gap-2 pt-4">
+                    <Button type="button" variant="secondary" onClick={onClose}>Cancel</Button>
+                    <Button type="submit">Distribute</Button>
+                </div>
+            </form>
+        </Modal>
+    );
+};
+
+
+const NewCooperativeModal: React.FC<{ isOpen: boolean, onClose: () => void, onCreate: (details: any) => void }> = ({ isOpen, onClose, onCreate }) => {
+    const [details, setDetails] = useState({
+        name: '',
+        description: '',
+        contributionAmount: 5000,
+        contributionFrequency: 'Monthly' as 'Weekly' | 'Monthly',
+    });
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setDetails(prev => ({...prev, [name]: name === 'contributionAmount' ? parseInt(value) : value }));
+    };
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        const cooperativeData = {
+            name: details.name,
+            description: details.description,
+            contributionSettings: {
+                amount: details.contributionAmount,
+                frequency: details.contributionFrequency,
+            }
+        };
+        onCreate(cooperativeData);
+        onClose();
+    };
+    return (
+        <Modal isOpen={isOpen} onClose={onClose} title="Create New Cooperative">
             <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
+                 <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cooperative Name</label>
-                    <input type="text" name="name" value={formData.name} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"/>
+                    <input type="text" name="name" value={details.name} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"/>
                 </div>
                  <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
-                    <textarea name="description" value={formData.description} onChange={handleChange} required rows={3} className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"></textarea>
+                    <textarea name="description" value={details.description} onChange={handleChange} required rows={3} className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"></textarea>
                 </div>
-                 <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contribution Amount (RWF)</label>
-                    <input type="number" name="amount" value={formData.contributionSettings.amount} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"/>
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contribution Amount (RWF)</label>
+                        <input type="number" name="contributionAmount" value={details.contributionAmount} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"/>
+                    </div>
+                     <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Frequency</label>
+                        <select name="contributionFrequency" value={details.contributionFrequency} onChange={handleChange} className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                            <option>Weekly</option>
+                            <option>Monthly</option>
+                        </select>
+                    </div>
                 </div>
-                 <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contribution Frequency</label>
-                    <select name="frequency" value={formData.contributionSettings.frequency} onChange={handleChange} className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
-                        <option>Monthly</option>
-                        <option>Weekly</option>
-                    </select>
-                </div>
-                <div className="flex justify-end gap-2 pt-4">
+                 <div className="flex justify-end gap-2 pt-4">
                     <Button type="button" variant="secondary" onClick={onClose}>Cancel</Button>
                     <Button type="submit">Create Cooperative</Button>
                 </div>
@@ -640,191 +683,47 @@ const NewCooperativeModal: React.FC<{
     );
 };
 
-const RequestLoanModal: React.FC<{ isOpen: boolean, onClose: () => void, cooperative: Cooperative }> = ({ isOpen, onClose, cooperative }) => {
+const RequestLoanModal: React.FC<{isOpen: boolean, onClose: () => void, cooperative: Cooperative}> = ({ isOpen, onClose, cooperative }) => {
     const { applyForLoan } = useCooperatives();
-    const [amount, setAmount] = useState(0);
-    const [purpose, setPurpose] = useState('');
-    const [repaymentPeriod, setRepaymentPeriod] = useState(6);
-    const [estimatedPayment, setEstimatedPayment] = useState(0);
-    const [totalInterest, setTotalInterest] = useState(0);
-    const [totalRepayment, setTotalRepayment] = useState(0);
-    const availableForLoan = cooperative.totalSavings - cooperative.totalLoans;
-
-    useEffect(() => {
-        if (amount > 0 && repaymentPeriod > 0) {
-            const principal = amount;
-            const annualRate = cooperative.loanSettings.interestRate / 100;
-            const months = repaymentPeriod;
-            const calculatedTotalInterest = principal * annualRate * (months / 12);
-            const calculatedTotalRepayment = principal + calculatedTotalInterest;
-            setTotalInterest(calculatedTotalInterest);
-            setTotalRepayment(calculatedTotalRepayment);
-            setEstimatedPayment(calculatedTotalRepayment / months);
-        } else {
-            setEstimatedPayment(0);
-            setTotalInterest(0);
-            setTotalRepayment(0);
-        }
-    }, [amount, repaymentPeriod, cooperative.loanSettings.interestRate]);
+    const [details, setDetails] = useState({ amount: 0, purpose: '', repaymentPeriod: 6 });
+    
+    const maxLoanable = (cooperative.totalSavings - cooperative.totalLoans) * (cooperative.loanSettings.maxLoanPercentage / 100);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (amount <= 0 || !purpose) return;
-        applyForLoan(cooperative.id, { amount, purpose, repaymentPeriod });
-        setAmount(0);
-        setPurpose('');
-        setRepaymentPeriod(6);
+        applyForLoan(cooperative.id, details);
         onClose();
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={`Request a Loan from ${cooperative.name}`}>
+        <Modal isOpen={isOpen} onClose={onClose} title="Request a Loan">
             <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg text-center">
-                    <p className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                        {`Available Funds for Loan: RWF ${availableForLoan.toLocaleString()}`}
-                    </p>
+                 <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                    <p className="text-sm text-blue-800 dark:text-blue-200">Max Loan Amount Available to You: <span className="font-bold">RWF {Math.floor(maxLoanable).toLocaleString()}</span></p>
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Loan Amount (RWF)</label>
-                    <input 
-                        type="number" 
-                        value={amount || ''} 
-                        onChange={e => setAmount(parseInt(e.target.value) || 0)} 
-                        required 
-                        max={availableForLoan}
-                        className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
-                    />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Repayment Period (Months)</label>
-                    <select value={repaymentPeriod} onChange={e => setRepaymentPeriod(parseInt(e.target.value))} className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
-                        <option value={3}>3 Months</option>
-                        <option value={6}>6 Months</option>
-                        <option value={9}>9 Months</option>
-                        <option value={12}>12 Months</option>
-                        <option value={24}>24 Months</option>
-                    </select>
+                    <input type="number" value={details.amount || ''} onChange={e => setDetails({...details, amount: parseInt(e.target.value) || 0})} required max={maxLoanable} className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"/>
                 </div>
                  <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Purpose of Loan</label>
-                    <input 
-                        type="text" 
-                        value={purpose} 
-                        onChange={e => setPurpose(e.target.value)} 
-                        required 
-                        placeholder="e.g., School fees, business startup"
-                        className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
-                    />
+                    <input type="text" value={details.purpose} onChange={e => setDetails({...details, purpose: e.target.value})} required className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"/>
                 </div>
-                <Card className="!p-4 bg-light dark:bg-gray-700/50">
-                     <h4 className="font-semibold text-sm text-dark dark:text-light mb-2">Estimated Loan Terms</h4>
-                     <div className="text-sm space-y-2">
-                        <div className="flex justify-between">
-                            <span className="text-gray-500 dark:text-gray-400">Annual Interest Rate</span>
-                            <span className="font-medium text-dark dark:text-light">{cooperative.loanSettings.interestRate}% (annual)</span>
-                        </div>
-                         <div className="flex justify-between">
-                            <span className="text-gray-500 dark:text-gray-400">Estimated Total Interest</span>
-                            <span className="font-medium text-dark dark:text-light">RWF {Math.round(totalInterest).toLocaleString()}</span>
-                        </div>
-                         <div className="flex justify-between">
-                            <span className="text-gray-500 dark:text-gray-400">Estimated Total Repayment</span>
-                            <span className="font-medium text-dark dark:text-light">RWF {Math.round(totalRepayment).toLocaleString()}</span>
-                        </div>
-                        <div className="flex justify-between border-t dark:border-gray-600 pt-2 mt-2">
-                            <span className="text-gray-500 dark:text-gray-400">Estimated Monthly Payment</span>
-                            <span className="font-bold text-primary">RWF {Math.round(estimatedPayment).toLocaleString()} / mo.</span>
-                        </div>
-                     </div>
-                </Card>
+                 <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Repayment Period (in months)</label>
+                    <select value={details.repaymentPeriod} onChange={e => setDetails({...details, repaymentPeriod: parseInt(e.target.value)})} className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
+                        <option value={3}>3 Months</option>
+                        <option value={6}>6 Months</option>
+                        <option value={12}>12 Months</option>
+                    </select>
+                </div>
                 <div className="flex justify-end gap-2 pt-4">
                     <Button type="button" variant="secondary" onClick={onClose}>Cancel</Button>
-                    <Button type="submit" disabled={amount <= 0 || amount > availableForLoan || !purpose}>Submit</Button>
+                    <Button type="submit">Submit Request</Button>
                 </div>
             </form>
         </Modal>
     );
 };
-
-const CooperativeSettingsModal: React.FC<{ isOpen: boolean, onClose: () => void, cooperative: Cooperative }> = ({ isOpen, onClose, cooperative }) => {
-    const { updateCooperativeSettings } = useCooperatives();
-    const [formData, setFormData] = useState({
-        name: cooperative.name,
-        description: cooperative.description,
-        contributionSettings: cooperative.contributionSettings,
-        loanSettings: cooperative.loanSettings,
-    });
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-        const [section, field] = name.split('.');
-
-        if (section === 'contributionSettings' || section === 'loanSettings') {
-            setFormData(prev => ({
-                ...prev,
-                [section]: {
-                    ...prev[section],
-                    [field]: field === 'frequency' ? value : parseFloat(value) || 0
-                }
-            }));
-        } else {
-            setFormData(prev => ({ ...prev, [name]: value }));
-        }
-    };
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        updateCooperativeSettings(cooperative.id, formData);
-        onClose();
-    };
-
-    return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Cooperative Settings">
-             <form onSubmit={handleSubmit} className="space-y-6">
-                <Card>
-                    <h4 className="font-bold text-lg mb-3">General</h4>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cooperative Name</label>
-                        <input type="text" name="name" value={formData.name} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"/>
-                    </div>
-                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
-                        <textarea name="description" value={formData.description} onChange={handleChange} required rows={2} className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"></textarea>
-                    </div>
-                </Card>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Card>
-                        <h4 className="font-bold text-lg mb-3">Contributions</h4>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contribution Amount (RWF)</label>
-                            <input type="number" name="contributionSettings.amount" value={formData.contributionSettings.amount} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"/>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contribution Frequency</label>
-                            <select name="contributionSettings.frequency" value={formData.contributionSettings.frequency} onChange={handleChange} className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
-                                <option value="Monthly">Monthly</option>
-                                <option value="Weekly">Weekly</option>
-                            </select>
-                        </div>
-                    </Card>
-                    <Card>
-                         <h4 className="font-bold text-lg mb-3">Loans</h4>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Annual Interest Rate (%)</label>
-                            <input type="number" name="loanSettings.interestRate" value={formData.loanSettings.interestRate} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"/>
-                        </div>
-                    </Card>
-                </div>
-                 <div className="flex justify-end gap-2 pt-4">
-                    <Button type="button" variant="secondary" onClick={onClose}>Cancel</Button>
-                    <Button type="submit">Save Changes</Button>
-                </div>
-            </form>
-        </Modal>
-    );
-};
-
 
 export default CooperativesPage;

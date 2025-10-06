@@ -1,10 +1,7 @@
-
-
 import React, { useState, useEffect, useRef } from 'react';
 import Modal from '../layout/Modal';
 import Button from '../layout/Button';
-import { PhoneIcon, VideoCameraIcon, VideoCameraSlashIcon, MicrophoneIcon } from '@heroicons/react/24/solid';
-import { BsMicMuteFill as MicrophoneSlashIcon } from 'react-icons/bs';
+import { PhoneIcon, VideoCameraIcon, VideoCameraSlashIcon, MicrophoneIcon, SpeakerXMarkIcon as MicrophoneSlashIcon } from '@heroicons/react/24/solid';
 
 
 interface VideoCallModalProps {

@@ -4,14 +4,17 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Card from '../components/ui/Card';
 import Button from '../components/layout/Button';
-import { PencilIcon, CheckBadgeIcon, SunIcon, MoonIcon } from '@heroicons/react/24/solid';
+import { PencilIcon, CheckBadgeIcon, SunIcon, MoonIcon, BriefcaseIcon } from '@heroicons/react/24/solid';
 import RingProgress from '../components/layout/RingProgress';
 import { useAppContext } from '../contexts/AppContext';
+import { COMPANIES, JOBS } from '../constants';
+import { UserRole } from '../types';
 
 type SettingsTab = 'profile' | 'preferences';
 
 const SettingsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
+  const { user } = useAuth();
 
   const tabs: { id: SettingsTab; label: string }[] = [
     { id: 'profile', label: 'My Profile' },
@@ -40,19 +43,34 @@ const SettingsPage: React.FC = () => {
       </div>
 
       <div>
-        {activeTab === 'profile' && <ProfileTab />}
+        {activeTab === 'profile' && (
+            user?.role === UserRole.SEEKER ? <SeekerProfileTab /> : <EmployerProfileTab />
+        )}
         {activeTab === 'preferences' && <PreferencesTab />}
       </div>
     </div>
   );
 };
 
-const ProfileTab: React.FC = () => {
+const SeekerProfileTab: React.FC = () => {
     const { user } = useAuth();
     
     if (!user) return null;
 
-    const userSkills = user.skills || ['React', 'TypeScript', 'Project Management', 'Agile'];
+    const userSkills = user.skills || [];
+    const profileData = user.profileData || {};
+    
+    const calculateAge = (dob: string | undefined) => {
+        if (!dob) return 'N/A';
+        const birthDate = new Date(dob);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age;
+    };
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -80,7 +98,7 @@ const ProfileTab: React.FC = () => {
                         Edit
                     </Button>
                     </div>
-                    <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Full Name</label>
                             <p className="text-dark dark:text-light font-semibold">{user.name}</p>
@@ -90,6 +108,26 @@ const ProfileTab: React.FC = () => {
                             <p className="text-dark dark:text-light font-semibold">{user.email}</p>
                         </div>
                          <div>
+                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Age</label>
+                            <p className="text-dark dark:text-light font-semibold">{calculateAge(profileData.dateOfBirth)}</p>
+                        </div>
+                         <div>
+                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Gender</label>
+                            <p className="text-dark dark:text-light font-semibold">{profileData.gender || 'N/A'}</p>
+                        </div>
+                         <div>
+                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Education</label>
+                            <p className="text-dark dark:text-light font-semibold">{profileData.educationLevel || 'N/A'}</p>
+                        </div>
+                         <div>
+                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Field of Study</label>
+                            <p className="text-dark dark:text-light font-semibold">{profileData.fieldOfStudy || 'N/A'}</p>
+                        </div>
+                         <div>
+                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Years of Experience</label>
+                            <p className="text-dark dark:text-light font-semibold">{profileData.yearsOfExperience} years</p>
+                        </div>
+                        <div>
                             <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Password</label>
                             <button className="text-primary text-sm font-semibold">Change Password</button>
                         </div>
@@ -103,6 +141,48 @@ const ProfileTab: React.FC = () => {
                                 <CheckBadgeIcon className="h-4 w-4 ml-1 text-primary" title="Endorsed"/>
                             </div>
                         ))}
+                    </div>
+                </Card>
+            </div>
+        </div>
+    )
+}
+
+const EmployerProfileTab: React.FC = () => {
+    const { user } = useAuth();
+    if (!user || !user.companyId) return null;
+
+    const company = COMPANIES.find(c => c.id === user.companyId);
+    const companyJobs = JOBS.filter(j => j.employerId === user.id);
+
+    if (!company) return <p>Company not found.</p>;
+
+    return (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-1 space-y-6">
+                <Card className="text-center">
+                     <img src={user.avatarUrl} alt={user.name} className="h-32 w-32 rounded-full mx-auto mb-4 border-4 border-primary" />
+                    <h2 className="text-2xl font-bold text-dark dark:text-light">{user.name}</h2>
+                    <p className="text-gray-500 dark:text-gray-400">{user.role}</p>
+                </Card>
+                 <Card title="Company Info">
+                    <h3 className="font-bold text-lg text-dark dark:text-light">{company.name}</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{company.industry}</p>
+                    <p className="text-sm mt-2 text-gray-600 dark:text-gray-300">{company.description}</p>
+                </Card>
+            </div>
+             <div className="lg:col-span-2 space-y-6">
+                <Card title="Active Job Postings">
+                    <div className="space-y-3 max-h-96 overflow-y-auto">
+                        {companyJobs.length > 0 ? companyJobs.map(job => (
+                            <div key={job.id} className="p-3 rounded-lg bg-light dark:bg-gray-700/50">
+                                <p className="font-semibold text-dark dark:text-light">{job.title}</p>
+                                <div className="flex justify-between items-center">
+                                    <p className="text-xs text-gray-500">{job.location}</p>
+                                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${job.status === 'Open' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{job.status}</span>
+                                </div>
+                            </div>
+                        )) : <p className="text-gray-500 text-center">No active job postings.</p>}
                     </div>
                 </Card>
             </div>

@@ -11,6 +11,15 @@ export const USERS: User[] = [
     skills: ['React', 'TypeScript', 'Node.js', 'Project Management'],
     careerProgress: 3,
     careerGoal: 'Become a Senior Frontend Developer and eventually a Tech Lead.',
+    profileData: {
+        dateOfBirth: '1995-08-15',
+        gender: 'Female',
+        educationLevel: 'Bachelors',
+        fieldOfStudy: 'Computer Science',
+        yearsOfExperience: 4,
+        resumeUrl: 'aline_umutoni_cv.pdf',
+        profileImage: `https://i.pravatar.cc/150?u=user-seeker-1`
+    }
   },
   {
     id: 'user-seeker-2',
@@ -21,6 +30,15 @@ export const USERS: User[] = [
     skills: ['UX/UI Design', 'Figma', 'Agile Methodologies'],
     careerProgress: 2,
     careerGoal: 'Transition into a Product Management role.',
+    profileData: {
+        dateOfBirth: '1998-02-20',
+        gender: 'Male',
+        educationLevel: 'Diploma',
+        fieldOfStudy: 'Graphic Design',
+        yearsOfExperience: 2,
+        resumeUrl: 'peter_mugabo_resume.pdf',
+        profileImage: `https://i.pravatar.cc/150?u=user-seeker-2`
+    }
   },
   {
     id: 'user-employer-1',
@@ -28,6 +46,7 @@ export const USERS: User[] = [
     email: 'jean@example.com',
     role: UserRole.EMPLOYER,
     avatarUrl: `https://i.pravatar.cc/150?u=user-employer-1`,
+    companyId: 'comp-1',
   },
 ];
 
@@ -80,10 +99,10 @@ export const JOBS: Job[] = [
 
 // APPLICATIONS
 export const APPLICATIONS: Application[] = [
-  { id: 'app-1', userId: 'user-seeker-1', jobId: 'job-1', submissionDate: new Date(Date.now() - 2 * 86400000).toISOString(), status: 'Interviewing' },
-  { id: 'app-2', userId: 'user-seeker-2', jobId: 'job-2', submissionDate: new Date(Date.now() - 5 * 86400000).toISOString(), status: 'Reviewed' },
+  { id: 'app-1', userId: 'user-seeker-1', jobId: 'job-1', submissionDate: new Date(Date.now() - 2 * 86400000).toISOString(), status: 'Interviewing', applicantInfo: USERS[0].profileData },
+  { id: 'app-2', userId: 'user-seeker-2', jobId: 'job-2', submissionDate: new Date(Date.now() - 5 * 86400000).toISOString(), status: 'Reviewed', applicantInfo: USERS[1].profileData },
   { id: 'app-3', userId: 'user-seeker-1', jobId: 'job-3', submissionDate: new Date(Date.now() - 10 * 86400000).toISOString(), status: 'Rejected' },
-  { id: 'app-4', userId: 'user-seeker-2', jobId: 'job-1', submissionDate: new Date().toISOString(), status: 'Applied' },
+  { id: 'app-4', userId: 'user-seeker-2', jobId: 'job-1', submissionDate: new Date().toISOString(), status: 'Applied', applicantInfo: USERS[1].profileData },
 ];
 
 // INTERVIEWS
@@ -119,6 +138,9 @@ export const COOPERATIVES: Cooperative[] = [
                 status: 'pending'
             }))
         }
+    ],
+    announcements: [
+        { text: "Welcome everyone to our new cooperative! First contribution cycle starts next month.", date: new Date(Date.now() - 5 * 86400000).toISOString() }
     ],
   },
 ];
