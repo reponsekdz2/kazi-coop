@@ -30,6 +30,8 @@ export interface Job {
   type: 'Full-time' | 'Part-time' | 'Contract';
   requirements: string[];
   employerId: string;
+  status?: 'Open' | 'Paused' | 'Closed';
+  isSaved?: boolean;
 }
 
 export interface Application {
@@ -46,7 +48,7 @@ export interface Interview {
   jobId: string;
   date: string;
   type: 'Phone Screen' | 'Technical' | 'On-site' | 'Final';
-  status: 'Scheduled' | 'Completed' | 'Canceled';
+  status: 'Scheduled' | 'Confirmed' | 'Completed' | 'Canceled';
   details?: string;
 }
 

@@ -1,7 +1,6 @@
-
 import React, { Fragment } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { ChevronDownIcon, BellIcon, SparklesIcon } from '@heroicons/react/24/solid';
+import { ChevronDownIcon, BellIcon, SparklesIcon, MagnifyingGlassIcon } from '@heroicons/react/24/solid';
 // FIX: Changed import to 'react-router' to resolve module export errors.
 import { Link } from 'react-router';
 import { Menu, Transition } from '@headlessui/react';
@@ -23,8 +22,15 @@ const Header: React.FC = () => {
 
   return (
     <header className="flex items-center justify-between p-4 bg-white border-b dark:bg-dark dark:border-gray-700">
-      <div>
-        {/* Can be dynamic based on route */}
+      <div className="relative w-full max-w-xs">
+         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+         </div>
+         <input
+            type="text"
+            placeholder="Search jobs, co-ops, users..."
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full bg-light dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:outline-none text-sm"
+         />
       </div>
       <div className="flex items-center space-x-4">
 

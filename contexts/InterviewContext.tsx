@@ -7,6 +7,7 @@ import { useToast } from './ToastContext';
 interface InterviewContextType {
   interviews: Interview[];
   scheduleInterview: (details: Omit<Interview, 'id' | 'status'>) => void;
+  updateInterviewStatus: (interviewId: string, status: Interview['status']) => void;
 }
 
 const InterviewContext = createContext<InterviewContextType | undefined>(undefined);
@@ -39,8 +40,13 @@ export const InterviewProvider: React.FC<{ children: ReactNode }> = ({ children 
       addToast('Interview scheduled successfully!', 'success');
   }
 
+  const updateInterviewStatus = (interviewId: string, status: Interview['status']) => {
+    setAllInterviews(prev => prev.map(i => i.id === interviewId ? { ...i, status } : i));
+    addToast(`Interview status updated to ${status}.`, 'info');
+  };
+
   return (
-    <InterviewContext.Provider value={{ interviews, scheduleInterview }}>
+    <InterviewContext.Provider value={{ interviews, scheduleInterview, updateInterviewStatus }}>
       {children}
     </InterviewContext.Provider>
   );

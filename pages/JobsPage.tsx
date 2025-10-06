@@ -1,11 +1,10 @@
-
-
 import React, { useState, useEffect } from 'react';
 import Card from '../components/ui/Card';
 import Button from '../components/layout/Button';
 import { useJobs } from '../contexts/JobContext';
 import { Job, User, Application, UserRole, Interview } from '../types';
-import { MapPinIcon, BriefcaseIcon, MagnifyingGlassIcon, XMarkIcon, CalendarDaysIcon, SparklesIcon } from '@heroicons/react/24/outline';
+import { MapPinIcon, BriefcaseIcon, MagnifyingGlassIcon, XMarkIcon, CalendarDaysIcon, SparklesIcon, BookmarkIcon as BookmarkOutlineIcon } from '@heroicons/react/24/outline';
+import { BookmarkIcon as BookmarkSolidIcon } from '@heroicons/react/24/solid';
 import Modal from '../components/layout/Modal';
 import { useAuth } from '../contexts/AuthContext';
 import { useApplications } from '../contexts/ApplicationContext';
@@ -14,6 +13,11 @@ import { useInterviews } from '../contexts/InterviewContext';
 import { GoogleGenAI, Type } from '@google/genai';
 import RingProgress from '../components/layout/RingProgress';
 import SeekerProfileModal from '../components/ui/SeekerProfileModal';
+import NewJobModal from '../components/ui/NewJobModal';
+import ScheduleInterviewModal from '../components/ui/ScheduleInterviewModal';
+import ApplicationStatusTracker from '../components/ui/ApplicationStatusTracker';
+
+type SeekerJobView = 'all' | 'saved';
 
 const JobsPage: React.FC = () => {
     const { user } = useAuth();
@@ -25,21 +29,27 @@ const JobsPage: React.FC = () => {
 };
 
 const SeekerJobsView: React.FC = () => {
-  const { jobs } = useJobs();
+  const { jobs, toggleSaveJob } = useJobs();
   const { user } = useAuth();
   const { applications, applyForJob } = useApplications();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<SeekerJobView>('all');
 
   const appliedJobIds = new Set(applications.map(app => app.jobId));
 
-  const filteredJobs = jobs.filter(job => 
-    job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    job.location.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredJobs = jobs.filter(job => {
+    const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          job.location.toLowerCase().includes(searchTerm.toLowerCase());
+
+    if (activeTab === 'saved') {
+        return job.isSaved && matchesSearch;
+    }
+    return matchesSearch;
+  });
   
   const handleApplyClick = (job: Job) => {
     setSelectedJob(job);
@@ -54,11 +64,22 @@ const SeekerJobsView: React.FC = () => {
       setSelectedJob(null);
   }
 
+  const userApplicationForSelectedJob = applications.find(app => app.jobId === selectedJob?.id);
+
   return (
     <div>
       <div className="mb-6 bg-white dark:bg-dark p-6 rounded-lg shadow-md">
-        <h1 className="text-3xl font-bold text-dark dark:text-light mb-2">Find Jobs</h1>
-        <p className="text-gray-500 dark:text-gray-400 mb-4">{`Search from ${jobs.length} open positions.`}</p>
+        <h1 className="text-3xl font-bold text-dark dark:text-light mb-2">Find Your Next Opportunity</h1>
+        <div className="border-b border-gray-200 dark:border-gray-700 my-4">
+            <nav className="-mb-px flex space-x-6">
+                <button onClick={() => setActiveTab('all')} className={`whitespace-nowrap pb-3 px-1 border-b-2 font-medium text-sm ${activeTab === 'all' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
+                    All Jobs
+                </button>
+                 <button onClick={() => setActiveTab('saved')} className={`whitespace-nowrap pb-3 px-1 border-b-2 font-medium text-sm ${activeTab === 'saved' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
+                    Saved Jobs
+                </button>
+            </nav>
+        </div>
         <div className="relative">
             <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 absolute top-1/2 left-4 -translate-y-1/2" />
             <input 
@@ -73,9 +94,12 @@ const SeekerJobsView: React.FC = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredJobs.map(job => (
-          <Card key={job.id} className="flex flex-col">
+          <Card key={job.id} className="flex flex-col relative">
+            <button onClick={() => toggleSaveJob(job.id)} className="absolute top-4 right-4 text-gray-400 hover:text-primary">
+                {job.isSaved ? <BookmarkSolidIcon className="h-6 w-6 text-primary" /> : <BookmarkOutlineIcon className="h-6 w-6" />}
+            </button>
             <div className="flex-grow">
-              <h2 className="text-xl font-bold text-dark dark:text-light">{job.title}</h2>
+              <h2 className="text-xl font-bold text-dark dark:text-light pr-8">{job.title}</h2>
               <p className="font-semibold text-primary">{job.company}</p>
               <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-2">
                 <MapPinIcon className="h-4 w-4 mr-1" />
@@ -99,6 +123,12 @@ const SeekerJobsView: React.FC = () => {
           </Card>
         ))}
       </div>
+      
+      {filteredJobs.length === 0 && (
+        <div className="text-center py-12 text-gray-500">
+            <p>No jobs found that match your criteria.</p>
+        </div>
+      )}
 
       {selectedJob && (
           <JobDetailsModal 
@@ -107,6 +137,7 @@ const SeekerJobsView: React.FC = () => {
             job={selectedJob} 
             onApply={() => handleApplyClick(selectedJob)}
             isApplied={appliedJobIds.has(selectedJob.id)}
+            application={userApplicationForSelectedJob}
           />
       )}
       {selectedJob && isApplyModalOpen && (
@@ -122,18 +153,32 @@ const SeekerJobsView: React.FC = () => {
 };
 
 const EmployerJobsView: React.FC = () => {
-    const { jobs } = useJobs();
+    const { jobs, createJob, updateJob } = useJobs();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [editingJob, setEditingJob] = useState<Job | null>(null);
     const [viewingApplicantsFor, setViewingApplicantsFor] = useState<Job | null>(null);
+
+    const handleSaveJob = (jobData: Omit<Job, 'id' | 'employerId' | 'isSaved'>) => {
+        if (editingJob) {
+            updateJob(editingJob.id, jobData);
+        } else {
+            createJob(jobData);
+        }
+    };
+
+    const handleEditJob = (job: Job) => {
+        setEditingJob(job);
+        setIsCreateModalOpen(true);
+    };
 
     return (
         <div>
             <div className="flex justify-between items-center mb-6">
                  <h1 className="text-3xl font-bold text-dark dark:text-light">Job Management</h1>
-                 <Button onClick={() => setIsCreateModalOpen(true)}>Post New Job</Button>
+                 <Button onClick={() => { setEditingJob(null); setIsCreateModalOpen(true); }}>Post New Job</Button>
             </div>
             <div className="space-y-4">
-                {jobs.map(job => <JobManagementCard key={job.id} job={job} onViewApplicants={() => setViewingApplicantsFor(job)} />)}
+                {jobs.map(job => <JobManagementCard key={job.id} job={job} onEdit={() => handleEditJob(job)} onViewApplicants={() => setViewingApplicantsFor(job)} />)}
             </div>
 
             {viewingApplicantsFor && (
@@ -143,23 +188,52 @@ const EmployerJobsView: React.FC = () => {
                     job={viewingApplicantsFor}
                 />
             )}
-            {/* Add NewJobModal here */}
+            {(isCreateModalOpen || editingJob) && (
+                <NewJobModal 
+                    isOpen={isCreateModalOpen || !!editingJob}
+                    onClose={() => { setIsCreateModalOpen(false); setEditingJob(null); }}
+                    onSave={handleSaveJob}
+                    job={editingJob}
+                />
+            )}
         </div>
     )
 };
 
-const JobManagementCard: React.FC<{ job: Job, onViewApplicants: () => void }> = ({ job, onViewApplicants }) => {
+const statusColors: { [key in Job['status'] & string]: string } = {
+    Open: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
+    Paused: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300',
+    Closed: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300',
+};
+
+const JobManagementCard: React.FC<{ job: Job, onEdit: () => void, onViewApplicants: () => void }> = ({ job, onEdit, onViewApplicants }) => {
     const { applications } = useApplications();
+    const { updateJobStatus } = useJobs();
     const applicantCount = applications.filter(a => a.jobId === job.id).length;
+
     return (
         <Card className="flex justify-between items-center">
             <div>
                 <h2 className="font-bold text-xl text-dark dark:text-light">{job.title}</h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{job.location} - {job.type}</p>
+                <div className="flex items-center gap-4 text-sm mt-1">
+                    <p className="text-gray-500 dark:text-gray-400">{job.location} - {job.type}</p>
+                    <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${statusColors[job.status || 'Open']}`}>
+                        {job.status || 'Open'}
+                    </span>
+                </div>
                 <p className="text-sm font-semibold text-primary mt-2">{applicantCount} Applicant(s)</p>
             </div>
-            <div className="flex gap-2">
-                <Button variant="secondary">Edit</Button>
+            <div className="flex items-center gap-2">
+                <select 
+                    value={job.status || 'Open'} 
+                    onChange={(e) => updateJobStatus(job.id, e.target.value as Job['status'])}
+                    className="bg-white border border-gray-300 rounded-md text-sm p-1.5 dark:bg-gray-800 dark:border-gray-600"
+                >
+                    <option value="Open">Open</option>
+                    <option value="Paused">Paused</option>
+                    <option value="Closed">Closed</option>
+                </select>
+                <Button variant="secondary" onClick={onEdit}>Edit</Button>
                 <Button onClick={onViewApplicants}>View Applicants</Button>
             </div>
         </Card>
@@ -302,56 +376,7 @@ const ViewApplicantsModal: React.FC<{ isOpen: boolean; onClose: () => void; job:
     )
 };
 
-const ScheduleInterviewModal: React.FC<{isOpen: boolean, onClose: () => void, application: Application}> = ({isOpen, onClose, application}) => {
-    const { scheduleInterview } = useInterviews();
-    const { updateApplicationStatus } = useApplications();
-    const [details, setDetails] = useState({ date: '', type: 'Technical', details: '' });
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        const interviewData: Omit<Interview, 'id' | 'status'> = {
-            userId: application.userId,
-            jobId: application.jobId,
-            date: new Date(details.date).toISOString(),
-            type: details.type as Interview['type'],
-            details: details.details,
-        }
-        scheduleInterview(interviewData);
-        updateApplicationStatus(application.id, 'Interview Scheduled');
-        onClose();
-    }
-
-    return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Schedule Interview">
-            <form onSubmit={handleSubmit} className="space-y-4">
-                 <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Interview Date & Time</label>
-                    <input type="datetime-local" value={details.date} onChange={e => setDetails({...details, date: e.target.value})} required className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"/>
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Interview Type</label>
-                    <select value={details.type} onChange={e => setDetails({...details, type: e.target.value})} className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
-                        <option>Phone Screen</option>
-                        <option>Technical</option>
-                        <option>On-site</option>
-                        <option>Final</option>
-                    </select>
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Details (e.g., location, video link)</label>
-                    <textarea value={details.details} onChange={e => setDetails({...details, details: e.target.value})} rows={3} className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"></textarea>
-                </div>
-                <div className="flex justify-end gap-2 pt-4">
-                    <Button type="button" variant="secondary" onClick={onClose}>Cancel</Button>
-                    <Button type="submit">Schedule Interview</Button>
-                </div>
-            </form>
-        </Modal>
-    )
-};
-
-
-const JobDetailsModal: React.FC<{ isOpen: boolean; onClose: () => void; job: Job; onApply: () => void; isApplied: boolean }> = ({ isOpen, onClose, job, onApply, isApplied }) => {
+const JobDetailsModal: React.FC<{ isOpen: boolean; onClose: () => void; job: Job; onApply: () => void; isApplied: boolean, application?: Application | null }> = ({ isOpen, onClose, job, onApply, isApplied, application }) => {
     return (
         <Modal isOpen={isOpen} onClose={onClose} title={job.title}>
             <div className="space-y-4">
@@ -372,6 +397,11 @@ const JobDetailsModal: React.FC<{ isOpen: boolean; onClose: () => void; job: Job
                         {job.requirements.map(req => <li key={req}>{req}</li>)}
                     </ul>
                 </div>
+                {isApplied && application && (
+                    <div className="mt-6 pt-4 border-t dark:border-gray-700">
+                        <ApplicationStatusTracker status={application.status} />
+                    </div>
+                )}
                 <div className="flex justify-end gap-2 pt-4">
                     <Button variant="secondary" onClick={onClose}>Close</Button>
                     <Button onClick={onApply} disabled={isApplied}>{isApplied ? 'Application Sent' : 'Apply Now'}</Button>

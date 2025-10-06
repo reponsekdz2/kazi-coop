@@ -57,6 +57,8 @@ export const JOBS: Job[] = [
     type: 'Full-time',
     requirements: ['2+ years of experience with React', 'Strong proficiency in TypeScript', 'Experience with state management libraries like Redux or Zustand'],
     employerId: 'user-2',
+    status: 'Open',
+    isSaved: false,
   },
   {
     id: 'job-2',
@@ -67,6 +69,8 @@ export const JOBS: Job[] = [
     type: 'Contract',
     requirements: ['Portfolio of design projects', 'Proficiency in Figma, Sketch, or Adobe XD', 'Understanding of user-centered design principles'],
     employerId: 'user-2',
+    status: 'Open',
+    isSaved: true,
   },
   {
     id: 'job-3',
@@ -77,6 +81,8 @@ export const JOBS: Job[] = [
     type: 'Full-time',
     requirements: ['PMP certification is a plus', 'Experience with Agile methodologies', 'Excellent communication skills'],
     employerId: 'user-2',
+    status: 'Closed',
+    isSaved: false,
   },
    {
     id: 'job-4',
@@ -87,6 +93,8 @@ export const JOBS: Job[] = [
     type: 'Part-time',
     requirements: ['Proficiency in SQL and Python (Pandas)', 'Experience with data visualization tools like Tableau or Power BI', 'Strong analytical skills'],
     employerId: 'another-employer-id',
+    status: 'Open',
+    isSaved: false,
   },
 ];
 
@@ -95,11 +103,13 @@ export const APPLICATIONS: Application[] = [
   { id: 'app-1', userId: 'user-1', jobId: 'job-1', submissionDate: new Date(Date.now() - 2 * 86400000).toISOString(), status: 'Interviewing' },
   { id: 'app-2', userId: 'user-3', jobId: 'job-4', submissionDate: new Date(Date.now() - 5 * 86400000).toISOString(), status: 'Reviewed' },
   { id: 'app-3', userId: 'user-1', jobId: 'job-3', submissionDate: new Date().toISOString(), status: 'Applied' },
+  { id: 'app-4', userId: 'user-1', jobId: 'job-2', submissionDate: new Date(Date.now() - 10 * 86400000).toISOString(), status: 'Interview Scheduled' },
 ];
 
 // Mock Interviews
 export const INTERVIEWS: Interview[] = [
-  { id: 'int-1', userId: 'user-1', jobId: 'job-1', date: new Date(Date.now() + 3 * 86400000).toISOString(), type: 'Technical', status: 'Scheduled' },
+  { id: 'int-1', userId: 'user-1', jobId: 'job-1', date: new Date(Date.now() + 3 * 86400000).toISOString(), type: 'Technical', status: 'Confirmed', details: 'Google Meet: https://meet.google.com/xyz-abc-def' },
+  { id: 'int-2', userId: 'user-1', jobId: 'job-2', date: new Date(Date.now() + 7 * 86400000).toISOString(), type: 'On-site', status: 'Scheduled', details: 'Kigali Heights, 4th Floor' },
 ];
 
 // Mock Cooperatives
