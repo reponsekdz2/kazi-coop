@@ -1,4 +1,4 @@
-// FIX: Removed circular import of 'UserRole' from './types' to resolve declaration conflicts.
+// FIX: Defined UserRole enum to resolve circular dependency.
 export enum UserRole {
   SEEKER = 'Job Seeker',
   EMPLOYER = 'Employer',

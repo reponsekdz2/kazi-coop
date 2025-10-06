@@ -211,10 +211,8 @@ const CooperativeDetailsModal: React.FC<{ isOpen: boolean; onClose: () => void; 
 }
 
 const OverviewTab: React.FC<{ cooperative: Cooperative }> = ({ cooperative }) => {
-    // FIX: Changed 'coop' to 'cooperative' to match the prop name.
     const loanPoolPercentage = cooperative.totalSavings > 0 ? Math.round((cooperative.totalLoans / cooperative.totalSavings) * 100) : 0;
     const communityGoal = 20000000; // Example goal
-    // FIX: Changed 'coop' to 'cooperative' to match the prop name.
     const goalProgressPercentage = Math.min(Math.round((cooperative.totalSavings / communityGoal) * 100), 100);
     const availableForLoan = cooperative.totalSavings - cooperative.totalLoans;
 

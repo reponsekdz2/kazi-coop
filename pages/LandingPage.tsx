@@ -8,6 +8,15 @@ import Card from '../components/ui/Card';
 import RingProgress from '../components/layout/RingProgress';
 
 const LandingPage: React.FC = () => {
+  const testimonials = [
+    { name: 'Aline U.', role: 'Frontend Developer', quote: 'KaziCoop helped me land my dream job in tech. The platform is intuitive and connected me directly with top employers in Kigali.', avatar: 'https://randomuser.me/api/portraits/women/1.jpg' },
+    { name: 'Jean M.', role: 'CEO, TechSolutions', quote: 'Managing our employee cooperative has never been easier. The financial tools are powerful yet simple to use, fostering a great savings culture.', avatar: 'https://randomuser.me/api/portraits/men/1.jpg' },
+    { name: 'Chris K.', role: 'Data Analyst', quote: 'The learning hub is fantastic. I took a course on advanced SQL that directly helped me get recognized for a promotion.', avatar: 'https://randomuser.me/api/portraits/men/2.jpg' },
+    { name: 'Fatima N.', role: 'UX Designer', quote: 'Joining a freelancers\' cooperative through KaziCoop gave me the financial stability to grow my business. It truly feels like a community.', avatar: 'https://randomuser.me/api/portraits/women/3.jpg' },
+    { name: 'Samuel B.', role: 'Project Manager', quote: 'The integrated wallet and budgeting tools are a game-changer for my personal finance. I can finally track my spending and savings goals effectively.', avatar: 'https://randomuser.me/api/portraits/men/4.jpg' },
+    { name: 'Grace I.', role: 'HR Manager, Innovate RW', quote: 'We found our last three hires through KaziCoop. The quality of candidates is excellent, and the platform simplifies our recruitment process.', avatar: 'https://randomuser.me/api/portraits/women/5.jpg' },
+  ];
+
   return (
     <div>
       {/* Hero Section */}
@@ -97,6 +106,32 @@ const LandingPage: React.FC = () => {
                      <p className="text-gray-600 dark:text-gray-400 mt-1">report improved financial literacy and stability.</p>
                 </div>
             </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20 bg-light dark:bg-dark">
+        <div className="container mx-auto px-4 lg:px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-dark dark:text-light">What Our Community Says</h2>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">Real stories from people growing with KaziCoop.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <Card key={index} className="flex flex-col">
+                <div className="flex-grow text-gray-600 dark:text-gray-300 mb-4">
+                  <p>"{testimonial.quote}"</p>
+                </div>
+                <div className="flex items-center">
+                  <img src={testimonial.avatar} alt={testimonial.name} className="h-12 w-12 rounded-full mr-4" />
+                  <div>
+                    <p className="font-semibold text-dark dark:text-light">{testimonial.name}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{testimonial.role}</p>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
         </div>
       </section>
     </div>
