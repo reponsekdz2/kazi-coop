@@ -1,9 +1,10 @@
+
+
 import React, { useState } from 'react';
-import Modal from './Modal';
-import Button from './Button';
+import Modal from '../layout/Modal';
+import Button from '../layout/Button';
 import { useTransactions } from '../../contexts/TransactionContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { useAppContext } from '../../contexts/AppContext';
 import { useToast } from '../../contexts/ToastContext';
 
 interface WithdrawModalProps {
@@ -13,7 +14,6 @@ interface WithdrawModalProps {
 }
 
 const WithdrawModal: React.FC<WithdrawModalProps> = ({ isOpen, onClose, currentBalance }) => {
-  const { t } = useAppContext();
   const { user } = useAuth();
   const { addTransaction } = useTransactions();
   const { addToast } = useToast();
@@ -42,14 +42,14 @@ const WithdrawModal: React.FC<WithdrawModalProps> = ({ isOpen, onClose, currentB
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={t('wallet.withdrawTitle')}>
+    <Modal isOpen={isOpen} onClose={onClose} title="Withdraw Funds">
       <form onSubmit={handleSubmit} className="space-y-4">
-        <p className="text-sm text-gray-500 dark:text-gray-400">{t('wallet.withdrawSubtitle')}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Transfer money from your wallet to your Mobile Money account.</p>
         <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
-          <p className="text-sm text-blue-800 dark:text-blue-200">{t('wallet.balance')}: <span className="font-bold">RWF {currentBalance.toLocaleString()}</span></p>
+          <p className="text-sm text-blue-800 dark:text-blue-200">Current Balance: <span className="font-bold">RWF {currentBalance.toLocaleString()}</span></p>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('wallet.loans.amount')} (RWF)</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Amount (RWF)</label>
           <input
             type="number"
             value={amount || ''}
@@ -61,7 +61,7 @@ const WithdrawModal: React.FC<WithdrawModalProps> = ({ isOpen, onClose, currentB
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('wallet.momoNumber')}</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Mobile Money Number</label>
           <input
             type="tel"
             value={momoNumber}
@@ -72,8 +72,8 @@ const WithdrawModal: React.FC<WithdrawModalProps> = ({ isOpen, onClose, currentB
           />
         </div>
         <div className="flex justify-end gap-2 pt-4">
-          <Button type="button" variant="secondary" onClick={onClose}>{t('common.cancel')}</Button>
-          <Button type="submit" disabled={!canWithdraw}>{t('wallet.confirm')}</Button>
+          <Button type="button" variant="secondary" onClick={onClose}>Cancel</Button>
+          <Button type="submit" disabled={!canWithdraw}>Confirm</Button>
         </div>
       </form>
     </Modal>

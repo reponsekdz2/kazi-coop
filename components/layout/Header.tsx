@@ -1,9 +1,10 @@
+
 import React, { Fragment } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { ChevronDownIcon, BellIcon, SparklesIcon } from '@heroicons/react/24/solid';
-import { Link } from 'react-router-dom';
+// FIX: Changed import to 'react-router' to resolve module export errors.
+import { Link } from 'react-router';
 import { Menu, Transition } from '@headlessui/react';
-import { useAppContext } from '../../contexts/AppContext';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { UserPlusIcon, BriefcaseIcon, ArrowTrendingUpIcon, BanknotesIcon } from '@heroicons/react/24/outline';
 
@@ -18,7 +19,6 @@ const notificationIcons: { [key: string]: React.ElementType } = {
 
 const Header: React.FC = () => {
   const { user, logout } = useAuth();
-  const { t } = useAppContext();
   const { notifications, unreadCount, markAllAsRead } = useNotifications();
 
   return (
@@ -48,8 +48,8 @@ const Header: React.FC = () => {
           >
             <Menu.Items className="absolute right-0 mt-2 w-80 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800 dark:ring-gray-700">
                 <div className="p-2 flex justify-between items-center border-b dark:border-gray-700">
-                    <h3 className="font-semibold text-sm text-dark dark:text-light">{t('notifications.title')}</h3>
-                    {unreadCount > 0 && <button onClick={markAllAsRead} className="text-xs text-primary hover:underline">{t('notifications.markAllRead')}</button>}
+                    <h3 className="font-semibold text-sm text-dark dark:text-light">Notifications</h3>
+                    {unreadCount > 0 && <button onClick={markAllAsRead} className="text-xs text-primary hover:underline">Mark all as read</button>}
                 </div>
                 <div className="py-1 max-h-96 overflow-y-auto">
                     {notifications.length > 0 ? notifications.map(notif => {
@@ -68,7 +68,7 @@ const Header: React.FC = () => {
                         </Menu.Item>
                        )
                     }) : (
-                        <div className="p-4 text-center text-sm text-gray-500">{t('notifications.noNotifications')}</div>
+                        <div className="p-4 text-center text-sm text-gray-500">You're all caught up!</div>
                     )}
                 </div>
             </Menu.Items>
@@ -96,7 +96,7 @@ const Header: React.FC = () => {
                      <Menu.Item>
                        {({ active }) => (
                          <Link to="/settings" className={`${active ? 'bg-primary text-white' : 'text-gray-900 dark:text-gray-200'} group flex w-full items-center rounded-md px-2 py-2 text-sm`}>
-                            {t('header.settings')}
+                            Settings
                          </Link>
                        )}
                      </Menu.Item>
@@ -105,7 +105,7 @@ const Header: React.FC = () => {
                      <Menu.Item>
                         {({ active }) => (
                            <button onClick={logout} className={`${active ? 'bg-primary text-white' : 'text-gray-900 dark:text-gray-200'} group flex w-full items-center rounded-md px-2 py-2 text-sm`}>
-                             {t('header.logout')}
+                             Logout
                            </button>
                         )}
                      </Menu.Item>

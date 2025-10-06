@@ -1,5 +1,7 @@
+
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+// FIX: Changed import to 'react-router' to resolve module export errors.
+import { NavLink } from 'react-router';
 import {
   ChartPieIcon,
   UserGroupIcon,
@@ -15,35 +17,33 @@ import {
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../../contexts/AuthContext';
 import { UserRole } from '../../types';
-import { useAppContext } from '../../contexts/AppContext';
 
 const Sidebar: React.FC = () => {
   const { user, logout } = useAuth();
-  const { t } = useAppContext();
 
   const seekerLinks = [
-    { name: t('sidebar.dashboard'), to: '/dashboard', icon: ChartPieIcon },
-    { name: t('sidebar.findJobs'), to: '/jobs', icon: BriefcaseIcon },
-    { name: t('sidebar.interviews'), to: '/interviews', icon: UsersIcon },
-    { name: t('sidebar.cooperatives'), to: '/cooperatives', icon: UserGroupIcon },
-    { name: t('sidebar.wallet'), to: '/wallet', icon: WalletIcon },
-    { name: t('sidebar.learningHub'), to: '/learning', icon: AcademicCapIcon },
-    { name: t('sidebar.messages'), to: '/messages', icon: ChatBubbleLeftRightIcon },
+    { name: 'Dashboard', to: '/dashboard', icon: ChartPieIcon },
+    { name: 'Find Jobs', to: '/jobs', icon: BriefcaseIcon },
+    { name: 'My Interviews', to: '/interviews', icon: UsersIcon },
+    { name: 'Cooperatives (Ikimina)', to: '/cooperatives', icon: UserGroupIcon },
+    { name: 'My Wallet', to: '/wallet', icon: WalletIcon },
+    { name: 'Learning Hub', to: '/learning', icon: AcademicCapIcon },
+    { name: 'Messages', to: '/messages', icon: ChatBubbleLeftRightIcon },
   ];
 
   const employerLinks = [
-    { name: t('sidebar.dashboard'), to: '/dashboard', icon: ChartPieIcon },
-    { name: t('sidebar.jobManagement'), to: '/jobs', icon: BriefcaseIcon },
-    { name: t('sidebar.cooperativeManagement'), to: '/cooperatives', icon: UserGroupIcon },
-    { name: t('sidebar.walletManagement'), to: '/wallet', icon: WalletIcon },
-    { name: t('sidebar.talentPool'), to: '/user-analytics', icon: UsersIcon },
-    { name: t('sidebar.platformAnalytics'), to: '/analytics', icon: BuildingOffice2Icon },
-    { name: t('sidebar.messages'), to: '/messages', icon: ChatBubbleLeftRightIcon },
+    { name: 'Dashboard', to: '/dashboard', icon: ChartPieIcon },
+    { name: 'Job Management', to: '/jobs', icon: BriefcaseIcon },
+    { name: 'Cooperative Management', to: '/cooperatives', icon: UserGroupIcon },
+    { name: 'Company Wallet', to: '/wallet', icon: WalletIcon },
+    { name: 'Talent Pool', to: '/user-analytics', icon: UsersIcon },
+    { name: 'Platform Analytics', to: '/analytics', icon: BuildingOffice2Icon },
+    { name: 'Messages', to: '/messages', icon: ChatBubbleLeftRightIcon },
   ];
   
   const bottomLinks = [
-    { name: t('sidebar.settings'), to: '/settings', icon: Cog6ToothIcon },
-    { name: t('sidebar.helpCenter'), to: '/help', icon: QuestionMarkCircleIcon },
+    { name: 'Settings', to: '/settings', icon: Cog6ToothIcon },
+    { name: 'Help Center', to: '/help', icon: QuestionMarkCircleIcon },
   ];
 
   const links = user?.role === UserRole.EMPLOYER ? employerLinks : seekerLinks;
@@ -94,7 +94,7 @@ const Sidebar: React.FC = () => {
             className="flex items-center w-full px-4 py-2.5 text-sm font-medium rounded-lg text-gray-600 dark:text-gray-300 hover:bg-light dark:hover:bg-gray-700"
         >
             <ArrowLeftOnRectangleIcon className="h-5 w-5 mr-3" />
-            {t('sidebar.logout')}
+            Logout
         </button>
       </div>
     </aside>

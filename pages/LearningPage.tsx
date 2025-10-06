@@ -1,8 +1,10 @@
 
+
 import React from 'react';
 import { LEARNING_MODULES } from '../constants';
 import Card from '../components/ui/Card';
-import { Link } from 'react-router-dom';
+// FIX: Changed import to 'react-router' to resolve module export errors.
+import { Link } from 'react-router';
 import { PlayCircleIcon, DocumentTextIcon, ClockIcon } from '@heroicons/react/24/solid';
 
 const LearningPage: React.FC = () => {

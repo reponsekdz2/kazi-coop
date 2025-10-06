@@ -1,6 +1,8 @@
+
 import React from 'react';
-import { Link } from 'react-router-dom';
-import Button from '../components/ui/Button';
+// FIX: Changed import to 'react-router' to resolve module export errors.
+import { Link } from 'react-router';
+import Button from '../components/layout/Button';
 import Typewriter from '../components/ui/Typewriter';
 import { BriefcaseIcon, UserGroupIcon, WalletIcon } from '@heroicons/react/24/outline';
 import Card from '../components/ui/Card';

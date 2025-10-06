@@ -1,7 +1,7 @@
 
 import React from 'react';
 import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
+import Button from '../components/layout/Button';
 import { useInterviews } from '../contexts/InterviewContext';
 import { JOBS } from '../constants';
 

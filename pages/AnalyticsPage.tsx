@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import Card from '../components/ui/Card';
 import StatCard from '../components/ui/StatCard';
-import Button from '../components/ui/Button';
+import Button from '../components/layout/Button';
 import { ACTIVITY_LOG, USERS, cooperativeFinancialsData } from '../constants';
 import { 
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, 

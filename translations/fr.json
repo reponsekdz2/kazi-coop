@@ -282,5 +282,11 @@
         "title": "Notifications",
         "markAllRead": "Tout marquer comme lu",
         "noNotifications": "Vous n'avez aucune nouvelle notification."
+    },
+    "profile": {
+        "applicantProfileTitle": "Profil de {name}",
+        "skills": "Compétences",
+        "profileStrength": "Force du profil",
+        "viewFullProfile": "Voir le profil complet"
     }
 }

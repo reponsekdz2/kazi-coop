@@ -1,31 +1,26 @@
+
+
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
-import { PencilIcon, CheckBadgeIcon, UserCircleIcon, SunIcon, MoonIcon, GlobeAltIcon } from '@heroicons/react/24/solid';
-import RingProgress from '../components/ui/RingProgress';
+import Button from '../components/layout/Button';
+import { PencilIcon, CheckBadgeIcon, SunIcon, MoonIcon } from '@heroicons/react/24/solid';
+import RingProgress from '../components/layout/RingProgress';
 import { useAppContext } from '../contexts/AppContext';
 
 type SettingsTab = 'profile' | 'preferences';
 
-const languages: { [key: string]: string } = {
-  en: 'English',
-  fr: 'Français',
-  rw: 'Kinyarwanda',
-};
-
 const SettingsPage: React.FC = () => {
-  const { t } = useAppContext();
   const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
 
   const tabs: { id: SettingsTab; label: string }[] = [
-    { id: 'profile', label: t('settings.tabs.profile') },
-    { id: 'preferences', label: t('settings.tabs.preferences') },
+    { id: 'profile', label: 'My Profile' },
+    { id: 'preferences', label: 'Preferences' },
   ];
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-dark dark:text-light mb-6">{t('settings.title')}</h1>
+      <h1 className="text-3xl font-bold text-dark dark:text-light mb-6">Settings</h1>
       <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
         <nav className="-mb-px flex space-x-6">
           {tabs.map(tab => (
@@ -54,7 +49,6 @@ const SettingsPage: React.FC = () => {
 
 const ProfileTab: React.FC = () => {
     const { user } = useAuth();
-    const { t } = useAppContext();
     
     if (!user) return null;
 
@@ -67,41 +61,41 @@ const ProfileTab: React.FC = () => {
                     <img src={user.avatarUrl} alt={user.name} className="h-32 w-32 rounded-full mx-auto mb-4 border-4 border-primary" />
                     <h2 className="text-2xl font-bold text-dark dark:text-light">{user.name}</h2>
                     <p className="text-gray-500 dark:text-gray-400">{user.role}</p>
-                    <Button variant="secondary" className="mt-4 w-full">{t('settings.changePicture')}</Button>
+                    <Button variant="secondary" className="mt-4 w-full">Change Picture</Button>
                 </Card>
-                 <Card title={t('settings.profileStrength')}>
+                 <Card title="Profile Strength">
                     <div className="flex flex-col items-center">
                         <RingProgress percentage={Math.round((user.careerProgress || 0) / 5 * 100)} size={150} strokeWidth={12} />
-                        <p className="mt-4 text-gray-600 dark:text-gray-400 text-center">{t('settings.completeProfilePrompt')}</p>
-                        <Button variant="secondary" className="mt-4">{t('settings.completeProfileBtn')}</Button>
+                        <p className="mt-4 text-gray-600 dark:text-gray-400 text-center">A complete profile increases your visibility to top employers.</p>
+                        <Button variant="secondary" className="mt-4">Enhance Your Profile</Button>
                     </div>
                 </Card>
             </div>
             <div className="lg:col-span-2 space-y-6">
                 <Card>
                     <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-xl font-bold text-dark dark:text-light">{t('settings.personalInfo')}</h3>
+                    <h3 className="text-xl font-bold text-dark dark:text-light">Personal Information</h3>
                     <Button variant="secondary">
                         <PencilIcon className="h-4 w-4 mr-2 inline" />
-                        {t('settings.edit')}
+                        Edit
                     </Button>
                     </div>
                     <div className="space-y-4">
                         <div>
-                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('settings.fullName')}</label>
+                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Full Name</label>
                             <p className="text-dark dark:text-light font-semibold">{user.name}</p>
                         </div>
                         <div>
-                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('settings.email')}</label>
+                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Email Address</label>
                             <p className="text-dark dark:text-light font-semibold">{user.email}</p>
                         </div>
                          <div>
-                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('settings.password')}</label>
-                            <button className="text-primary text-sm font-semibold">{t('settings.changePassword')}</button>
+                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Password</label>
+                            <button className="text-primary text-sm font-semibold">Change Password</button>
                         </div>
                     </div>
                 </Card>
-                <Card title={t('settings.skills')}>
+                <Card title="My Skills">
                     <div className="flex flex-wrap gap-2">
                         {userSkills.map(skill => (
                             <div key={skill} className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold dark:bg-blue-900/50 dark:text-blue-300">
@@ -117,38 +111,22 @@ const ProfileTab: React.FC = () => {
 }
 
 const PreferencesTab: React.FC = () => {
-    const { t, theme, toggleTheme, language, changeLanguage } = useAppContext();
+    const { theme, toggleTheme } = useAppContext();
     return (
         <Card>
             <div className="max-w-md space-y-6">
                 <div>
-                    <h3 className="text-lg font-semibold text-dark dark:text-light">{t('settings.theme')}</h3>
+                    <h3 className="text-lg font-semibold text-dark dark:text-light">Appearance</h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">Choose how KaziCoop looks to you. Select a theme below.</p>
                     <div className="flex gap-4">
                         <button onClick={() => theme !== 'light' && toggleTheme()} className={`flex-1 p-4 rounded-lg border-2 ${theme === 'light' ? 'border-primary' : 'border-gray-300 dark:border-gray-600'}`}>
                             <SunIcon className="h-8 w-8 mx-auto mb-2 text-yellow-500"/>
-                            <span className="font-semibold">{t('settings.themeLight')}</span>
+                            <span className="font-semibold">Light</span>
                         </button>
                         <button onClick={() => theme !== 'dark' && toggleTheme()} className={`flex-1 p-4 rounded-lg border-2 ${theme === 'dark' ? 'border-primary' : 'border-gray-300 dark:border-gray-600'}`}>
                             <MoonIcon className="h-8 w-8 mx-auto mb-2 text-indigo-400"/>
-                            <span className="font-semibold">{t('settings.themeDark')}</span>
+                            <span className="font-semibold">Dark</span>
                         </button>
-                    </div>
-                </div>
-                 <div>
-                    <h3 className="text-lg font-semibold text-dark dark:text-light">{t('settings.language')}</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">Select your preferred language for the interface.</p>
-                     <div className="relative">
-                        <GlobeAltIcon className="h-5 w-5 text-gray-400 absolute top-1/2 left-3 -translate-y-1/2" />
-                        <select 
-                            value={language} 
-                            onChange={(e) => changeLanguage(e.target.value as 'en' | 'fr' | 'rw')}
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-dark focus:ring-2 focus:ring-primary focus:outline-none appearance-none"
-                        >
-                            {Object.entries(languages).map(([code, name]) => (
-                                <option key={code} value={code}>{name}</option>
-                            ))}
-                        </select>
                     </div>
                 </div>
             </div>

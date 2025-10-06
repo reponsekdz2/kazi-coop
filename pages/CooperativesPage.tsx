@@ -1,15 +1,16 @@
+
+
 import React, { useState, useMemo, useEffect } from 'react';
 import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
+import Button from '../components/layout/Button';
 import { useCooperatives } from '../contexts/CooperativeContext';
 import { Cooperative, User, Contribution, CooperativeLoan, RepaymentInstallment } from '../types';
 import { UserGroupIcon, Cog6ToothIcon, ArrowUpRightIcon, CheckIcon, XMarkIcon, CalendarDaysIcon, CurrencyDollarIcon, ChevronDownIcon, InformationCircleIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../contexts/AuthContext';
 import { UserRole } from '../types';
-import Modal from '../components/ui/Modal';
-import { useAppContext } from '../contexts/AppContext';
+import Modal from '../components/layout/Modal';
 import { USERS } from '../constants';
-import RingProgress from '../components/ui/RingProgress';
+import RingProgress from '../components/layout/RingProgress';
 import SeekerProfileModal from '../components/ui/SeekerProfileModal';
 
 type CooperativeTab = 'overview' | 'members' | 'management' | 'finance';
@@ -24,7 +25,6 @@ const loanStatusColors: { [key: string]: string } = {
 const CooperativesPage: React.FC = () => {
     const { user } = useAuth();
     const { cooperatives, createCooperative } = useCooperatives();
-    const { t } = useAppContext();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [selectedCoop, setSelectedCoop] = useState<Cooperative | null>(null);
     const [isLoanModalOpen, setIsLoanModalOpen] = useState(false);
@@ -45,13 +45,13 @@ const CooperativesPage: React.FC = () => {
             <div className="flex flex-col md:flex-row justify-between md:items-center mb-8 gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-dark dark:text-light mb-2">
-                        {isEmployer ? t('cooperatives.manageTitle') : t('cooperatives.pageTitle')}
+                        {isEmployer ? 'Cooperative Management' : 'Community Cooperatives (Ikimina)'}
                     </h1>
                     <p className="text-gray-500 dark:text-gray-400 max-w-2xl">
-                        {isEmployer ? t('cooperatives.manageSubtitle') : t('cooperatives.pageSubtitle')}
+                        {isEmployer ? 'Oversee your cooperatives or create a new one to empower your team and community.' : 'Join a savings group to build your financial future with the community. Save, borrow, and grow together.'}
                     </p>
                 </div>
-                {isEmployer && <Button onClick={() => setIsCreateModalOpen(true)}>{t('cooperatives.create')}</Button>}
+                {isEmployer && <Button onClick={() => setIsCreateModalOpen(true)}>Create Cooperative</Button>}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -66,7 +66,7 @@ const CooperativesPage: React.FC = () => {
 
             {cooperatives.length === 0 && isEmployer && (
                  <div className="text-center py-12">
-                    <p className="text-gray-500 dark:text-gray-400">{t('cooperatives.noCooperatives')}</p>
+                    <p className="text-gray-500 dark:text-gray-400">You have not created any cooperatives yet.</p>
                 </div>
             )}
             
@@ -96,7 +96,6 @@ const CooperativesPage: React.FC = () => {
 
 const CooperativeCard: React.FC<{coop: Cooperative, onViewDetails: () => void}> = ({ coop, onViewDetails }) => {
     const { user } = useAuth();
-    const { t } = useAppContext();
     const { requestToJoin } = useCooperatives();
     const isEmployer = user?.role === UserRole.EMPLOYER;
 
@@ -111,12 +110,12 @@ const CooperativeCard: React.FC<{coop: Cooperative, onViewDetails: () => void}> 
     const getJoinButtonState = (): { text: string; disabled: boolean; } => {
         if (!user || isEmployer) return { text: '', disabled: true };
         if (coop.members.includes(user.id)) {
-            return { text: t('cooperatives.alreadyMember'), disabled: true };
+            return { text: "You're a Member", disabled: true };
         }
         if (coop.joinRequests.includes(user.id)) {
-            return { text: t('cooperatives.requestPending'), disabled: true };
+            return { text: 'Request Pending', disabled: true };
         }
-        return { text: t('cooperatives.requestJoin'), disabled: false };
+        return { text: 'Request to Join', disabled: false };
     }
     
     const joinButtonState = getJoinButtonState();
@@ -134,7 +133,7 @@ const CooperativeCard: React.FC<{coop: Cooperative, onViewDetails: () => void}> 
 
                     <div>
                         <div className="flex justify-between items-baseline">
-                            <span className="font-semibold text-gray-700 dark:text-gray-300">{t('cooperatives.savingsPool')}</span>
+                            <span className="font-semibold text-gray-700 dark:text-gray-300">Total Savings Pool</span>
                             <span className="font-bold text-dark dark:text-light">RWF {coop.totalSavings.toLocaleString()}</span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 mt-1">
@@ -145,8 +144,8 @@ const CooperativeCard: React.FC<{coop: Cooperative, onViewDetails: () => void}> 
                             ></div>
                         </div>
                         <div className="flex justify-between items-baseline text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            <span>{t('cooperatives.loaned')}: RWF {coop.totalLoans.toLocaleString()}</span>
-                            <span>{loanPercentage}% {t('cooperatives.used')}</span>
+                            <span>Loaned Out: RWF {coop.totalLoans.toLocaleString()}</span>
+                            <span>{loanPercentage}% Utilized</span>
                         </div>
                     </div>
 
@@ -158,7 +157,7 @@ const CooperativeCard: React.FC<{coop: Cooperative, onViewDetails: () => void}> 
             </div>
             <div className="mt-6 flex gap-2">
                 <Button variant="secondary" onClick={onViewDetails} className="flex-1">
-                    {isEmployer ? t('cooperatives.manageBtn') : t('cooperatives.viewDetails')}
+                    {isEmployer ? 'Manage' : 'View Details'}
                 </Button>
                 {!isEmployer && <Button onClick={() => handleJoinClick(coop)} disabled={joinButtonState.disabled} className="flex-1">{joinButtonState.text}</Button>}
             </div>
@@ -168,21 +167,20 @@ const CooperativeCard: React.FC<{coop: Cooperative, onViewDetails: () => void}> 
 
 const CooperativeDetailsModal: React.FC<{ isOpen: boolean; onClose: () => void; cooperative: Cooperative; onRequestLoan: () => void; }> = ({ isOpen, onClose, cooperative, onRequestLoan }) => {
     const { user } = useAuth();
-    const { t } = useAppContext();
     const [activeTab, setActiveTab] = useState<CooperativeTab>('overview');
     
     const isCreator = user?.id === cooperative.creatorId;
     const isMember = user ? cooperative.members.includes(user.id) : false;
 
     const tabs: {id: CooperativeTab, label: string}[] = [
-        { id: 'overview', label: t('cooperatives.tabs.overview') },
-        { id: 'members', label: t('cooperatives.tabs.members') },
+        { id: 'overview', label: 'Overview' },
+        { id: 'members', label: 'Members' },
     ];
     if (isMember) {
-        tabs.push({ id: 'finance', label: t('cooperatives.tabs.finance') });
+        tabs.push({ id: 'finance', label: 'My Finances' });
     }
     if (isCreator) {
-        tabs.push({ id: 'management', label: t('cooperatives.tabs.management') });
+        tabs.push({ id: 'management', label: 'Management' });
     }
 
     return (
@@ -213,9 +211,10 @@ const CooperativeDetailsModal: React.FC<{ isOpen: boolean; onClose: () => void; 
 }
 
 const OverviewTab: React.FC<{ cooperative: Cooperative }> = ({ cooperative }) => {
-    const { t } = useAppContext();
+    // FIX: Changed 'coop' to 'cooperative' to match the prop name.
     const loanPoolPercentage = cooperative.totalSavings > 0 ? Math.round((cooperative.totalLoans / cooperative.totalSavings) * 100) : 0;
     const communityGoal = 20000000; // Example goal
+    // FIX: Changed 'coop' to 'cooperative' to match the prop name.
     const goalProgressPercentage = Math.min(Math.round((cooperative.totalSavings / communityGoal) * 100), 100);
     const availableForLoan = cooperative.totalSavings - cooperative.totalLoans;
 
@@ -226,12 +225,12 @@ const OverviewTab: React.FC<{ cooperative: Cooperative }> = ({ cooperative }) =>
                 {/* Modern Card for Total Savings & Goal */}
                 <Card className="flex flex-col justify-between">
                     <div>
-                        <h4 className="font-semibold text-gray-500 dark:text-gray-400">{t('dashboard.totalSavings')}</h4>
+                        <h4 className="font-semibold text-gray-500 dark:text-gray-400">Cooperative Savings</h4>
                         <p className="text-4xl font-bold text-dark dark:text-light mt-2">RWF {cooperative.totalSavings.toLocaleString()}</p>
                     </div>
                     <div className="mt-4">
                         <div className="flex justify-between text-sm font-medium text-gray-600 dark:text-gray-300">
-                           <span>{t('cooperatives.goalProgress')}</span>
+                           <span>Community Savings Goal</span>
                            <span>{goalProgressPercentage}%</span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 mt-1">
@@ -244,14 +243,14 @@ const OverviewTab: React.FC<{ cooperative: Cooperative }> = ({ cooperative }) =>
                 {/* Modern Card for Loan Pool */}
                 <Card className="flex flex-col justify-between">
                      <div>
-                        <h4 className="font-semibold text-gray-500 dark:text-gray-400">{t('cooperatives.loanPool')}</h4>
+                        <h4 className="font-semibold text-gray-500 dark:text-gray-400">Loan Pool</h4>
                         <p className="text-4xl font-bold text-dark dark:text-light mt-2">RWF {cooperative.totalLoans.toLocaleString()}</p>
-                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('cooperatives.disbursed')}</p>
+                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Disbursed</p>
                     </div>
                     <div className="mt-4 flex items-center justify-between gap-4">
                         <div className="flex-1">
                              <h5 className="text-sm font-semibold text-dark dark:text-light">RWF {availableForLoan.toLocaleString()}</h5>
-                             <p className="text-xs text-gray-400">{t('cooperatives.availableForLoan')}</p>
+                             <p className="text-xs text-gray-400">Available for Loan</p>
                         </div>
                         <RingProgress percentage={loanPoolPercentage} size={70} strokeWidth={7} progressColorClassName="text-yellow-500"/>
                     </div>
@@ -282,7 +281,6 @@ const MembersTab: React.FC<{ cooperative: Cooperative }> = ({ cooperative }) => 
 }
 
 const FinanceTab: React.FC<{ cooperative: Cooperative, onRequestLoan: () => void }> = ({ cooperative, onRequestLoan }) => {
-    const { t } = useAppContext();
     const { makeContribution } = useCooperatives();
     const { user } = useAuth();
     const myLoans = user ? cooperative.loans.filter(l => l.userId === user.id) : [];
@@ -324,16 +322,16 @@ const FinanceTab: React.FC<{ cooperative: Cooperative, onRequestLoan: () => void
                 <div className="p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/30 flex items-start gap-4">
                     <InformationCircleIcon className="h-6 w-6 text-yellow-500 flex-shrink-0 mt-0.5" />
                     <div>
-                        <h4 className="font-bold text-yellow-800 dark:text-yellow-200">{t('cooperatives.contributionDueTitle')}</h4>
+                        <h4 className="font-bold text-yellow-800 dark:text-yellow-200">Contribution Due</h4>
                         <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
-                           {t('cooperatives.contributionDueText').replace('{amount}', cooperative.contributionSettings.amount.toLocaleString())}
+                           {`Your regular contribution of RWF ${cooperative.contributionSettings.amount.toLocaleString()} is due. Please make a payment to stay on track.`}
                         </p>
-                         <Button onClick={handleContribute} className="!mt-3 !py-1 !px-3 !text-sm">{t('cooperatives.contributeNow')}</Button>
+                         <Button onClick={handleContribute} className="!mt-3 !py-1 !px-3 !text-sm">Contribute Now</Button>
                     </div>
                 </div>
             )}
              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                 <Card title={t('cooperatives.contributionSettings')}>
+                 <Card title="Contribution Settings">
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
                             <span className="font-medium text-gray-600 dark:text-gray-300">Amount</span>
@@ -344,15 +342,15 @@ const FinanceTab: React.FC<{ cooperative: Cooperative, onRequestLoan: () => void
                             <span className="font-bold text-dark dark:text-light">{cooperative.contributionSettings.frequency}</span>
                         </div>
                          <div className="flex items-center justify-between">
-                            <span className="font-medium text-gray-600 dark:text-gray-300">{t('cooperatives.nextContribution')}</span>
+                            <span className="font-medium text-gray-600 dark:text-gray-300">Next Contribution Due</span>
                             <span className="font-bold text-dark dark:text-light">{nextDueDate.toLocaleDateString()}</span>
                         </div>
                         <Button onClick={handleContribute} className="w-full !mt-6">
-                            {t('cooperatives.makeContribution')} (RWF {cooperative.contributionSettings.amount.toLocaleString()})
+                            {`Make Contribution (RWF ${cooperative.contributionSettings.amount.toLocaleString()})`}
                         </Button>
                     </div>
                 </Card>
-                <Card title={t('cooperatives.contributionHistory')}>
+                <Card title="Contribution History">
                     <div className="space-y-3 max-h-60 overflow-y-auto">
                         {cooperative.contributions.length > 0 ? cooperative.contributions.map((c, i) => {
                             const contributor = USERS.find(u => u.id === c.userId);
@@ -368,11 +366,11 @@ const FinanceTab: React.FC<{ cooperative: Cooperative, onRequestLoan: () => void
                                     </div>
                                 </div>
                             )
-                        }) : <p className="text-center text-gray-500 py-8">{t('cooperatives.noContributions')}</p>}
+                        }) : <p className="text-center text-gray-500 py-8">No contributions have been made yet.</p>}
                     </div>
                 </Card>
             </div>
-             <Card title={t('cooperatives.myLoans')}>
+             <Card title="My Loans">
                 <div className="space-y-3 max-h-[400px] overflow-y-auto">
                     {myLoans.length > 0 ? myLoans.map(loan => (
                         <div key={loan.id} className="p-3 rounded-lg bg-light dark:bg-gray-700/50">
@@ -401,11 +399,11 @@ const FinanceTab: React.FC<{ cooperative: Cooperative, onRequestLoan: () => void
                             )}
                         </div>
                     )) : (
-                        <p className="text-center text-gray-500 dark:text-gray-400 py-4">{t('cooperatives.noActiveLoans')}</p>
+                        <p className="text-center text-gray-500 dark:text-gray-400 py-4">You have no active or pending loans with this cooperative.</p>
                     )}
                 </div>
                 <Button onClick={onRequestLoan} className="w-full !mt-6">
-                    {t('cooperatives.requestLoan')}
+                    Apply for a Loan
                 </Button>
             </Card>
         </div>
@@ -413,25 +411,24 @@ const FinanceTab: React.FC<{ cooperative: Cooperative, onRequestLoan: () => void
 };
 
 const RepaymentScheduleTable: React.FC<{ schedule: RepaymentInstallment[], cooperativeId: string, loanId: string }> = ({ schedule, cooperativeId, loanId }) => {
-    const { t } = useAppContext();
     const { makeLoanRepayment } = useCooperatives();
 
     return (
         <div className="mt-4 border-t pt-3 dark:border-gray-600">
-            <h4 className="font-semibold text-sm mb-2 text-dark dark:text-light">{t('cooperatives.repaymentSchedule')}</h4>
+            <h4 className="font-semibold text-sm mb-2 text-dark dark:text-light">Repayment Schedule</h4>
             <table className="w-full text-sm text-left">
                 <thead className="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-800 dark:text-gray-400">
                     <tr>
-                        <th className="px-4 py-2">{t('cooperatives.dueDate')}</th>
-                        <th className="px-4 py-2">{t('wallet.loans.amount')}</th>
-                        <th className="px-4 py-2">{t('cooperatives.status')}</th>
+                        <th className="px-4 py-2">Due Date</th>
+                        <th className="px-4 py-2">Amount</th>
+                        <th className="px-4 py-2">Status</th>
                         <th className="px-4 py-2"></th>
                     </tr>
                 </thead>
                 <tbody>
                     {schedule.map((item) => {
                         const isOverdue = item.status === 'pending' && new Date() > new Date(item.dueDate);
-                        const statusText = isOverdue ? t('cooperatives.overdue') : t(`cooperatives.${item.status}`);
+                        const statusText = isOverdue ? 'Overdue' : item.status;
                         
                         let statusClasses = 'dark:bg-gray-900/50';
                         if (isOverdue) {
@@ -465,7 +462,6 @@ const RepaymentScheduleTable: React.FC<{ schedule: RepaymentInstallment[], coope
 
 
 const ManagementTab: React.FC<{ cooperative: Cooperative }> = ({ cooperative }) => {
-    const { t } = useAppContext();
     const { approveJoinRequest, denyJoinRequest, approveLoan, rejectLoan } = useCooperatives();
     const pendingRequests = USERS.filter(u => cooperative.joinRequests.includes(u.id));
     const pendingLoans = cooperative.loans.filter(l => l.status === 'Pending');
@@ -478,10 +474,10 @@ const ManagementTab: React.FC<{ cooperative: Cooperative }> = ({ cooperative }) 
         <div className="space-y-6">
             <Card>
                 <div className="flex justify-between items-center mb-4">
-                    <h4 className="font-bold text-lg text-dark dark:text-light">{t('cooperatives.pendingRequests')} ({pendingRequests.length})</h4>
+                    <h4 className="font-bold text-lg text-dark dark:text-light">{`Pending Join Requests (${pendingRequests.length})`}</h4>
                     <Button variant="secondary" onClick={() => setIsSettingsOpen(true)}>
                         <Cog6ToothIcon className="h-5 w-5 mr-2 inline"/>
-                        {t('cooperatives.settings')}
+                        Cooperative Settings
                     </Button>
                 </div>
                 <div className="space-y-3 max-h-96 overflow-y-auto">
@@ -492,7 +488,7 @@ const ManagementTab: React.FC<{ cooperative: Cooperative }> = ({ cooperative }) 
                                 <p className="font-bold text-dark dark:text-light">{requestUser.name}</p>
                             </div>
                             <div className="flex gap-2">
-                                <Button variant="secondary" onClick={() => setViewingUser(requestUser)}>{t('jobs.viewProfile')}</Button>
+                                <Button variant="secondary" onClick={() => setViewingUser(requestUser)}>Profile</Button>
                                 <Button onClick={() => approveJoinRequest(cooperative.id, requestUser.id)} className="!p-2">
                                     <CheckIcon className="h-5 w-5"/>
                                 </Button>
@@ -502,12 +498,12 @@ const ManagementTab: React.FC<{ cooperative: Cooperative }> = ({ cooperative }) 
                             </div>
                         </div>
                     )) : (
-                        <p className="text-gray-500 dark:text-gray-400 text-center py-4">{t('cooperatives.noPendingRequests')}</p>
+                        <p className="text-gray-500 dark:text-gray-400 text-center py-4">There are no pending join requests.</p>
                     )}
                 </div>
             </Card>
              <Card>
-                <h4 className="font-bold text-lg text-dark dark:text-light mb-4">{t('cooperatives.loanRequests')} ({pendingLoans.length})</h4>
+                <h4 className="font-bold text-lg text-dark dark:text-light mb-4">{`Loan Requests (${pendingLoans.length})`}</h4>
                  <div className="space-y-3 max-h-96 overflow-y-auto">
                     {pendingLoans.length > 0 ? pendingLoans.map(loan => {
                         const loanUser = USERS.find(u => u.id === loan.userId);
@@ -524,19 +520,19 @@ const ManagementTab: React.FC<{ cooperative: Cooperative }> = ({ cooperative }) 
                                 </div>
                                 <div className="flex flex-col items-end gap-2">
                                      <div className="flex gap-2">
-                                        <Button onClick={() => approveLoan(cooperative.id, loan.id)} className="!p-2" disabled={!canAfford} title={canAfford ? 'Approve' : t('cooperatives.insufficientFunds')}>
+                                        <Button onClick={() => approveLoan(cooperative.id, loan.id)} className="!p-2" disabled={!canAfford} title={canAfford ? 'Approve' : 'Insufficient funds to approve.'}>
                                             <CheckIcon className="h-5 w-5"/>
                                         </Button>
                                         <Button onClick={() => rejectLoan(cooperative.id, loan.id)} variant="danger" className="!p-2" title="Reject">
                                             <XMarkIcon className="h-5 w-5"/>
                                         </Button>
                                     </div>
-                                    {!canAfford && <p className="text-xs text-red-500">{t('cooperatives.insufficientFunds')}</p>}
+                                    {!canAfford && <p className="text-xs text-red-500">Insufficient funds to approve.</p>}
                                 </div>
                             </div>
                         )
                     }) : (
-                         <p className="text-gray-500 dark:text-gray-400 text-center py-4">{t('cooperatives.noLoanRequests')}</p>
+                         <p className="text-gray-500 dark:text-gray-400 text-center py-4">There are no pending loan requests.</p>
                     )}
                 </div>
             </Card>
@@ -564,7 +560,6 @@ const NewCooperativeModal: React.FC<{
     onClose: () => void; 
     onCreate: (details: Omit<Cooperative, 'id' | 'creatorId' | 'members' | 'joinRequests' | 'totalSavings' | 'totalLoans' | 'contributions'|'loans' | 'loanSettings'>) => void;
 }> = ({ isOpen, onClose, onCreate }) => {
-    const { t } = useAppContext();
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -594,30 +589,30 @@ const NewCooperativeModal: React.FC<{
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={t('cooperatives.createModalTitle')}>
+        <Modal isOpen={isOpen} onClose={onClose} title="Create a New Cooperative">
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('cooperatives.name')}</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cooperative Name</label>
                     <input type="text" name="name" value={formData.name} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"/>
                 </div>
                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('cooperatives.description')}</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
                     <textarea name="description" value={formData.description} onChange={handleChange} required rows={3} className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"></textarea>
                 </div>
                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('cooperatives.contributionAmount')}</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contribution Amount (RWF)</label>
                     <input type="number" name="amount" value={formData.contributionSettings.amount} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"/>
                 </div>
                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('cooperatives.contributionFrequency')}</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contribution Frequency</label>
                     <select name="frequency" value={formData.contributionSettings.frequency} onChange={handleChange} className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
                         <option>Monthly</option>
                         <option>Weekly</option>
                     </select>
                 </div>
                 <div className="flex justify-end gap-2 pt-4">
-                    <Button type="button" variant="secondary" onClick={onClose}>{t('common.cancel')}</Button>
-                    <Button type="submit">{t('cooperatives.create')}</Button>
+                    <Button type="button" variant="secondary" onClick={onClose}>Cancel</Button>
+                    <Button type="submit">Create Cooperative</Button>
                 </div>
             </form>
         </Modal>
@@ -625,7 +620,6 @@ const NewCooperativeModal: React.FC<{
 };
 
 const RequestLoanModal: React.FC<{ isOpen: boolean, onClose: () => void, cooperative: Cooperative }> = ({ isOpen, onClose, cooperative }) => {
-    const { t } = useAppContext();
     const { applyForLoan } = useCooperatives();
     const [amount, setAmount] = useState(0);
     const [purpose, setPurpose] = useState('');
@@ -663,15 +657,15 @@ const RequestLoanModal: React.FC<{ isOpen: boolean, onClose: () => void, coopera
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={t('cooperatives.requestLoanModalTitle').replace('{coopName}', cooperative.name)}>
+        <Modal isOpen={isOpen} onClose={onClose} title={`Request a Loan from ${cooperative.name}`}>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg text-center">
                     <p className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                        {t('cooperatives.availableFunds').replace('{amount}', availableForLoan.toLocaleString())}
+                        {`Available Funds for Loan: RWF ${availableForLoan.toLocaleString()}`}
                     </p>
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('cooperatives.loanAmount')}</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Loan Amount (RWF)</label>
                     <input 
                         type="number" 
                         value={amount || ''} 
@@ -682,7 +676,7 @@ const RequestLoanModal: React.FC<{ isOpen: boolean, onClose: () => void, coopera
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('cooperatives.repaymentPeriod')}</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Repayment Period (Months)</label>
                     <select value={repaymentPeriod} onChange={e => setRepaymentPeriod(parseInt(e.target.value))} className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
                         <option value={3}>3 Months</option>
                         <option value={6}>6 Months</option>
@@ -692,7 +686,7 @@ const RequestLoanModal: React.FC<{ isOpen: boolean, onClose: () => void, coopera
                     </select>
                 </div>
                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('cooperatives.loanPurpose')}</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Purpose of Loan</label>
                     <input 
                         type="text" 
                         value={purpose} 
@@ -703,29 +697,29 @@ const RequestLoanModal: React.FC<{ isOpen: boolean, onClose: () => void, coopera
                     />
                 </div>
                 <Card className="!p-4 bg-light dark:bg-gray-700/50">
-                     <h4 className="font-semibold text-sm text-dark dark:text-light mb-2">{t('cooperatives.loanTerms')}</h4>
+                     <h4 className="font-semibold text-sm text-dark dark:text-light mb-2">Estimated Loan Terms</h4>
                      <div className="text-sm space-y-2">
                         <div className="flex justify-between">
-                            <span className="text-gray-500 dark:text-gray-400">{t('cooperatives.interestRate')}</span>
-                            <span className="font-medium text-dark dark:text-light">{cooperative.loanSettings.interestRate}% ({t('cooperatives.annual')})</span>
+                            <span className="text-gray-500 dark:text-gray-400">Annual Interest Rate</span>
+                            <span className="font-medium text-dark dark:text-light">{cooperative.loanSettings.interestRate}% (annual)</span>
                         </div>
                          <div className="flex justify-between">
-                            <span className="text-gray-500 dark:text-gray-400">{t('cooperatives.totalInterest')}</span>
+                            <span className="text-gray-500 dark:text-gray-400">Estimated Total Interest</span>
                             <span className="font-medium text-dark dark:text-light">RWF {Math.round(totalInterest).toLocaleString()}</span>
                         </div>
                          <div className="flex justify-between">
-                            <span className="text-gray-500 dark:text-gray-400">{t('cooperatives.totalRepayment')}</span>
+                            <span className="text-gray-500 dark:text-gray-400">Estimated Total Repayment</span>
                             <span className="font-medium text-dark dark:text-light">RWF {Math.round(totalRepayment).toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between border-t dark:border-gray-600 pt-2 mt-2">
-                            <span className="text-gray-500 dark:text-gray-400">{t('cooperatives.estimatedPayment')}</span>
+                            <span className="text-gray-500 dark:text-gray-400">Estimated Monthly Payment</span>
                             <span className="font-bold text-primary">RWF {Math.round(estimatedPayment).toLocaleString()} / mo.</span>
                         </div>
                      </div>
                 </Card>
                 <div className="flex justify-end gap-2 pt-4">
-                    <Button type="button" variant="secondary" onClick={onClose}>{t('common.cancel')}</Button>
-                    <Button type="submit" disabled={amount <= 0 || amount > availableForLoan || !purpose}>{t('common.submit')}</Button>
+                    <Button type="button" variant="secondary" onClick={onClose}>Cancel</Button>
+                    <Button type="submit" disabled={amount <= 0 || amount > availableForLoan || !purpose}>Submit</Button>
                 </div>
             </form>
         </Modal>
@@ -733,7 +727,6 @@ const RequestLoanModal: React.FC<{ isOpen: boolean, onClose: () => void, coopera
 };
 
 const CooperativeSettingsModal: React.FC<{ isOpen: boolean, onClose: () => void, cooperative: Cooperative }> = ({ isOpen, onClose, cooperative }) => {
-    const { t } = useAppContext();
     const { updateCooperativeSettings } = useCooperatives();
     const [formData, setFormData] = useState({
         name: cooperative.name,
@@ -766,16 +759,16 @@ const CooperativeSettingsModal: React.FC<{ isOpen: boolean, onClose: () => void,
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={t('cooperatives.settings')}>
+        <Modal isOpen={isOpen} onClose={onClose} title="Cooperative Settings">
              <form onSubmit={handleSubmit} className="space-y-6">
                 <Card>
                     <h4 className="font-bold text-lg mb-3">General</h4>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('cooperatives.name')}</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cooperative Name</label>
                         <input type="text" name="name" value={formData.name} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"/>
                     </div>
                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('cooperatives.description')}</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
                         <textarea name="description" value={formData.description} onChange={handleChange} required rows={2} className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"></textarea>
                     </div>
                 </Card>
@@ -784,11 +777,11 @@ const CooperativeSettingsModal: React.FC<{ isOpen: boolean, onClose: () => void,
                     <Card>
                         <h4 className="font-bold text-lg mb-3">Contributions</h4>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('cooperatives.contributionAmount')}</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contribution Amount (RWF)</label>
                             <input type="number" name="contributionSettings.amount" value={formData.contributionSettings.amount} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"/>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('cooperatives.contributionFrequency')}</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contribution Frequency</label>
                             <select name="contributionSettings.frequency" value={formData.contributionSettings.frequency} onChange={handleChange} className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600">
                                 <option value="Monthly">Monthly</option>
                                 <option value="Weekly">Weekly</option>
@@ -798,14 +791,14 @@ const CooperativeSettingsModal: React.FC<{ isOpen: boolean, onClose: () => void,
                     <Card>
                          <h4 className="font-bold text-lg mb-3">Loans</h4>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('cooperatives.interestRate')} (%)</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Annual Interest Rate (%)</label>
                             <input type="number" name="loanSettings.interestRate" value={formData.loanSettings.interestRate} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"/>
                         </div>
                     </Card>
                 </div>
                  <div className="flex justify-end gap-2 pt-4">
-                    <Button type="button" variant="secondary" onClick={onClose}>{t('common.cancel')}</Button>
-                    <Button type="submit">{t('common.save')}</Button>
+                    <Button type="button" variant="secondary" onClick={onClose}>Cancel</Button>
+                    <Button type="submit">Save Changes</Button>
                 </div>
             </form>
         </Modal>

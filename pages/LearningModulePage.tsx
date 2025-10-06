@@ -1,5 +1,7 @@
+
 import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+// FIX: Changed import to 'react-router' to resolve module export errors.
+import { useParams, Link } from 'react-router';
 import { LEARNING_MODULES } from '../constants';
 import Card from '../components/ui/Card';
 import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid';

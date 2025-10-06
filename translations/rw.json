@@ -282,5 +282,11 @@
         "title": "Imenyesha",
         "markAllRead": "Soma byose",
         "noNotifications": "Nta menyesha mashya ufite."
+    },
+    "profile": {
+        "applicantProfileTitle": "Umwirondoro wa {name}",
+        "skills": "Ubumenyi",
+        "profileStrength": "Imbaraga z'umwirondoro",
+        "viewFullProfile": "Reba umwirondoro wose"
     }
 }
