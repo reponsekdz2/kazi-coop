@@ -21,7 +21,8 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({ isOpen, o
 
   if (!applicant) return null;
 
-  const applicantInfo = application.applicantInfo || {};
+  // FIX: Removed `|| {}` as `applicantInfo` is not optional on Application type, fixing type errors.
+  const applicantInfo = application.applicantInfo;
   const userSkills = applicant.skills || [];
 
   const handleStatusUpdate = (status: Application['status']) => {

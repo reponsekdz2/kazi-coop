@@ -4,7 +4,8 @@ import Card from '../ui/Card';
 interface FinancialMetricCardProps {
   title: string;
   value: string;
-  change: string;
+  // FIX: Made the `change` prop optional to allow for cards without a trend value.
+  change?: string;
   isPositive: boolean;
   icon?: React.ElementType;
 }

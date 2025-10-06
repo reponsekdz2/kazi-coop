@@ -1,11 +1,10 @@
-// FIX: Created JobsPage.tsx to resolve module not found error.
 import React, { useState, useMemo } from 'react';
 import Card from '../components/ui/Card';
 import Button from '../components/layout/Button';
 import { useJobs } from '../contexts/JobContext';
 import { useAuth } from '../contexts/AuthContext';
 import { UserRole, Job, Application, Company, User } from '../types';
-import { BriefcaseIcon, MapPinIcon, ClockIcon, BookmarkIcon, PlusIcon, PencilIcon, TrashIcon, ChevronDownIcon, CheckCircleIcon, XCircleIcon, EnvelopeIcon } from '@heroicons/react/24/solid';
+import { BriefcaseIcon, MapPinIcon, ClockIcon, BookmarkIcon, PlusIcon, PencilIcon, TrashIcon, ChevronDownIcon, CheckCircleIcon, XCircleIcon, EnvelopeIcon, StarIcon, UsersIcon, BanknotesIcon } from '@heroicons/react/24/solid';
 import { useApplications } from '../contexts/ApplicationContext';
 import { USERS, COMPANIES } from '../constants';
 import NewJobModal from '../components/ui/NewJobModal';
@@ -35,7 +34,6 @@ const NewJobButton: React.FC = () => {
     const { createJob } = useJobs();
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // FIX: Updated handleSave to correctly pass jobData with companyId from the modal.
     const handleSave = (jobData: Omit<Job, 'id' | 'employerId' | 'isSaved'>) => {
         createJob(jobData);
     }
@@ -189,24 +187,24 @@ const EmployerJobsView: React.FC = () => {
     const [editingJob, setEditingJob] = useState<Job | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     
-    // FIX: Updated handleSave to correctly pass jobData with companyId from the modal.
     const handleSave = (jobData: Omit<Job, 'id' | 'employerId' | 'isSaved'>) => {
         if (editingJob) {
             updateJob(editingJob.id, jobData);
         }
     };
     
-    const jobsWithCompany = useMemo(() => {
+    const jobsWithDetails = useMemo(() => {
         return jobs.map(job => {
             const company = COMPANIES.find(c => c.id === job.companyId);
-            return { ...job, companyName: company?.name || 'Unknown Company' };
+            const employer = USERS.find(u => u.id === job.employerId);
+            return { ...job, companyName: company?.name || 'Unknown', employer };
         });
     }, [jobs]);
 
 
     return (
-        <div className="space-y-4">
-            {jobsWithCompany.map(job => {
+        <div className="space-y-6">
+            {jobsWithDetails.map(job => {
                 const jobApps = applications.filter(app => app.jobId === job.id);
                 return (
                     <JobPostingCard 
@@ -230,7 +228,7 @@ const EmployerJobsView: React.FC = () => {
 
 
 const JobPostingCard: React.FC<{
-    job: Job & { companyName: string };
+    job: Job & { companyName: string, employer: User | undefined };
     applications: Application[];
     onEdit: () => void;
     onStatusChange: (status: Job['status']) => void;
@@ -244,29 +242,60 @@ const JobPostingCard: React.FC<{
         setIsApplicantModalOpen(true);
     };
 
+    const RatingStars = ({ rating = 0 }) => (
+        <div className="flex items-center">
+            {[...Array(5)].map((_, i) => (
+                <StarIcon key={i} className={`h-4 w-4 ${i < rating ? 'text-yellow-400' : 'text-gray-300'}`} />
+            ))}
+        </div>
+    );
+
     return (
-        <Card>
-            <div className="flex justify-between items-center">
-                <div>
-                    <h3 className="text-xl font-bold text-dark dark:text-light">{job.title}</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{applications.length} applicant(s)</p>
+        <Card className="!p-0 overflow-hidden">
+            <div 
+                className="h-32 bg-cover bg-center relative"
+                style={{ backgroundImage: `url(${job.imageUrl || 'https://placehold.co/600x400'})` }}
+            >
+                <div className="absolute inset-0 bg-black/50 p-4 flex flex-col justify-between">
+                    <div className="flex justify-between items-start">
+                        <div className="flex items-center gap-2">
+                            <img src={job.employer?.avatarUrl} alt={job.employer?.name} className="h-10 w-10 rounded-full border-2 border-white" />
+                            <div>
+                                <p className="font-bold text-white">{job.companyName}</p>
+                                <p className="text-xs text-gray-200">Posted by {job.employer?.name}</p>
+                            </div>
+                        </div>
+                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${job.status === 'Open' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{job.status}</span>
+                    </div>
                 </div>
-                <div className="flex items-center gap-2">
-                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${job.status === 'Open' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{job.status}</span>
-                    <Button variant="secondary" onClick={onEdit}><PencilIcon className="h-4 w-4"/></Button>
-                    <Button variant="danger"><TrashIcon className="h-4 w-4"/></Button>
-                    {applications.length > 0 && <Button variant="secondary" onClick={() => setExpanded(!expanded)}><ChevronDownIcon className={`h-4 w-4 transition-transform ${expanded ? 'rotate-180' : ''}`}/></Button>}
+            </div>
+            <div className="p-4">
+                <h3 className="text-xl font-bold text-dark dark:text-light">{job.title}</h3>
+                <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 my-2">
+                    <span className="flex items-center gap-1"><BanknotesIcon className="h-4 w-4"/> RWF {job.salary?.toLocaleString()}</span>
+                    <span className="flex items-center gap-1"><UsersIcon className="h-4 w-4"/> {job.workersNeeded} needed</span>
+                    <RatingStars rating={job.rating} />
+                </div>
+                 <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">{job.description}</p>
+                <div className="flex justify-between items-center">
+                    <div className="text-sm font-semibold text-dark dark:text-light">
+                        {applications.length} Applicant(s)
+                    </div>
+                    <div className="flex items-center gap-2">
+                        {applications.length > 0 && <Button variant="primary" onClick={() => setExpanded(!expanded)}>View Applicants</Button>}
+                        <Button variant="secondary" onClick={onEdit}><PencilIcon className="h-4 w-4"/></Button>
+                    </div>
                 </div>
             </div>
             {expanded && (
-                 <div className="mt-4 border-t pt-4 dark:border-gray-700">
+                 <div className="p-4 border-t dark:border-gray-700 bg-light dark:bg-dark">
                      <h4 className="font-semibold mb-2 text-dark dark:text-light">Applicants</h4>
-                     <div className="space-y-2">
+                     <div className="space-y-2 max-h-60 overflow-y-auto">
                          {applications.map(app => {
                             const applicant = USERS.find(u => u.id === app.userId);
                             if (!applicant) return null;
                             return (
-                                <div key={app.id} className="flex items-center justify-between p-2 bg-light dark:bg-gray-700/50 rounded-md">
+                                <div key={app.id} className="flex items-center justify-between p-2 bg-white dark:bg-gray-700/50 rounded-md">
                                     <div className="flex items-center gap-3">
                                         <img src={applicant.avatarUrl} alt={applicant.name} className="h-10 w-10 rounded-full" />
                                         <div>
@@ -274,9 +303,7 @@ const JobPostingCard: React.FC<{
                                             <p className="text-sm text-gray-500 dark:text-gray-400">{app.status}</p>
                                         </div>
                                     </div>
-                                    <div className="flex gap-2">
-                                        <Button onClick={() => handleViewApplicant(app)}>View Details</Button>
-                                    </div>
+                                    <Button onClick={() => handleViewApplicant(app)}>View Details</Button>
                                 </div>
                             )
                          })}

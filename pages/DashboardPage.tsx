@@ -1,7 +1,3 @@
-
-
-
-
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Application, UserRole } from '../types';
@@ -9,9 +5,9 @@ import Card from '../components/ui/Card';
 import StatCard from '../components/ui/StatCard';
 import Button from '../components/layout/Button';
 import CareerProgressTracker from '../components/ui/CareerProgressTracker';
-// FIX: Property 'company' does not exist on type 'Job'. Use companyId to find company name from COMPANIES.
 import { APPLICATIONS, JOBS, USERS, INTERVIEWS, COMPANIES } from '../constants';
-import { ArrowTrendingUpIcon, BanknotesIcon, BriefcaseIcon, CalendarDaysIcon, UserGroupIcon, UserPlusIcon, WalletIcon, AcademicCapIcon } from '@heroicons/react/24/outline';
+// FIX: Imported PlusIcon to resolve 'Cannot find name' error.
+import { ArrowTrendingUpIcon, BanknotesIcon, BriefcaseIcon, CalendarDaysIcon, UserGroupIcon, UserPlusIcon, WalletIcon, AcademicCapIcon, ArrowRightIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, Pie, PieChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppContext } from '../contexts/AppContext';
@@ -105,7 +101,6 @@ const SeekerDashboard: React.FC = () => {
                     <div key={job.id} className="flex justify-between items-center p-3 border-b dark:border-gray-700 last:border-b-0">
                         <div>
                             <p className="font-bold text-dark dark:text-light">{job.title}</p>
-                            {/* FIX: Property 'company' does not exist on type 'Job'. Use companyId to find company name. */}
                             <p className="text-sm text-gray-500 dark:text-gray-400">{COMPANIES.find(c => c.id === job.companyId)?.name} - {job.location}</p>
                         </div>
                         <Link to="/jobs"><Button variant="secondary">View Details</Button></Link>
@@ -124,16 +119,14 @@ const EmployerDashboard: React.FC = () => {
     const gridColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(128, 128, 128, 0.3)';
     const tooltipBg = theme === 'dark' ? '#2D3748' : '#FFFFFF';
     const tooltipBorder = theme === 'dark' ? '#4A5568' : '#E5E7EB';
-    const COLORS = ['#005A9C', '#5E96C3', '#10B981', '#F59E0B', '#EF4444'];
     
     // Data processing
-    const applicationStatuses: Application['status'][] = ['Applied', 'Reviewed', 'Interviewing', 'Offered', 'Rejected'];
-    const applicationStatusData = applicationStatuses
-        .map((status, index) => ({
-            name: status,
-            value: APPLICATIONS.filter(a => a.status === status).length,
-            fill: COLORS[index % COLORS.length]
-        }));
+    const applicantFunnelData = [
+        { name: 'Applied', value: APPLICATIONS.length },
+        { name: 'Reviewed', value: APPLICATIONS.filter(a => ['Reviewed', 'Interviewing', 'Offered'].includes(a.status)).length },
+        { name: 'Interviewing', value: APPLICATIONS.filter(a => ['Interviewing', 'Offered'].includes(a.status)).length },
+        { name: 'Offered', value: APPLICATIONS.filter(a => a.status === 'Offered').length },
+    ];
         
     const applicationTrendData = Array.from({ length: 7 }, (_, i) => {
         const date = new Date(Date.now() - (6 - i) * 86400000);
@@ -151,13 +144,13 @@ const EmployerDashboard: React.FC = () => {
         <div>
             <h1 className="text-3xl font-bold text-dark dark:text-light mb-6">Employer Dashboard</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                <StatCard icon={BriefcaseIcon} title="Active Job Postings" value={JOBS.length} trend={0} data={[3,4,4,4]}/>
-                <StatCard icon={UserPlusIcon} title="New Applicants" value={APPLICATIONS.length} trend={5} data={[10, 12, 15, 18]}/>
-                <StatCard icon={CalendarDaysIcon} title="Interviews This Week" value={upcomingInterviews.length} trend={-1} data={[3,3,2,2]}/>
-                <StatCard icon={ArrowTrendingUpIcon} title="Average Applicant Match" value="85%" trend={2} data={[80, 82, 83, 85]}/>
+                <Link to="/jobs"><StatCard icon={BriefcaseIcon} title="Active Job Postings" value={JOBS.filter(j => j.status === 'Open').length} trend={0} data={[3,4,4,4]}/></Link>
+                <Link to="/jobs"><StatCard icon={UserPlusIcon} title="New Applicants" value={APPLICATIONS.length} trend={5} data={[10, 12, 15, 18]}/></Link>
+                <Link to="/interviews"><StatCard icon={CalendarDaysIcon} title="Interviews This Week" value={upcomingInterviews.length} trend={-1} data={[3,3,2,2]}/></Link>
+                <Link to="/user-analytics"><StatCard icon={ArrowTrendingUpIcon} title="Talent Pool Size" value={USERS.filter(u => u.role === UserRole.SEEKER).length} trend={2} data={[80, 82, 83, 85]}/></Link>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <Card title="Recent Application Trends" className="lg:col-span-3">
+                <Card title="Recent Application Trends" className="lg:col-span-2">
                     <ResponsiveContainer width="100%" height={300}>
                         <LineChart data={applicationTrendData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={gridColor}/>
@@ -169,72 +162,46 @@ const EmployerDashboard: React.FC = () => {
                         </LineChart>
                     </ResponsiveContainer>
                 </Card>
-                <Card title="Applicant Pipeline" className="lg:col-span-1">
-                    <ResponsiveContainer width="100%" height={300}>
-                         <PieChart>
-                            <Pie 
-                                data={applicationStatusData} 
-                                dataKey="value" 
-                                nameKey="name" 
-                                cx="50%" 
-                                cy="50%" 
-                                innerRadius={70}
-                                outerRadius={100} 
-                                paddingAngle={5}
-                            >
-                                {applicationStatusData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.fill} />)}
-                            </Pie>
-                            <Tooltip formatter={(value) => `${value} applicant(s)`} />
-                            <Legend iconType="circle" />
-                            <text x="50%" y="50%" textAnchor="middle" dominantBaseline="central" className="text-3xl font-bold fill-dark dark:fill-light">
-                                {APPLICATIONS.length}
-                            </text>
-                            <text x="50%" y="50%" dy={25} textAnchor="middle" className="text-sm fill-gray-500 dark:fill-gray-400">
-                                Applicants
-                            </text>
-                        </PieChart>
-                    </ResponsiveContainer>
-                </Card>
-                 <Card title="Upcoming Interviews" className="lg:col-span-2">
-                    {upcomingInterviews.length > 0 ? (
-                        <div className="space-y-3">
-                            {upcomingInterviews.map(interview => {
-                                const user = USERS.find(u => u.id === interview.userId);
-                                const job = JOBS.find(j => j.id === interview.jobId);
-                                if (!user || !job) return null;
-                                return (
-                                    <div key={interview.id} className="flex items-center justify-between p-3 rounded-lg bg-light dark:bg-gray-700/50">
-                                        <div className="flex items-center gap-3">
-                                            <img src={user.avatarUrl} alt={user.name} className="h-10 w-10 rounded-full" />
-                                            <div>
-                                                <p className="font-bold text-dark dark:text-light">{user.name}</p>
-                                                <p className="text-sm text-gray-500 dark:text-gray-400">{`For: ${job.title}`}</p>
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="font-semibold text-dark dark:text-light">{new Date(interview.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</p>
-                                            <p className="text-sm text-gray-500 dark:text-gray-400">{new Date(interview.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</p>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    ) : (
-                        <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 dark:text-gray-400">
-                             <CalendarDaysIcon className="h-12 w-12 text-gray-400 mb-2"/>
-                            <p>No interviews are scheduled for the upcoming week.</p>
-                        </div>
-                    )}
-                     <div className="mt-4 text-right">
-                        <Link to="/interviews">
-                            <Button variant="secondary">View Full Schedule</Button>
-                        </Link>
+
+                 <Card title="Quick Actions" className="lg:col-span-1">
+                    <div className="space-y-3">
+                        <QuickActionLink to="/jobs" icon={PlusIcon} text="Post a New Job"/>
+                        <QuickActionLink to="/jobs" icon={BriefcaseIcon} text="Manage Applicants"/>
+                        <QuickActionLink to="/cooperatives" icon={UserGroupIcon} text="Manage Cooperatives"/>
+                        <QuickActionLink to="/wallet" icon={WalletIcon} text="View Company Wallet"/>
                     </div>
+                 </Card>
+
+                 <Card title="Applicant Funnel" className="lg:col-span-3">
+                     <ResponsiveContainer width="100%" height={250}>
+                        <BarChart data={applicantFunnelData} layout="vertical" margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+                            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={gridColor}/>
+                            <XAxis type="number" tick={{ fill: axisColor }} />
+                            <YAxis type="category" dataKey="name" width={80} tick={{ fill: axisColor }} />
+                            <Tooltip contentStyle={{ backgroundColor: tooltipBg, border: `1px solid ${tooltipBorder}` }} />
+                            <Bar dataKey="value" name="Applicants" fill="#005A9C" barSize={30}>
+                                {applicantFunnelData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fillOpacity={1 - (index * 0.2)} />
+                                ))}
+                            </Bar>
+                        </BarChart>
+                    </ResponsiveContainer>
                  </Card>
             </div>
         </div>
     );
 };
+
+const QuickActionLink: React.FC<{to: string, icon: React.ElementType, text: string}> = ({ to, icon: Icon, text }) => (
+    <Link to={to} className="flex items-center justify-between p-3 rounded-lg bg-light dark:bg-gray-700/50 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors">
+        <div className="flex items-center gap-3">
+            <Icon className="h-5 w-5 text-primary"/>
+            <p className="font-semibold text-dark dark:text-light">{text}</p>
+        </div>
+        <ArrowRightIcon className="h-4 w-4 text-gray-400"/>
+    </Link>
+);
+
 
 const DashboardPage: React.FC = () => {
     const { user } = useAuth();

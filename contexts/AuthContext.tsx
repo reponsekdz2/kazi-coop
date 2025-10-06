@@ -1,4 +1,5 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+
+import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
 import { User, UserRole } from '../types';
 import { USERS } from '../constants';
 
@@ -11,22 +12,28 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-
-  const login = (role: UserRole) => {
-    const userToLogin = USERS.find(u => u.role === role);
-    if (userToLogin) {
-      setUser(userToLogin);
-    } else {
-        console.error("No user found for role:", role);
-        // Fallback to first user if specific role not found in mock data
-        setUser(USERS[0]);
+  const [user, setUser] = useState<User | null>(() => {
+    try {
+      const storedUser = localStorage.getItem('user');
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch (error) {
+      return null;
     }
-  };
+  });
 
-  const logout = () => {
+  const login = useCallback((role: UserRole) => {
+    // Find the first user that matches the role for demo purposes
+    const demoUser = USERS.find(u => u.role === role);
+    if (demoUser) {
+      setUser(demoUser);
+      localStorage.setItem('user', JSON.stringify(demoUser));
+    }
+  }, []);
+
+  const logout = useCallback(() => {
     setUser(null);
-  };
+    localStorage.removeItem('user');
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>

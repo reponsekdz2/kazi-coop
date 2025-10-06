@@ -1,6 +1,5 @@
-// FIX: Created TransactionContext.tsx to resolve module not found error.
 import React, { createContext, useState, useContext, ReactNode, useMemo } from 'react';
-import { Transaction, User } from '../types';
+import { Transaction, User, PaymentProvider } from '../types';
 import { TRANSACTIONS, USERS } from '../constants';
 import { useAuth } from './AuthContext';
 import { useToast } from './ToastContext';
@@ -35,9 +34,9 @@ export const TransactionProvider: React.FC<{ children: ReactNode }> = ({ childre
     };
     setAllTransactions(prev => [newTransaction, ...prev]);
     if (details.amount > 0) {
-        addToast(`Deposited RWF ${details.amount.toLocaleString()}`, 'success');
-    } else if (details.description.toLowerCase().includes('withdraw')) {
-        addToast(`Withdrawal of RWF ${Math.abs(details.amount).toLocaleString()} processed.`, 'success');
+        addToast(`Deposited RWF ${details.amount.toLocaleString()} via ${details.provider}`, 'success');
+    } else if (details.category === 'Withdrawal') {
+        addToast(`Withdrawal of RWF ${Math.abs(details.amount).toLocaleString()} to ${details.provider} processed.`, 'success');
     }
   };
   
@@ -57,6 +56,7 @@ export const TransactionProvider: React.FC<{ children: ReactNode }> = ({ childre
       description: `Transfer to ${receiver.name}${note ? `: ${note}` : ''}`,
       amount: -amount,
       category: 'Transfer',
+      provider: 'Mobile Money' // Internal transfers are like this
     };
 
     const receiverTransaction: Transaction = {
@@ -66,6 +66,7 @@ export const TransactionProvider: React.FC<{ children: ReactNode }> = ({ childre
       description: `Transfer from ${sender.name}${note ? `: ${note}` : ''}`,
       amount: amount,
       category: 'Transfer',
+      provider: 'Mobile Money'
     };
 
     setAllTransactions(prev => [senderTransaction, receiverTransaction, ...prev]);
