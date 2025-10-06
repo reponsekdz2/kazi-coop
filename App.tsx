@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 // FIX: Changed import to 'react-router-dom' and switched BrowserRouter to MemoryRouter to resolve module export errors.
 import { MemoryRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
@@ -25,6 +26,7 @@ import InterviewsPage from './pages/InterviewsPage';
 import UserAnalyticsPage from './pages/UserAnalyticsPage';
 import LearningModulePage from './pages/LearningModulePage';
 import HelpCenterPage from './pages/HelpCenterPage';
+import CareerPathPage from './pages/CareerPathPage'; // Import the new page
 import { UserRole } from './types';
 
 const PrivateRoute: React.FC<{ allowedRoles?: UserRole[] }> = ({ allowedRoles }) => {
@@ -75,6 +77,7 @@ const AuthRoutes: React.FC = () => {
         <Route path="/messages" element={<MessagesPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/help" element={<HelpCenterPage />} />
+        <Route path="/career-path" element={<CareerPathPage />} />
         
         {/* Employer/Admin only routes */}
         <Route path="/analytics" element={<AnalyticsPage />} />

@@ -1,3 +1,4 @@
+// FIX: Removed a circular import of `UserRole` from this file, which conflicted with the enum declaration below.
 export enum UserRole {
   SEEKER = 'Job Seeker',
   EMPLOYER = 'Employer',
@@ -11,6 +12,7 @@ export interface User {
   avatarUrl: string;
   skills?: string[];
   careerProgress?: number; // From 1 to 5
+  careerGoal?: string; // New field for AI suggestions
 }
 
 export interface Company {

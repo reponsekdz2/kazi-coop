@@ -1,6 +1,6 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { ChevronDownIcon, BellIcon, SparklesIcon, MagnifyingGlassIcon } from '@heroicons/react/24/solid';
+import { ChevronDownIcon, BellIcon, SparklesIcon, MagnifyingGlassIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/solid';
 // FIX: Changed import to 'react-router-dom' to resolve module export errors.
 import { Link } from 'react-router-dom';
 import { Menu, Transition } from '@headlessui/react';
@@ -17,23 +17,44 @@ const notificationIcons: { [key in ActivityLog['type'] | 'default']: React.Eleme
 };
 
 
-const Header: React.FC = () => {
+const Header: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
   const { user, logout } = useAuth();
   const { notifications, unreadCount, markAllAsRead } = useNotifications();
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   return (
-    <header className="flex items-center justify-between p-4 bg-white border-b dark:bg-dark dark:border-gray-700">
-      <div className="relative w-full max-w-xs">
-         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
-         </div>
-         <input
-            type="text"
-            placeholder="Search jobs, co-ops, users..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full bg-light dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:outline-none text-sm"
-         />
+    <header className="flex items-center justify-between p-4 bg-white border-b dark:bg-dark dark:border-gray-700 flex-shrink-0">
+      <div className="flex items-center gap-4">
+        <button onClick={onMenuClick} className="lg:hidden text-gray-500 dark:text-gray-400">
+            <Bars3Icon className="h-6 w-6" />
+        </button>
+        <div className="relative hidden lg:block">
+             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+             </div>
+             <input
+                type="text"
+                placeholder="Search jobs, co-ops, users..."
+                className="w-full max-w-xs pl-10 pr-4 py-2 border border-gray-300 rounded-full bg-light dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:outline-none text-sm"
+             />
+        </div>
       </div>
-      <div className="flex items-center space-x-4">
+
+      <div className="flex items-center space-x-2 md:space-x-4">
+        <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="lg:hidden p-2 text-gray-500 rounded-full hover:bg-light dark:hover:bg-gray-700">
+            {isSearchOpen ? <XMarkIcon className="h-6 w-6"/> : <MagnifyingGlassIcon className="h-6 w-6"/>}
+        </button>
+        
+        {isSearchOpen && (
+            <div className="absolute top-16 left-0 right-0 p-4 bg-white dark:bg-dark border-b dark:border-gray-700 lg:hidden z-20">
+                 <input
+                    type="text"
+                    placeholder="Search..."
+                    className="w-full px-4 py-2 border border-gray-300 rounded-full bg-light dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:outline-none text-sm"
+                    autoFocus
+                 />
+            </div>
+        )}
 
         <Menu as="div" className="relative">
           <Menu.Button className="relative text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-2 rounded-full hover:bg-light dark:hover:bg-gray-700">
@@ -53,7 +74,7 @@ const Header: React.FC = () => {
             leaveFrom="transform opacity-100 scale-100"
             leaveTo="transform opacity-0 scale-95"
           >
-            <Menu.Items className="absolute right-0 mt-2 w-80 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800 dark:ring-gray-700">
+            <Menu.Items className="absolute right-0 mt-2 w-80 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800 dark:ring-gray-700 z-30">
                 <div className="p-2 flex justify-between items-center border-b dark:border-gray-700">
                     <h3 className="font-semibold text-sm text-dark dark:text-light">Notifications</h3>
                     {unreadCount > 0 && <button onClick={markAllAsRead} className="text-xs text-primary hover:underline">Mark all as read</button>}
@@ -98,7 +119,7 @@ const Header: React.FC = () => {
                 leaveFrom="transform opacity-100 scale-100"
                 leaveTo="transform opacity-0 scale-95"
               >
-                <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right divide-y divide-gray-100 dark:divide-gray-700 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800">
+                <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right divide-y divide-gray-100 dark:divide-gray-700 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800 z-30">
                    <div className="px-1 py-1">
                      <Menu.Item>
                        {({ active }) => (

@@ -10,6 +10,7 @@ export const USERS: User[] = [
     avatarUrl: `https://i.pravatar.cc/150?u=user-seeker-1`,
     skills: ['React', 'TypeScript', 'Node.js', 'Project Management'],
     careerProgress: 3,
+    careerGoal: 'Become a Senior Frontend Developer and eventually a Tech Lead.',
   },
   {
     id: 'user-seeker-2',
@@ -19,6 +20,7 @@ export const USERS: User[] = [
     avatarUrl: `https://i.pravatar.cc/150?u=user-seeker-2`,
     skills: ['UX/UI Design', 'Figma', 'Agile Methodologies'],
     careerProgress: 2,
+    careerGoal: 'Transition into a Product Management role.',
   },
   {
     id: 'user-employer-1',
