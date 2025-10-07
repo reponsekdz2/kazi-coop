@@ -7,8 +7,8 @@ import { PlayCircleIcon, DocumentTextIcon, ClockIcon, StarIcon } from '@heroicon
 const LearningPage: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState('All');
   
-  const categories = ['All', 'Entrepreneurship', 'Web Development', 'Soft Skills'];
-  const featuredModule = LEARNING_MODULES.find(m => m.id === 'lm-3'); // Feature the new entrepreneurship module
+  const categories = ['All', 'Financial Literacy', 'Entrepreneurship', 'Web Development', 'Soft Skills'];
+  const featuredModule = LEARNING_MODULES.find(m => m.id === 'lm-4'); // Feature the new financial literacy module
 
   const filteredModules = activeCategory === 'All' 
     ? LEARNING_MODULES 
@@ -24,12 +24,12 @@ const LearningPage: React.FC = () => {
       {featuredModule && <FeaturedModuleCard module={featuredModule} />}
 
       <div className="my-8">
-        <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2 mb-6">
+        <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2 mb-6 overflow-x-auto">
             {categories.map(category => (
                 <button 
                     key={category}
                     onClick={() => setActiveCategory(category)}
-                    className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors ${
+                    className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors flex-shrink-0 ${
                         activeCategory === category 
                         ? 'bg-primary text-white' 
                         : 'text-gray-600 dark:text-gray-300 hover:bg-light dark:hover:bg-gray-700'
