@@ -1,81 +1,88 @@
-import React, { createContext, useState, useContext, ReactNode, useCallback, useEffect } from 'react';
-import { User } from '../types';
-import api from '../services/api';
-// FIX: Import mock users data.
+import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback } from 'react';
+import { User, UserRole } from '../types';
 import { USERS } from '../constants';
+// import api from '../services/api'; // Mocking API calls for now
 
 interface AuthContextType {
   user: User | null;
-  // FIX: Added users array to the context type.
   users: User[];
-  token: string | null;
   isLoading: boolean;
-  login: (credentials: { email: string, password: string }) => Promise<void>;
-  register: (details: any) => Promise<void>;
+  login: (credentials: { email: string; password: string }) => Promise<void>;
   logout: () => void;
-  updateUserProfile: (updatedUser: Partial<User>) => Promise<void>;
+  register: (details: { name: string; email: string; password: string; role: UserRole }) => Promise<void>;
+  updateUserProfile: (updatedUser: User) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  // FIX: Added users state, initialized with mock data.
   const [users, setUsers] = useState<User[]>(USERS);
-  const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const checkUser = async () => {
+    // Simulate checking for a logged-in user on initial load
+    const checkLoggedInUser = () => {
       try {
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
-          const parsedUser = JSON.parse(storedUser);
-          setToken(parsedUser.token);
-          // Verify token by fetching profile
-          const profile = await api.get<User>('/users/profile');
-          setUser(profile);
+          setUser(JSON.parse(storedUser));
         }
       } catch (error) {
-        console.error("Session expired or invalid", error);
+        console.error("Failed to parse user from localStorage", error);
         localStorage.removeItem('user');
-        setToken(null);
-        setUser(null);
       } finally {
         setIsLoading(false);
       }
     };
-    checkUser();
+    checkLoggedInUser();
   }, []);
 
-  const login = useCallback(async (credentials: { email: string, password: string }) => {
-    const data = await api.post<User & { token: string }>('/auth/login', credentials);
-    setUser(data);
-    setToken(data.token);
-    localStorage.setItem('user', JSON.stringify({ token: data.token }));
-  }, []);
-  
-  const register = useCallback(async (details: any) => {
-    const data = await api.post<User & { token: string }>('/auth/register', details);
-    setUser(data);
-    setToken(data.token);
-    localStorage.setItem('user', JSON.stringify({ token: data.token }));
-  }, []);
-
+  const login = useCallback(async (credentials: { email: string; password: string }) => {
+    // In a real app, this would be an API call
+    // For this mock, we'll find a user in our constants
+    const foundUser = users.find(u => u.email === credentials.email);
+    if (foundUser) { // a real app would check password
+      setUser(foundUser);
+      localStorage.setItem('user', JSON.stringify(foundUser));
+    } else {
+      throw new Error('Invalid email or password');
+    }
+  }, [users]);
 
   const logout = useCallback(() => {
     setUser(null);
-    setToken(null);
     localStorage.removeItem('user');
+    // In a real app, you might want to call an API endpoint to invalidate a token
   }, []);
 
-  const updateUserProfile = useCallback(async (updatedData: Partial<User>) => {
-    const updatedUser = await api.put<User>('/users/profile', updatedData);
+  const register = useCallback(async (details: { name: string; email: string; password: string; role: UserRole }) => {
+    // In a real app, this would be an API call
+    if (users.some(u => u.email === details.email)) {
+      throw new Error('User with this email already exists');
+    }
+    const newUser: User = {
+      id: `u-${users.length + 1}`,
+      name: details.name,
+      email: details.email,
+      role: details.role,
+      avatarUrl: `https://i.pravatar.cc/150?u=${details.email}`,
+      notificationSettings: { jobAlerts: true, messageAlerts: true, coopUpdates: false }
+    };
+    setUsers(prev => [...prev, newUser]);
+    setUser(newUser);
+    localStorage.setItem('user', JSON.stringify(newUser));
+  }, [users]);
+  
+  const updateUserProfile = useCallback((updatedUser: User) => {
     setUser(updatedUser);
+    setUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
+    localStorage.setItem('user', JSON.stringify(updatedUser));
   }, []);
+
 
   return (
-    <AuthContext.Provider value={{ user, users, token, isLoading, login, register, logout, updateUserProfile }}>
+    <AuthContext.Provider value={{ user, users, isLoading, login, logout, register, updateUserProfile }}>
       {children}
     </AuthContext.Provider>
   );

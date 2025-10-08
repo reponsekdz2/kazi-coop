@@ -1,43 +1,41 @@
-import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-// FIX: Import mock data from the new constants file.
+import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
+import { Notification } from '../types';
 import { ACTIVITY_LOG } from '../constants';
-import { ActivityLog, Notification } from '../types';
 
 interface NotificationContextType {
   notifications: Notification[];
-  unreadCount: number;
+  markAsRead: (id: string) => void;
   markAllAsRead: () => void;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
+const initialNotifications: Notification[] = ACTIVITY_LOG.map(log => ({ ...log, read: false }));
+
 export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    // In a real app, 'read' status would be persisted
-    const [notifications, setNotifications] = useState<Notification[]>(() => 
-        ACTIVITY_LOG.map((log): Notification => ({ ...log, read: false }))
+  const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
+
+  const markAsRead = useCallback((id: string) => {
+    setNotifications(prev =>
+      prev.map(n => (n.id === id ? { ...n, read: true } : n))
     );
+  }, []);
+  
+  const markAllAsRead = useCallback(() => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  }, []);
 
-    const [unreadCount, setUnreadCount] = useState(notifications.filter(n => !n.read).length);
-
-    useEffect(() => {
-        setUnreadCount(notifications.filter(n => !n.read).length);
-    }, [notifications]);
-
-    const markAllAsRead = () => {
-        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-    };
-
-    return (
-        <NotificationContext.Provider value={{ notifications, unreadCount, markAllAsRead }}>
-            {children}
-        </NotificationContext.Provider>
-    );
+  return (
+    <NotificationContext.Provider value={{ notifications, markAsRead, markAllAsRead }}>
+      {children}
+    </NotificationContext.Provider>
+  );
 };
 
-export const useNotifications = (): NotificationContextType => {
-    const context = useContext(NotificationContext);
-    if (!context) {
-        throw new Error('useNotifications must be used within a NotificationProvider');
-    }
-    return context;
+export const useNotification = (): NotificationContextType => {
+  const context = useContext(NotificationContext);
+  if (!context) {
+    throw new Error('useNotification must be used within a NotificationProvider');
+  }
+  return context;
 };
