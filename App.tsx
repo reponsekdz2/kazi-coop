@@ -1,8 +1,3 @@
-
-
-
-
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider } from './contexts/AppContext';
@@ -31,6 +26,7 @@ import LearningModulePage from './pages/LearningModulePage';
 import HelpCenterPage from './pages/HelpCenterPage';
 import CareerPathPage from './pages/CareerPathPage'; // Import the new page
 import AdminContentPage from './pages/AdminContentPage'; // Import new Admin page
+import MyApplicationsPage from './pages/MyApplicationsPage'; // Import new Applications page
 // FIX: Added missing import for UserRole.
 import { UserRole } from './types';
 
@@ -75,6 +71,7 @@ const AuthRoutes: React.FC = () => {
       <Route element={<DashboardLayout />}>
         <Route path="/dashboard" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
         <Route path="/jobs" element={<PrivateRoute><JobsPage /></PrivateRoute>} />
+        <Route path="/applications" element={<PrivateRoute allowedRoles={[UserRole.SEEKER]}><MyApplicationsPage /></PrivateRoute>} />
         <Route path="/interviews" element={<PrivateRoute><InterviewsPage /></PrivateRoute>} />
         <Route path="/cooperatives" element={<PrivateRoute><CooperativesPage /></PrivateRoute>} />
         <Route path="/wallet" element={<PrivateRoute><WalletPage /></PrivateRoute>} />

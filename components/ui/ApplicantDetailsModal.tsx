@@ -1,14 +1,13 @@
-
-
 import React, { useState } from 'react';
 import Modal from '../layout/Modal';
 import { Application, User } from '../../types';
 import { USERS } from '../../constants';
 import Card from './Card';
 import Button from '../layout/Button';
-import { CheckBadgeIcon, BriefcaseIcon, AcademicCapIcon, CalendarDaysIcon, CheckCircleIcon, XCircleIcon, EnvelopeIcon } from '@heroicons/react/24/solid';
+import { CheckBadgeIcon, BriefcaseIcon, AcademicCapIcon, CalendarDaysIcon, CheckCircleIcon, XCircleIcon, EnvelopeIcon, DocumentArrowDownIcon } from '@heroicons/react/24/solid';
 import { useApplications } from '../../contexts/ApplicationContext';
 import ScheduleInterviewModal from './ScheduleInterviewModal';
+import { useToast } from '../../contexts/ToastContext';
 
 interface ApplicantDetailsModalProps {
   isOpen: boolean;
@@ -19,9 +18,29 @@ interface ApplicantDetailsModalProps {
 const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({ isOpen, onClose, application }) => {
   const applicant = USERS.find(u => u.id === application.userId);
   const { updateApplicationStatus } = useApplications();
+  const { addToast } = useToast();
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
 
   if (!applicant) return null;
+  
+  const handleDownloadResume = (base64Data: string) => {
+    try {
+        const link = document.createElement('a');
+        link.href = base64Data;
+        
+        const fileType = base64Data.split(';')[0].split('/')[1];
+        const fileName = `resume_${applicant.name.replace(' ', '_')}.${fileType}`;
+        link.download = fileName;
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (error) {
+        console.error("Failed to download resume:", error);
+        addToast("Could not download resume.", "error");
+    }
+  };
+
 
   // FIX: Removed `|| {}` as `applicantInfo` is not optional on Application type, fixing type errors.
   const applicantInfo = application.applicantInfo;
@@ -66,7 +85,14 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({ isOpen, o
 
          <Card title="Documents">
             {applicantInfo.resumeUrl ? (
-                <a href="#" className="text-primary hover:underline font-semibold">{applicantInfo.resumeUrl}</a>
+                applicantInfo.resumeUrl.startsWith('data:') ? (
+                     <Button variant="secondary" onClick={() => handleDownloadResume(applicantInfo.resumeUrl!)}>
+                        <DocumentArrowDownIcon className="h-5 w-5 mr-2 inline-block"/>
+                        Download Resume
+                     </Button>
+                ) : (
+                    <p className="text-gray-600 dark:text-gray-400">Resume: {applicantInfo.resumeUrl}</p>
+                )
             ) : <p className="text-gray-500">No resume submitted.</p>}
         </Card>
 
