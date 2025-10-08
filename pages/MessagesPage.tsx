@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+// FIX: Import mock data from the new constants file.
 import { MESSAGES } from '../constants';
 import { Message, User } from '../types';
 import Card from '../components/ui/Card';
 import { PaperAirplaneIcon, EllipsisVerticalIcon } from '@heroicons/react/24/solid';
 
 const MessagesPage: React.FC = () => {
+    // FIX: Destructure 'users' from useAuth, which now provides the full user list.
     const { user, users: allUsers } = useAuth();
     const [messages, setMessages] = useState<Message[]>(MESSAGES);
     const [selectedConversation, setSelectedConversation] = useState<string | null>(null);

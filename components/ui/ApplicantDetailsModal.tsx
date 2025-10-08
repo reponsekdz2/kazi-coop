@@ -1,9 +1,11 @@
+
 import React, { useState } from 'react';
 import Modal from '../layout/Modal';
 import { Application, User } from '../../types';
+// FIX: Import mock data from the new constants file.
 import { USERS } from '../../constants';
 import Card from './Card';
-import Button from '../layout/Button';
+import Button from './Button';
 import { CheckBadgeIcon, BriefcaseIcon, AcademicCapIcon, CalendarDaysIcon, CheckCircleIcon, XCircleIcon, EnvelopeIcon, DocumentArrowDownIcon } from '@heroicons/react/24/solid';
 import { useApplications } from '../../contexts/ApplicationContext';
 import ScheduleInterviewModal from './ScheduleInterviewModal';
@@ -42,7 +44,6 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({ isOpen, o
   };
 
 
-  // FIX: Removed `|| {}` as `applicantInfo` is not optional on Application type, fixing type errors.
   const applicantInfo = application.applicantInfo;
   const userSkills = applicant.skills || [];
 

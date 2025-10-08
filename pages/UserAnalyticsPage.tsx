@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import Card from '../components/ui/Card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, PieChart, Pie, Cell } from 'recharts';
+// FIX: Import mock data from the new constants file.
 import { USERS } from '../constants';
 import { UserRole } from '../types';
 import SeekerProfileModal from '../components/ui/SeekerProfileModal';

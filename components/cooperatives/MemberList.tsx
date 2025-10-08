@@ -1,8 +1,9 @@
 
 import React from 'react';
 import { CooperativeMember } from '../../types';
+// FIX: Import mock data from the new constants file.
 import { USERS } from '../../constants';
-import Button from '../layout/Button';
+import Button from '../ui/Button';
 import { useCooperative } from '../../contexts/CooperativeContext';
 
 interface MemberListProps {

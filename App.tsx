@@ -12,7 +12,6 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import JobsPage from './pages/JobsPage';
-// FIX: Added missing import for CooperativesPage.
 import CooperativesPage from './pages/CooperativesPage';
 import WalletPage from './pages/WalletPage';
 import AnalyticsPage from './pages/AnalyticsPage';
@@ -27,17 +26,22 @@ import HelpCenterPage from './pages/HelpCenterPage';
 import CareerPathPage from './pages/CareerPathPage'; // Import the new page
 import AdminContentPage from './pages/AdminContentPage'; // Import new Admin page
 import MyApplicationsPage from './pages/MyApplicationsPage'; // Import new Applications page
-// FIX: Added missing import for UserRole.
 import { UserRole } from './types';
+import Card from './components/ui/Card';
 
-// FIX: Added `children: React.ReactNode` to the props type to resolve type errors.
 const PrivateRoute: React.FC<{ children: React.ReactNode; allowedRoles?: UserRole[] }> = ({ children, allowedRoles }) => {
-  const { user } = useAuth();
-  if (!user) {
-    return <Navigate to="/login" />;
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div className="flex h-screen items-center justify-center"><Card>Loading...</Card></div>;
   }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/dashboard" />; // Or an unauthorized page
+    return <Navigate to="/dashboard" replace />; // Or an unauthorized page
   }
   return <>{children}</>;
 };
@@ -56,15 +60,19 @@ const getBasename = () => {
 };
 
 const AuthRoutes: React.FC = () => {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+  
+  if (isLoading) {
+     return <div className="flex h-screen items-center justify-center"><Card>Initializing KaziCoop...</Card></div>;
+  }
 
   return (
     <Routes>
       {/* Public Routes */}
       <Route element={<PublicLayout />}>
         <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/dashboard" replace /> } />
+        <Route path="/register" element={!user ? <RegisterPage /> : <Navigate to="/dashboard" replace />} />
       </Route>
 
       {/* Private Routes */}

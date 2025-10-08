@@ -1,7 +1,8 @@
 
+
 import React, { useState } from 'react';
 import Card from '../components/ui/Card';
-import Button from '../components/layout/Button';
+import Button from '../components/ui/Button';
 import { useLearning } from '../contexts/LearningContext';
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/solid';
 import NewModuleModal from '../components/learning/NewModuleModal';

@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 import { SavingsGoal } from '../types';
+// FIX: Import mock data from the new constants file.
 import { SAVINGS_GOALS } from '../constants';
 import { useToast } from './ToastContext';
 import { useAuth } from './AuthContext';

@@ -1,10 +1,9 @@
 
-
-
 import React, { useState } from 'react';
 import Card from '../components/ui/Card';
 import StatCard from '../components/ui/StatCard';
-import Button from '../components/layout/Button';
+import Button from '../components/ui/Button';
+// FIX: Import mock data from the new constants file.
 import { ACTIVITY_LOG, USERS, cooperativeFinancialsData, JOBS, COOPERATIVES } from '../constants';
 import { 
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, 

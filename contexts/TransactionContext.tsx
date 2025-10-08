@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode, useMemo } from 'react';
 import { Transaction, User, PaymentProvider } from '../types';
+// FIX: Import mock data from the new constants file.
 import { TRANSACTIONS, USERS } from '../constants';
 import { useAuth } from './AuthContext';
 import { useToast } from './ToastContext';

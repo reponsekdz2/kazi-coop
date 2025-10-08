@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Card from '../components/ui/Card';
-import Button from '../components/layout/Button';
+import Button from '../components/ui/Button';
 import { PencilIcon, CheckBadgeIcon } from '@heroicons/react/24/solid';
 import { BriefcaseIcon, UserGroupIcon, WalletIcon } from '@heroicons/react/24/outline';
 import RingProgress from '../components/layout/RingProgress';

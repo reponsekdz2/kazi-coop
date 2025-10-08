@@ -1,13 +1,11 @@
 
-
-
 import React, { useState } from 'react';
 import Card from '../components/ui/Card';
-import Button from '../components/layout/Button';
+import Button from '../components/ui/Button';
 import { GoogleGenAI } from '@google/genai';
 import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../contexts/AuthContext';
-// FIX: LEARNING_MODULES is not exported from constants, it should be fetched from the LearningContext.
+// FIX: Import mock data from the new constants file.
 import { JOBS } from '../constants';
 import { SparklesIcon, LightBulbIcon } from '@heroicons/react/24/solid';
 import { Link } from 'react-router-dom';
@@ -23,7 +21,6 @@ interface CareerPath {
 const CareerPathPage: React.FC = () => {
     const { user } = useAuth();
     const { addToast } = useToast();
-    // FIX: Get learning modules from context instead of constants.
     const { learningModules } = useLearning();
     const [isGenerating, setIsGenerating] = useState(false);
     const [careerPath, setCareerPath] = useState<CareerPath | null>(null);
@@ -59,7 +56,6 @@ const CareerPathPage: React.FC = () => {
                 config: { responseMimeType: 'application/json' },
             });
             
-            // FIX: Use response.text to get the JSON string from the response.
             const jsonText = response.text.trim();
             const parsedPath = JSON.parse(jsonText);
             setCareerPath(parsedPath);

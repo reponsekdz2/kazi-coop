@@ -1,6 +1,7 @@
+
 import React, { useState } from 'react';
 import Modal from '../layout/Modal';
-import Button from '../layout/Button';
+import Button from './Button';
 import { useInterviews } from '../../contexts/InterviewContext';
 import { useApplications } from '../../contexts/ApplicationContext';
 import { Application, Interview } from '../../types';

@@ -1,7 +1,8 @@
 
+
 import React, { useState, useCallback } from 'react';
 import Modal from '../layout/Modal';
-import Button from '../layout/Button';
+import Button from '../ui/Button';
 import { LearningModule, QuizQuestion } from '../../types';
 import { useLearning } from '../../contexts/LearningContext';
 import { PlusIcon, TrashIcon } from '@heroicons/react/24/solid';

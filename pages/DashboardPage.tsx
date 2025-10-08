@@ -1,5 +1,4 @@
 
-
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { UserRole } from '../types';
@@ -10,18 +9,21 @@ import CareerProgressTracker from '../components/ui/CareerProgressTracker';
 import { useApplications } from '../contexts/ApplicationContext';
 import { useJobs } from '../contexts/JobContext';
 import { useCooperative } from '../contexts/CooperativeContext';
-import Button from '../components/layout/Button';
+import Button from '../components/ui/Button';
 import { Link } from 'react-router-dom';
 import { useTransactions } from '../contexts/TransactionContext';
-// FIX: Added missing import for USERS constant.
-import { USERS } from '../constants';
-
 
 const SeekerDashboard: React.FC = () => {
     const { user } = useAuth();
-    const { applications } = useApplications();
+    const { applications, isLoading: isLoadingApps } = useApplications();
     const { balance } = useTransactions();
+    // FIX: Get jobs from context to look up job titles.
+    const { jobs, isLoading: isLoadingJobs } = useJobs();
     const activeApplications = applications.filter(a => a.status !== 'Offered' && a.status !== 'Rejected');
+    
+    if (isLoadingApps || isLoadingJobs) {
+        return <Card>Loading your dashboard...</Card>
+    }
 
     return (
         <div className="space-y-6">
@@ -41,15 +43,19 @@ const SeekerDashboard: React.FC = () => {
              <Card title="Recent Applications">
                 {activeApplications.length > 0 ? (
                     <div className="space-y-3">
-                        {activeApplications.slice(0, 3).map(app => (
+                        {activeApplications.slice(0, 3).map(app => {
+                             // FIX: Find the job corresponding to the application to get its title.
+                             const job = jobs.find(j => j.id === app.jobId);
+                             return (
                              <div key={app.id} className="p-3 bg-light dark:bg-dark rounded-md flex justify-between items-center">
                                 <div>
-                                    <p className="font-bold text-dark dark:text-light">{useJobs().jobs.find(j => j.id === app.jobId)?.title}</p>
+                                    {/* FIX: Display job title from the found job object. */}
+                                    <p className="font-bold text-dark dark:text-light">{job?.title}</p>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">Status: <span className="font-semibold text-primary">{app.status}</span></p>
                                 </div>
                                 <Button size="sm" variant="secondary">View</Button>
                             </div>
-                        ))}
+                        )})}
                     </div>
                 ) : (
                     <div className="text-center py-8">
@@ -64,9 +70,16 @@ const SeekerDashboard: React.FC = () => {
 };
 
 const EmployerDashboard: React.FC = () => {
-    const { jobs } = useJobs();
-    const { applications } = useApplications();
-    const { cooperatives } = useCooperative();
+    const { jobs, isLoading: isLoadingJobs } = useJobs();
+    const { applications, isLoading: isLoadingApps } = useApplications();
+    const { cooperatives, isLoading: isLoadingCoops } = useCooperative();
+    // FIX: Get all users from AuthContext to look up applicant names.
+    const { users } = useAuth();
+    
+    if (isLoadingJobs || isLoadingApps || isLoadingCoops) {
+        return <Card>Loading dashboard...</Card>
+    }
+    
     const openJobs = jobs.filter(j => j.status === 'Open').length;
     const newApplicants = applications.filter(a => a.status === 'Applied').length;
 
@@ -82,15 +95,20 @@ const EmployerDashboard: React.FC = () => {
              <Card title="Recent Applicants">
                 {applications.length > 0 ? (
                      <div className="space-y-3">
-                        {applications.slice(0, 4).map(app => (
+                        {applications.slice(0, 4).map(app => {
+                            // FIX: Find the applicant and job objects to get their details.
+                            const applicant = users.find(u => u.id === app.userId);
+                            const job = jobs.find(j => j.id === app.jobId);
+                            return (
                             <div key={app.id} className="p-3 bg-light dark:bg-dark rounded-md flex justify-between items-center">
                                 <div>
-                                    <p className="font-bold text-dark dark:text-light">{USERS.find(u => u.id === app.userId)?.name}</p>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">Applied for {jobs.find(j => j.id === app.jobId)?.title}</p>
+                                    {/* FIX: Display applicant name and job title from the found objects. */}
+                                    <p className="font-bold text-dark dark:text-light">{applicant?.name}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Applied for {job?.title}</p>
                                 </div>
                                <Button size="sm" variant="secondary">View Applicant</Button>
                             </div>
-                        ))}
+                        )})}
                     </div>
                 ) : <p className="text-gray-500">No applicants yet.</p>}
              </Card>
@@ -102,7 +120,7 @@ const EmployerDashboard: React.FC = () => {
 const DashboardPage: React.FC = () => {
     const { user } = useAuth();
     if (!user) {
-        return <div>Loading...</div>; // Or a spinner
+        return <div>Loading...</div>; // Should be handled by PrivateRoute
     }
 
     return user.role === UserRole.EMPLOYER ? <EmployerDashboard /> : <SeekerDashboard />;

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Modal from '../layout/Modal';
-import Button from '../layout/Button';
+import Button from './Button';
 import { Cooperative } from '../../types';
 
 interface EditCooperativeModalProps {

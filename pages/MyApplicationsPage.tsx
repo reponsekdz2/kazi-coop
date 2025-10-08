@@ -1,12 +1,14 @@
+
 import React, { useState, useMemo } from 'react';
 import { useApplications } from '../contexts/ApplicationContext';
 import { useJobs } from '../contexts/JobContext';
+// FIX: Import mock data from the new constants file.
 import { COMPANIES } from '../constants';
 import { Application, Job } from '../types';
 import Card from '../components/ui/Card';
 import ApplicationStatusTracker from '../components/ui/ApplicationStatusTracker';
 import { Link } from 'react-router-dom';
-import Button from '../components/layout/Button';
+import Button from '../components/ui/Button';
 import { BriefcaseIcon } from '@heroicons/react/24/solid';
 
 const MyApplicationsPage: React.FC = () => {

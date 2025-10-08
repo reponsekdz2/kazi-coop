@@ -2,9 +2,10 @@
 import React, { useState, useMemo } from 'react';
 import { Cooperative, UserRole } from '../../types';
 import Card from '../ui/Card';
-import Button from '../layout/Button';
+import Button from '../ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCooperative } from '../../contexts/CooperativeContext';
+// FIX: Import mock data from the new constants file.
 import { USERS } from '../../constants';
 import { BuildingOffice2Icon, UsersIcon, BanknotesIcon, PencilIcon } from '@heroicons/react/24/solid';
 import AgreeToRulesModal from '../ui/AgreeToRulesModal';

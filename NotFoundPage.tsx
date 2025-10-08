@@ -2,7 +2,7 @@
 import React from 'react';
 // FIX: Changed import to 'react-router-dom' to resolve module export errors.
 import { Link } from 'react-router-dom';
-import Button from './components/layout/Button';
+import Button from './components/ui/Button';
 
 const NotFoundPage: React.FC = () => {
   return (

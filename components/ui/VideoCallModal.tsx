@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import Modal from '../layout/Modal';
-import Button from '../layout/Button';
+import Button from './Button';
 import { PhoneIcon, VideoCameraIcon, VideoCameraSlashIcon, MicrophoneIcon, SpeakerXMarkIcon as MicrophoneSlashIcon } from '@heroicons/react/24/solid';
 
 

@@ -1,9 +1,11 @@
+
 // FIX: Created TransferModal.tsx to resolve module not found error.
 import React, { useState } from 'react';
 import Modal from '../layout/Modal';
-import Button from '../layout/Button';
+import Button from './Button';
 import { useTransactions } from '../../contexts/TransactionContext';
 import { useAuth } from '../../contexts/AuthContext';
+// FIX: Import mock data from the new constants file.
 import { USERS } from '../../constants';
 import { useToast } from '../../contexts/ToastContext';
 

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Button from '../components/layout/Button';
 import Typewriter from '../components/ui/Typewriter';
 import { BriefcaseIcon, UserGroupIcon, WalletIcon, AcademicCapIcon, UserCircleIcon, BuildingOffice2Icon } from '@heroicons/react/24/outline';
+// FIX: Import mock data from the new constants file.
 import { TESTIMONIALS, JOBS, COMPANIES } from '../constants';
 import RingProgress from '../components/layout/RingProgress';
 

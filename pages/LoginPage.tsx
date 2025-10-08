@@ -1,24 +1,39 @@
 
-
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { UserRole } from '../types';
 import Card from '../components/ui/Card';
-import Button from '../components/layout/Button';
-// FIX: Changed import to 'react-router-dom' to resolve module export errors.
+import Button from '../components/ui/Button';
 import { Link, Navigate } from 'react-router-dom';
+import { useToast } from '../contexts/ToastContext';
+
 
 const LoginPage: React.FC = () => {
   const { login, user } = useAuth();
+  const { addToast } = useToast();
   const [role, setRole] = useState<UserRole>(UserRole.SEEKER);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   if (user) {
     return <Navigate to="/dashboard" />;
   }
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    login(role);
+    setIsLoading(true);
+    setError('');
+    try {
+      await login({ email, password });
+      addToast('Login successful! Welcome back.', 'success');
+    } catch (err: any) {
+      setError(err.message || 'Failed to login. Please check your credentials.');
+      addToast(err.message || 'Login failed.', 'error');
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   return (
@@ -43,11 +58,14 @@ const LoginPage: React.FC = () => {
         </div>
         
         <form onSubmit={handleLogin} className="space-y-4">
+          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
             <input 
               type="email" 
-              placeholder={role === UserRole.SEEKER ? 'aline@example.com' : 'jean@example.com'}
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="your.email@example.com"
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white" 
               required
             />
@@ -56,13 +74,15 @@ const LoginPage: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
             <input 
               type="password" 
-              defaultValue="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="••••••••"
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white" 
               required
             />
           </div>
-          <Button type="submit" className="w-full !mt-6">
-            {`Login as ${role}`}
+          <Button type="submit" className="w-full !mt-6" disabled={isLoading}>
+            {isLoading ? 'Logging in...' : `Login as ${role}`}
           </Button>
         </form>
         

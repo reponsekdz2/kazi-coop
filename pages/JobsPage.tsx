@@ -1,16 +1,14 @@
 
-
-
-
 import React, { useState, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 // FIX: Added import for Application type.
 import { UserRole, Job, Application, Company } from '../types';
 import { useJobs } from '../contexts/JobContext';
 import Card from '../components/ui/Card';
-import Button from '../components/layout/Button';
+import Button from '../components/ui/Button';
 import { PlusIcon, BookmarkIcon, MapPinIcon, BuildingOffice2Icon, MagnifyingGlassIcon } from '@heroicons/react/24/solid';
 import { BookmarkIcon as BookmarkOutlineIcon } from '@heroicons/react/24/outline';
+// FIX: Import mock data from the new constants file.
 import { COMPANIES, USERS } from '../constants';
 import { useApplications } from '../contexts/ApplicationContext';
 import NewJobModal from '../components/ui/NewJobModal';

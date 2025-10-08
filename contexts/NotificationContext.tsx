@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+// FIX: Import mock data from the new constants file.
 import { ACTIVITY_LOG } from '../constants';
-// FIX: Added missing imports for ActivityLog and Notification types.
 import { ActivityLog, Notification } from '../types';
 
 interface NotificationContextType {

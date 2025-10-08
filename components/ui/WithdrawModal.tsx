@@ -1,6 +1,7 @@
+
 import React, { useState } from 'react';
 import Modal from '../layout/Modal';
-import Button from '../layout/Button';
+import Button from './Button';
 import { useTransactions } from '../../contexts/TransactionContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';

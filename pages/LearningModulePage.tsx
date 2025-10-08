@@ -1,10 +1,11 @@
 
+
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import { ArrowLeftIcon, CheckCircleIcon, XCircleIcon, CheckIcon, LightBulbIcon, PhotoIcon, DocumentArrowDownIcon } from '@heroicons/react/24/solid';
 import { QuizQuestion } from '../types';
-import Button from '../components/layout/Button';
+import Button from '../components/ui/Button';
 import { useLearning } from '../contexts/LearningContext';
 
 const LearningModulePage: React.FC = () => {

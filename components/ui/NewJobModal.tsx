@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import Modal from '../layout/Modal';
-import Button from '../layout/Button';
+import Button from './Button';
 import { Job } from '../../types';
+// FIX: Import mock data from the new constants file.
 import { COMPANIES } from '../../constants';
 
 interface NewJobModalProps {

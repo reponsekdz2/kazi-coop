@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode, useMemo } from 'react';
 import { Interview, UserRole } from '../types';
+// FIX: Import mock data from the new constants file.
 import { INTERVIEWS } from '../constants';
 import { useAuth } from './AuthContext';
 import { useToast } from './ToastContext';
