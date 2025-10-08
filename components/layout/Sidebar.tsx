@@ -1,5 +1,7 @@
 
 
+
+
 import React, { Fragment } from 'react';
 // FIX: Changed import to 'react-router-dom' to resolve module export errors.
 import { NavLink } from 'react-router-dom';
@@ -16,7 +18,8 @@ import {
   BuildingOffice2Icon,
   ArrowLeftOnRectangleIcon,
   ArrowTrendingUpIcon,
-  XMarkIcon
+  XMarkIcon,
+  DocumentPlusIcon
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../../contexts/AuthContext';
 import { UserRole } from '../../types';
@@ -44,6 +47,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
   const employerLinks = [
     { name: 'Dashboard', to: '/dashboard', icon: ChartPieIcon },
     { name: 'Job Management', to: '/jobs', icon: BriefcaseIcon },
+    { name: 'Content Management', to: '/content-management', icon: DocumentPlusIcon },
     { name: 'Cooperative Management', to: '/cooperatives', icon: UserGroupIcon },
     { name: 'Company Wallet', to: '/wallet', icon: WalletIcon },
     { name: 'Talent Pool', to: '/user-analytics', icon: UsersIcon },

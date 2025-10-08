@@ -1,14 +1,16 @@
+
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { LEARNING_MODULES } from '../constants';
 import Card from '../components/ui/Card';
-import { ArrowLeftIcon, CheckCircleIcon, XCircleIcon, CheckIcon, LightBulbIcon } from '@heroicons/react/24/solid';
+import { ArrowLeftIcon, CheckCircleIcon, XCircleIcon, CheckIcon, LightBulbIcon, PhotoIcon, DocumentArrowDownIcon } from '@heroicons/react/24/solid';
 import { QuizQuestion } from '../types';
 import Button from '../components/layout/Button';
+import { useLearning } from '../contexts/LearningContext';
 
 const LearningModulePage: React.FC = () => {
     const { moduleId } = useParams<{ moduleId: string }>();
-    const module = LEARNING_MODULES.find(m => m.id === moduleId);
+    const { learningModules } = useLearning();
+    const module = learningModules.find(m => m.id === moduleId);
 
     if (!module) {
         return (
@@ -17,6 +19,44 @@ const LearningModulePage: React.FC = () => {
                 <Link to="/learning" className="text-primary hover:underline mt-4 inline-block">Back to Learning Hub</Link>
             </div>
         );
+    }
+    
+    const renderContent = () => {
+        switch (module.type) {
+            case 'video':
+                return module.content.videoUrl && (
+                    <div className="aspect-video bg-black rounded-lg overflow-hidden mb-6">
+                        <iframe 
+                            width="100%" 
+                            height="100%" 
+                            src={module.content.videoUrl}
+                            title={module.title} 
+                            frameBorder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowFullScreen
+                        ></iframe>
+                    </div>
+                );
+            case 'image':
+                return module.content.imageUrl && (
+                    <div className="mb-6">
+                        <img src={module.content.imageUrl} alt={module.title} className="rounded-lg max-h-[500px] w-auto mx-auto"/>
+                    </div>
+                );
+            case 'file':
+                 return module.content.fileUrl && (
+                    <div className="p-4 border-2 border-dashed rounded-lg flex flex-col items-center text-center">
+                        <DocumentArrowDownIcon className="h-12 w-12 text-primary" />
+                        <p className="font-semibold mt-2">{module.content.fileName || 'Downloadable File'}</p>
+                        <a href={module.content.fileUrl} download={module.content.fileName}>
+                            <Button className="mt-4">Download</Button>
+                        </a>
+                    </div>
+                );
+            case 'article':
+            default:
+                return null; // Article content is handled below in the main body
+        }
     }
 
     return (
@@ -33,19 +73,7 @@ const LearningModulePage: React.FC = () => {
                         <h1 className="text-4xl font-extrabold text-dark dark:text-light mb-4">{module.title}</h1>
                         <p className="text-gray-500 mb-6">{module.duration}</p>
                         
-                        {module.type === 'video' && module.content.videoUrl && (
-                            <div className="aspect-video bg-black rounded-lg overflow-hidden mb-6">
-                                <iframe 
-                                    width="100%" 
-                                    height="100%" 
-                                    src={module.content.videoUrl}
-                                    title={module.title} 
-                                    frameBorder="0" 
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                    allowFullScreen
-                                ></iframe>
-                            </div>
-                        )}
+                        {renderContent()}
 
                         <div className="prose max-w-none text-gray-700 dark:prose-invert">
                              <p className="lead text-lg mb-4">{module.content.summary}</p>

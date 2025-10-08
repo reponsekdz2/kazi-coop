@@ -1,6 +1,8 @@
 
 
 
+
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider } from './contexts/AppContext';
@@ -28,10 +30,12 @@ import UserAnalyticsPage from './pages/UserAnalyticsPage';
 import LearningModulePage from './pages/LearningModulePage';
 import HelpCenterPage from './pages/HelpCenterPage';
 import CareerPathPage from './pages/CareerPathPage'; // Import the new page
+import AdminContentPage from './pages/AdminContentPage'; // Import new Admin page
 // FIX: Added missing import for UserRole.
 import { UserRole } from './types';
 
-const PrivateRoute: React.FC<{ allowedRoles?: UserRole[] }> = ({ allowedRoles }) => {
+// FIX: Added `children: React.ReactNode` to the props type to resolve type errors.
+const PrivateRoute: React.FC<{ children: React.ReactNode; allowedRoles?: UserRole[] }> = ({ children, allowedRoles }) => {
   const { user } = useAuth();
   if (!user) {
     return <Navigate to="/login" />;
@@ -39,7 +43,7 @@ const PrivateRoute: React.FC<{ allowedRoles?: UserRole[] }> = ({ allowedRoles })
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     return <Navigate to="/dashboard" />; // Or an unauthorized page
   }
-  return <DashboardLayout />;
+  return <>{children}</>;
 };
 
 const getBasename = () => {
@@ -68,22 +72,23 @@ const AuthRoutes: React.FC = () => {
       </Route>
 
       {/* Private Routes */}
-      <Route element={<PrivateRoute />}>
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/jobs" element={<JobsPage />} />
-        <Route path="/interviews" element={<InterviewsPage />} />
-        <Route path="/cooperatives" element={<CooperativesPage />} />
-        <Route path="/wallet" element={<WalletPage />} />
-        <Route path="/learning" element={<LearningPage />} />
-        <Route path="/learning/:moduleId" element={<LearningModulePage />} />
-        <Route path="/messages" element={<MessagesPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-        <Route path="/help" element={<HelpCenterPage />} />
-        <Route path="/career-path" element={<CareerPathPage />} />
+      <Route element={<DashboardLayout />}>
+        <Route path="/dashboard" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
+        <Route path="/jobs" element={<PrivateRoute><JobsPage /></PrivateRoute>} />
+        <Route path="/interviews" element={<PrivateRoute><InterviewsPage /></PrivateRoute>} />
+        <Route path="/cooperatives" element={<PrivateRoute><CooperativesPage /></PrivateRoute>} />
+        <Route path="/wallet" element={<PrivateRoute><WalletPage /></PrivateRoute>} />
+        <Route path="/learning" element={<PrivateRoute><LearningPage /></PrivateRoute>} />
+        <Route path="/learning/:moduleId" element={<PrivateRoute><LearningModulePage /></PrivateRoute>} />
+        <Route path="/messages" element={<PrivateRoute><MessagesPage /></PrivateRoute>} />
+        <Route path="/settings" element={<PrivateRoute><SettingsPage /></PrivateRoute>} />
+        <Route path="/help" element={<PrivateRoute><HelpCenterPage /></PrivateRoute>} />
+        <Route path="/career-path" element={<PrivateRoute><CareerPathPage /></PrivateRoute>} />
         
         {/* Employer/Admin only routes */}
-        <Route path="/analytics" element={<AnalyticsPage />} />
-        <Route path="/user-analytics" element={<UserAnalyticsPage />} />
+        <Route path="/analytics" element={<PrivateRoute allowedRoles={[UserRole.EMPLOYER]}><AnalyticsPage /></PrivateRoute>} />
+        <Route path="/user-analytics" element={<PrivateRoute allowedRoles={[UserRole.EMPLOYER]}><UserAnalyticsPage /></PrivateRoute>} />
+        <Route path="/content-management" element={<PrivateRoute allowedRoles={[UserRole.EMPLOYER]}><AdminContentPage /></PrivateRoute>} />
 
         {/* Wildcard for private routes, redirects to dashboard */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

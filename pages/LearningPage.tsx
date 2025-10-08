@@ -1,18 +1,31 @@
+
 import React, { useState } from 'react';
-import { LEARNING_MODULES } from '../constants';
 import Card from '../components/ui/Card';
 import { Link } from 'react-router-dom';
-import { PlayCircleIcon, DocumentTextIcon, ClockIcon, StarIcon } from '@heroicons/react/24/solid';
+import { PlayCircleIcon, DocumentTextIcon, ClockIcon, StarIcon, PhotoIcon, DocumentArrowDownIcon } from '@heroicons/react/24/solid';
+import { useLearning } from '../contexts/LearningContext';
+import { LearningModule } from '../types';
 
 const LearningPage: React.FC = () => {
+  const { learningModules } = useLearning();
   const [activeCategory, setActiveCategory] = useState('All');
   
-  const categories = ['All', 'Financial Literacy', 'Entrepreneurship', 'Web Development', 'Soft Skills'];
-  const featuredModule = LEARNING_MODULES.find(m => m.id === 'lm-4'); // Feature the new financial literacy module
+  const categories = ['All', ...new Set(learningModules.map(m => m.category))];
+  const featuredModule = learningModules.find(m => m.id === 'lm-4') || learningModules[0];
 
   const filteredModules = activeCategory === 'All' 
-    ? LEARNING_MODULES 
-    : LEARNING_MODULES.filter(m => m.category === activeCategory);
+    ? learningModules 
+    : learningModules.filter(m => m.category === activeCategory);
+
+  const getModuleIcon = (type: LearningModule['type']) => {
+    switch (type) {
+        case 'video': return <PlayCircleIcon className="h-16 w-16 text-primary/50" />;
+        case 'article': return <DocumentTextIcon className="h-16 w-16 text-primary/50" />;
+        case 'image': return <PhotoIcon className="h-16 w-16 text-primary/50" />;
+        case 'file': return <DocumentArrowDownIcon className="h-16 w-16 text-primary/50" />;
+        default: return <DocumentTextIcon className="h-16 w-16 text-primary/50" />;
+    }
+  };
 
   return (
     <div>
@@ -40,41 +53,53 @@ const LearningPage: React.FC = () => {
             ))}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredModules.map(module => <LearningModuleCard key={module.id} module={module} />)}
+          {filteredModules.map(module => <LearningModuleCard key={module.id} module={module} icon={getModuleIcon(module.type)} />)}
         </div>
       </div>
     </div>
   );
 };
 
-const FeaturedModuleCard: React.FC<{ module: typeof LEARNING_MODULES[0] }> = ({ module }) => (
-    <Card className="!p-0 overflow-hidden flex flex-col md:flex-row">
-        <div className="md:w-1/2 aspect-video bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-            {module.type === 'video' ? <PlayCircleIcon className="h-24 w-24 text-primary/50" /> : <DocumentTextIcon className="h-24 w-24 text-primary/50" />}
-        </div>
-        <div className="md:w-1/2 p-6 flex flex-col justify-center">
-             <div className="flex items-center gap-2 text-sm font-semibold text-yellow-500 mb-2">
-                <StarIcon className="h-5 w-5" />
-                <span>Featured Module</span>
-            </div>
-            <p className="text-sm font-semibold text-primary">{module.category}</p>
-            <h2 className="text-2xl font-bold text-dark dark:text-light mt-1 mb-2">{module.title}</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-4">{module.content.summary}</p>
-            <Link to={`/learning/${module.id}`}>
-                <button className="w-full md:w-auto px-4 py-2 rounded-md font-semibold text-sm transition-colors bg-primary text-white hover:bg-secondary">
-                    Start Learning Now
-                </button>
-            </Link>
-        </div>
-    </Card>
-);
+const FeaturedModuleCard: React.FC<{ module: LearningModule }> = ({ module }) => {
+    const getIcon = (type: LearningModule['type']) => {
+        switch (type) {
+            case 'video': return <PlayCircleIcon className="h-24 w-24 text-primary/50" />;
+            case 'article': return <DocumentTextIcon className="h-24 w-24 text-primary/50" />;
+            case 'image': return <PhotoIcon className="h-24 w-24 text-primary/50" />;
+            case 'file': return <DocumentArrowDownIcon className="h-24 w-24 text-primary/50" />;
+            default: return <DocumentTextIcon className="h-24 w-24 text-primary/50" />;
+        }
+    };
 
-const LearningModuleCard: React.FC<{ module: typeof LEARNING_MODULES[0] }> = ({ module }) => (
+    return (
+        <Card className="!p-0 overflow-hidden flex flex-col md:flex-row">
+            <div className="md:w-1/2 aspect-video bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                {getIcon(module.type)}
+            </div>
+            <div className="md:w-1/2 p-6 flex flex-col justify-center">
+                 <div className="flex items-center gap-2 text-sm font-semibold text-yellow-500 mb-2">
+                    <StarIcon className="h-5 w-5" />
+                    <span>Featured Module</span>
+                </div>
+                <p className="text-sm font-semibold text-primary">{module.category}</p>
+                <h2 className="text-2xl font-bold text-dark dark:text-light mt-1 mb-2">{module.title}</h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-4">{module.content.summary}</p>
+                <Link to={`/learning/${module.id}`}>
+                    <button className="w-full md:w-auto px-4 py-2 rounded-md font-semibold text-sm transition-colors bg-primary text-white hover:bg-secondary">
+                        Start Learning Now
+                    </button>
+                </Link>
+            </div>
+        </Card>
+    );
+};
+
+const LearningModuleCard: React.FC<{ module: LearningModule, icon: React.ReactNode }> = ({ module, icon }) => (
     <Card className="flex flex-col hover:shadow-xl transition-shadow">
         <div className="flex-grow">
             <div className="relative mb-4">
                 <div className="aspect-video bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-                    {module.type === 'video' ? <PlayCircleIcon className="h-16 w-16 text-primary/50" /> : <DocumentTextIcon className="h-16 w-16 text-primary/50" />}
+                    {icon}
                 </div>
             </div>
             <p className="text-sm font-semibold text-primary">{module.category}</p>

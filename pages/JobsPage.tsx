@@ -1,9 +1,11 @@
 
 
+
+
 import React, { useState, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 // FIX: Added import for Application type.
-import { UserRole, Job, Application } from '../types';
+import { UserRole, Job, Application, Company } from '../types';
 import { useJobs } from '../contexts/JobContext';
 import Card from '../components/ui/Card';
 import Button from '../components/layout/Button';
@@ -14,19 +16,30 @@ import { useApplications } from '../contexts/ApplicationContext';
 import NewJobModal from '../components/ui/NewJobModal';
 import ApplicantDetailsModal from '../components/ui/ApplicantDetailsModal';
 import ApplicationFormModal from '../components/ui/ApplicationFormModal';
+import CompanyProfileModal from '../components/ui/CompanyProfileModal';
 
 const SeekerJobsView: React.FC = () => {
-  const { jobs, toggleSaveJob } = useJobs();
+  const { jobs: allJobs, toggleSaveJob } = useJobs();
   const { applications } = useApplications();
-  const [selectedJob, setSelectedJob] = useState<Job | null>(jobs[0] || null);
+  const [selectedJob, setSelectedJob] = useState<Job | null>(allJobs[0] || null);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [jobToApply, setJobToApply] = useState<Job | null>(null);
+  const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
+  const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
 
   const handleApplyClick = (job: Job) => {
       setJobToApply(job);
       setIsApplyModalOpen(true);
   };
   
+  const handleCompanyClick = (companyId: string) => {
+    const company = COMPANIES.find(c => c.id === companyId);
+    if (company) {
+        setSelectedCompany(company);
+        setIsCompanyModalOpen(true);
+    }
+  };
+
   const hasApplied = (jobId: string) => applications.some(app => app.jobId === jobId);
 
   return (
@@ -38,12 +51,12 @@ const SeekerJobsView: React.FC = () => {
                      <input type="text" placeholder="Search by title, skill..." className="w-full pl-10 pr-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"/>
                  </div>
               </Card>
-              {jobs.map(job => (
+              {allJobs.map(job => (
                   <Card key={job.id} className={`!p-4 cursor-pointer ${selectedJob?.id === job.id ? 'border-2 border-primary' : ''}`} onClick={() => setSelectedJob(job)}>
                       <div className="flex justify-between items-start">
                           <div>
                               <p className="font-bold text-dark dark:text-light">{job.title}</p>
-                              <p className="text-sm text-gray-500">{COMPANIES.find(c => c.id === job.companyId)?.name}</p>
+                              <p onClick={(e) => { e.stopPropagation(); handleCompanyClick(job.companyId); }} className="text-sm text-gray-500 hover:text-primary hover:underline">{COMPANIES.find(c => c.id === job.companyId)?.name}</p>
                           </div>
                           <button onClick={(e) => { e.stopPropagation(); toggleSaveJob(job.id); }} className="text-gray-400 hover:text-primary">
                               {job.isSaved ? <BookmarkIcon className="h-5 w-5 text-primary"/> : <BookmarkOutlineIcon className="h-5 w-5"/>}
@@ -60,7 +73,7 @@ const SeekerJobsView: React.FC = () => {
                   <Card>
                       <h2 className="text-2xl font-bold text-dark dark:text-light">{selectedJob.title}</h2>
                       <div className="flex items-center gap-4 text-gray-500 dark:text-gray-400 my-2">
-                        <span className="flex items-center"><BuildingOffice2Icon className="h-4 w-4 mr-1"/> {COMPANIES.find(c => c.id === selectedJob.companyId)?.name}</span>
+                        <span onClick={() => handleCompanyClick(selectedJob.companyId)} className="flex items-center cursor-pointer hover:text-primary hover:underline"><BuildingOffice2Icon className="h-4 w-4 mr-1"/> {COMPANIES.find(c => c.id === selectedJob.companyId)?.name}</span>
                         <span className="flex items-center"><MapPinIcon className="h-4 w-4 mr-1"/> {selectedJob.location}</span>
                       </div>
                       <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap mt-4">{selectedJob.description}</p>
@@ -77,6 +90,7 @@ const SeekerJobsView: React.FC = () => {
               )}
           </div>
           {jobToApply && <ApplicationFormModal isOpen={isApplyModalOpen} onClose={() => setIsApplyModalOpen(false)} job={jobToApply} />}
+          {selectedCompany && <CompanyProfileModal isOpen={isCompanyModalOpen} onClose={() => setIsCompanyModalOpen(false)} company={selectedCompany} jobs={allJobs.filter(j => j.companyId === selectedCompany.id)} />}
       </div>
   );
 };

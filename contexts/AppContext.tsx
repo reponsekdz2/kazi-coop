@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 import { AuthProvider } from './AuthContext';
 import { CooperativeProvider } from './CooperativeContext';
@@ -10,6 +11,7 @@ import { InterviewProvider } from './InterviewContext';
 import { JobProvider } from './JobContext';
 import { ApplicationProvider } from './ApplicationContext';
 import { NotificationProvider } from './NotificationContext';
+import { LearningProvider } from './LearningContext';
 
 type Theme = 'light' | 'dark';
 
@@ -45,21 +47,23 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         <AuthProvider>
           <TransactionProvider>
             <NotificationProvider>
-              <JobProvider>
-                <ApplicationProvider>
-                  <InterviewProvider>
-                    <CooperativeProvider>
-                      <BudgetProvider>
-                        <SavingsGoalProvider>
-                          <LoanProvider>
-                            {children}
-                          </LoanProvider>
-                        </SavingsGoalProvider>
-                      </BudgetProvider>
-                    </CooperativeProvider>
-                  </InterviewProvider>
-                </ApplicationProvider>
-              </JobProvider>
+              <LearningProvider>
+                <JobProvider>
+                  <ApplicationProvider>
+                    <InterviewProvider>
+                      <CooperativeProvider>
+                        <BudgetProvider>
+                          <SavingsGoalProvider>
+                            <LoanProvider>
+                              {children}
+                            </LoanProvider>
+                          </SavingsGoalProvider>
+                        </BudgetProvider>
+                      </CooperativeProvider>
+                    </InterviewProvider>
+                  </ApplicationProvider>
+                </JobProvider>
+              </LearningProvider>
             </NotificationProvider>
           </TransactionProvider>
         </AuthProvider>

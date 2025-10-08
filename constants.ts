@@ -1,5 +1,6 @@
+
 // FIX: Created constants.ts to provide mock data for the application.
-import { User, UserRole, Company, Job, Application, Interview, Cooperative, CooperativeMember, Loan, Transaction, SavingsGoal, Budget, LoanApplication, ActivityLog, Message, LearningModule, Testimonial } from './types';
+import { User, UserRole, Company, Job, Application, Interview, Cooperative, CooperativeMember, Loan, Transaction, SavingsGoal, Budget, LoanApplication, ActivityLog, Message, Testimonial } from './types';
 
 export const USERS: User[] = [
   { id: 'user-1', name: 'Aline Umutoni', email: 'aline@example.com', role: UserRole.SEEKER, avatarUrl: 'https://randomuser.me/api/portraits/women/1.jpg', skills: ['JavaScript', 'React', 'Node.js', 'Communication'], careerProgress: 3, notificationSettings: { jobAlerts: true, messageAlerts: true, coopUpdates: false } },
@@ -105,108 +106,6 @@ export const ACTIVITY_LOG: ActivityLog[] = [
   { id: 'log-2', type: 'NEW_JOB', description: 'TechSolutions Ltd. posted a new job: "Backend Developer".', timestamp: '2023-10-02T15:00:00Z' },
   { id: 'log-3', type: 'SAVINGS_GOAL', description: 'You reached 33% of your "New Laptop" goal.', timestamp: '2023-10-01T10:00:00Z' },
   { id: 'log-4', type: 'LARGE_DEPOSIT', description: 'You received a large deposit of RWF 800,000.', timestamp: '2023-10-01T09:01:00Z' },
-];
-
-export const LEARNING_MODULES: LearningModule[] = [
-    { 
-      id: 'lm-1', title: 'Advanced React Patterns', category: 'Web Development', type: 'video', duration: '1h 45m', progress: 50, 
-      content: { summary: 'Deep dive into advanced React concepts like higher-order components, render props, and context API.', videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', keyTakeaways: ['Understand render props pattern', 'Master Higher-Order Components (HOCs)', 'Effectively use the Context API for state management'] } 
-    },
-    { 
-      id: 'lm-2', title: 'Effective Communication', category: 'Soft Skills', type: 'article', duration: '30m read', progress: 0, 
-      content: { summary: 'Learn the fundamentals of clear, concise, and professional communication in the workplace.', articleText: 'Effective communication is the cornerstone of any successful team...', keyTakeaways: ['Active Listening techniques', 'Providing constructive feedback', 'Clarity in written communication'] } 
-    },
-    { 
-      id: 'lm-3', title: 'Startup Fundamentals', category: 'Entrepreneurship', type: 'video', duration: '2h 15m', progress: 0, 
-      content: { 
-        summary: 'From idea to MVP. Learn the essential first steps to starting your own business in the tech space.', 
-        videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', 
-        keyTakeaways: ['Validating your business idea', 'Creating a Minimum Viable Product (MVP)', 'Basics of market research', 'Pitching to investors'] 
-      },
-      quiz: [
-          {
-              question: "What does MVP stand for?",
-              options: ["Most Valuable Player", "Minimum Viable Product", "Maximum Value Proposition", "Mainstream Viable Project"],
-              correctAnswerIndex: 1
-          },
-          {
-              question: "What is the primary goal of market research?",
-              options: ["To sell your product", "To understand customer needs and market size", "To design a logo", "To hire employees"],
-              correctAnswerIndex: 1
-          }
-      ]
-    },
-    { 
-      id: 'lm-4', 
-      title: 'Mastering Your Budget in Rwanda', 
-      category: 'Financial Literacy', 
-      type: 'article', 
-      duration: '25m read', 
-      progress: 0, 
-      content: { 
-        summary: 'Learn practical budgeting techniques tailored for the Rwandan context. From tracking expenses on Mobile Money to planning for long-term goals, this guide will help you take control of your finances.', 
-        articleText: 'Budgeting is the first step toward financial freedom. A popular method is the 50/30/20 rule: 50% of your income goes to needs (rent, food, transport), 30% to wants (entertainment, dining out), and 20% to savings and debt repayment. In Rwanda, a significant portion of transactions happen via Mobile Money. Make it a habit to review your MoMo statement weekly to understand where your money is going. Setting SMART (Specific, Measurable, Achievable, Relevant, Time-bound) goals is crucial. Instead of "save money," a SMART goal is "save RWF 100,000 for an emergency fund in the next 6 months by saving RWF 4,200 per week."', 
-        keyTakeaways: ['The 50/30/20 rule (Needs/Wants/Savings)', 'Using apps or notebooks to track Mobile Money transactions', 'Setting SMART financial goals', 'How to adjust your budget for irregular income'] 
-      },
-      quiz: [
-          {
-              question: "What percentage of income is recommended for savings in the 50/30/20 rule?",
-              options: ["10%", "20%", "30%", "50%"],
-              correctAnswerIndex: 1
-          },
-          {
-              question: "What does the 'M' in SMART goals stand for?",
-              options: ["Money", "Monthly", "Measurable", "Memorable"],
-              correctAnswerIndex: 2
-          }
-      ]
-    },
-    { 
-      id: 'lm-5', 
-      title: 'Smart Saving with Ikimina & Beyond', 
-      category: 'Financial Literacy', 
-      type: 'video', 
-      duration: '1h 10m', 
-      progress: 0, 
-      content: { 
-        summary: 'Explore the power of traditional savings groups (Ikimina) in the digital age. This module covers best practices for participating in cooperatives and introduces other savings vehicles available in Rwanda.', 
-        videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', 
-        keyTakeaways: ['Benefits of joining a digital Ikimina on KaziCoop', 'Understanding cooperative rules and penalties', 'Introduction to SACCOs (Savings and Credit Cooperatives)', 'How to open and benefit from a high-yield savings account'] 
-      }
-    },
-    { 
-      id: 'lm-6', 
-      title: 'Understanding Loans and Credit', 
-      category: 'Financial Literacy', 
-      type: 'article', 
-      duration: '35m read', 
-      progress: 0, 
-      content: { 
-        summary: 'Demystify loans and credit. Learn about interest rates, repayment schedules, and how to build a good credit history. This module will empower you to borrow responsibly from cooperatives or financial institutions.', 
-        articleText: 'Taking a loan can be a powerful tool for growth, but it\'s important to understand the terms. The interest rate is the cost of borrowing money. Always check if it\'s a flat rate or reducing balance. A repayment schedule shows you how much you need to pay and when. Missing payments can lead to penalties and damage your ability to get loans in the future. Building a good credit history by paying on time makes you a trustworthy borrower for both cooperatives and banks. Before taking any loan, ensure you have a clear plan to repay it without straining your finances.', 
-        keyTakeaways: ['Difference between flat rate and reducing balance interest', 'How to read a loan agreement', 'The importance of a good credit history', 'Responsible borrowing habits to avoid debt traps'] 
-      },
-       quiz: [
-          {
-              question: "What is the most important factor to consider before taking a loan?",
-              options: ["The loan officer's name", "The color of the bank", "The interest rate and repayment terms", "How quickly you get the money"],
-              correctAnswerIndex: 2
-          }
-      ]
-    },
-    { 
-      id: 'lm-7', 
-      title: 'Introduction to Investing in Rwanda', 
-      category: 'Financial Literacy', 
-      type: 'video', 
-      duration: '1h 30m', 
-      progress: 0, 
-      content: { 
-        summary: 'Take the first step towards building wealth. This module provides a beginner-friendly overview of investment opportunities in Rwanda, from government bonds to the stock market and real estate.', 
-        videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', 
-        keyTakeaways: ['The difference between investing and saving', 'An overview of the Rwanda Stock Exchange (RSE)', 'Understanding low-risk government Treasury Bonds', 'Basics of getting started with real estate or land investment'] 
-      }
-    }
 ];
 
 export const TESTIMONIALS: Testimonial[] = [

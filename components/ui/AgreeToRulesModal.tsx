@@ -1,23 +1,22 @@
+
 import React, { useState } from 'react';
 import Modal from '../layout/Modal';
 import Button from '../layout/Button';
 import { Cooperative } from '../../types';
-import { useToast } from '../../contexts/ToastContext';
 
 interface AgreeToRulesModalProps {
   isOpen: boolean;
   onClose: () => void;
   cooperative: Cooperative | null;
+  onAgree: () => void;
 }
 
-const AgreeToRulesModal: React.FC<AgreeToRulesModalProps> = ({ isOpen, onClose, cooperative }) => {
+const AgreeToRulesModal: React.FC<AgreeToRulesModalProps> = ({ isOpen, onClose, cooperative, onAgree }) => {
     const [agreed, setAgreed] = useState(false);
-    const { addToast } = useToast();
 
     const handleSubmit = () => {
         if (!cooperative) return;
-        addToast(`You have successfully joined ${cooperative.name}!`, 'success');
-        onClose();
+        onAgree();
     }
     
     if (!cooperative) return null;

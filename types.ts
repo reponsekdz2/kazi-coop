@@ -194,13 +194,16 @@ export interface LearningModule {
   id: string;
   title: string;
   category: string;
-  type: 'video' | 'article';
+  type: 'video' | 'article' | 'image' | 'file';
   duration: string;
   progress: number;
   content: {
     summary: string;
     videoUrl?: string;
     articleText?: string;
+    imageUrl?: string; // For base64 image data
+    fileUrl?: string; // For base64 file data
+    fileName?: string;
     keyTakeaways: string[];
   };
   quiz?: QuizQuestion[];

@@ -1,14 +1,17 @@
 
 
+
 import React, { useState } from 'react';
 import Card from '../components/ui/Card';
 import Button from '../components/layout/Button';
 import { GoogleGenAI } from '@google/genai';
 import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../contexts/AuthContext';
-import { LEARNING_MODULES, JOBS } from '../constants';
+// FIX: LEARNING_MODULES is not exported from constants, it should be fetched from the LearningContext.
+import { JOBS } from '../constants';
 import { SparklesIcon, LightBulbIcon } from '@heroicons/react/24/solid';
 import { Link } from 'react-router-dom';
+import { useLearning } from '../contexts/LearningContext';
 
 interface CareerPath {
     currentRole: string;
@@ -20,6 +23,8 @@ interface CareerPath {
 const CareerPathPage: React.FC = () => {
     const { user } = useAuth();
     const { addToast } = useToast();
+    // FIX: Get learning modules from context instead of constants.
+    const { learningModules } = useLearning();
     const [isGenerating, setIsGenerating] = useState(false);
     const [careerPath, setCareerPath] = useState<CareerPath | null>(null);
     const [currentRole, setCurrentRole] = useState('Junior Frontend Developer');
@@ -37,7 +42,7 @@ const CareerPathPage: React.FC = () => {
                 Target Role: ${targetRole}
                 User's current skills: ${user?.skills?.join(', ') || 'React, JavaScript'}
                 
-                Available learning modules on platform: ${LEARNING_MODULES.map(m => m.title).join(', ')}
+                Available learning modules on platform: ${learningModules.map(m => m.title).join(', ')}
 
                 Provide the output in a JSON object with the following structure:
                 {
@@ -113,7 +118,7 @@ const CareerPathPage: React.FC = () => {
                             </Card>
                             <Card title="Suggested Learning">
                                 <div className="space-y-2">
-                                {LEARNING_MODULES.filter(m => careerPath.suggestedModules.includes(m.title)).map(module => (
+                                {learningModules.filter(m => careerPath.suggestedModules.includes(m.title)).map(module => (
                                     <Link key={module.id} to={`/learning/${module.id}`} className="block p-3 bg-light dark:bg-dark rounded-md hover:bg-primary/10">
                                         <p className="font-semibold text-dark dark:text-light">{module.title}</p>
                                         <p className="text-xs text-primary">{module.category}</p>
