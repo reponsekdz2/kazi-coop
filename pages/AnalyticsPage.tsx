@@ -90,7 +90,7 @@ ${JSON.stringify(memberRoleData, null, 2)}
 ${ACTIVITY_LOG.slice(0, 4).map(log => `- ${log.description}`).join('\n')}
 `;
             
-            // FIX: Correct API call to generateContent
+            // FIX: Correct API call to generateContent using gemini-2.5-flash model
             const response = await ai.models.generateContent({ model: 'gemini-2.5-flash', contents: prompt });
             // FIX: Correct way to extract text from response
             setSummary(response.text);

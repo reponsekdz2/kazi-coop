@@ -50,12 +50,14 @@ const CareerPathPage: React.FC = () => {
                 }
             `;
 
+            // FIX: Corrected Gemini API call for JSON response
             const response = await ai.models.generateContent({
                 model: 'gemini-2.5-flash',
                 contents: prompt,
                 config: { responseMimeType: 'application/json' },
             });
             
+            // FIX: Corrected text extraction from response
             const jsonText = response.text.trim();
             const parsedPath = JSON.parse(jsonText);
             setCareerPath(parsedPath);

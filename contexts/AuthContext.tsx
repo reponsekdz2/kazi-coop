@@ -1,88 +1,96 @@
-import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback } from 'react';
+
+import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
 import { User, UserRole } from '../types';
 import { USERS } from '../constants';
-// import api from '../services/api'; // Mocking API calls for now
+import { useToast } from './ToastContext';
+
+type UserCredentials = {
+  email: string;
+  password?: string;
+};
+
+type RegisterData = {
+  name: string;
+  email: string;
+  password?: string;
+  role: UserRole;
+};
 
 interface AuthContextType {
   user: User | null;
-  users: User[];
   isLoading: boolean;
-  login: (credentials: { email: string; password: string }) => Promise<void>;
+  login: (credentials: UserCredentials) => Promise<void>;
   logout: () => void;
-  register: (details: { name: string; email: string; password: string; role: UserRole }) => Promise<void>;
-  updateUserProfile: (updatedUser: User) => void;
+  register: (data: RegisterData) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// In-memory user store for simulation
+let userStore: User[] = [...USERS];
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [users, setUsers] = useState<User[]>(USERS);
   const [isLoading, setIsLoading] = useState(true);
+  const { addToast } = useToast();
 
-  useEffect(() => {
-    // Simulate checking for a logged-in user on initial load
-    const checkLoggedInUser = () => {
-      try {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
+  // Simulate checking for an existing session
+  useState(() => {
+    // To keep a user logged in across refreshes in a real app, you'd check localStorage/sessionStorage here.
+    // For this mock, we start fresh.
+    setIsLoading(false);
+  });
+  
+  const login = useCallback(async (credentials: UserCredentials) => {
+    return new Promise<void>((resolve, reject) => {
+      setTimeout(() => {
+        const foundUser = userStore.find(u => u.email.toLowerCase() === credentials.email.toLowerCase());
+        if (foundUser) {
+          setUser(foundUser);
+          resolve();
+        } else {
+          reject(new Error('Invalid email or password.'));
         }
-      } catch (error) {
-        console.error("Failed to parse user from localStorage", error);
-        localStorage.removeItem('user');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    checkLoggedInUser();
+      }, 500);
+    });
   }, []);
-
-  const login = useCallback(async (credentials: { email: string; password: string }) => {
-    // In a real app, this would be an API call
-    // For this mock, we'll find a user in our constants
-    const foundUser = users.find(u => u.email === credentials.email);
-    if (foundUser) { // a real app would check password
-      setUser(foundUser);
-      localStorage.setItem('user', JSON.stringify(foundUser));
-    } else {
-      throw new Error('Invalid email or password');
-    }
-  }, [users]);
 
   const logout = useCallback(() => {
     setUser(null);
-    localStorage.removeItem('user');
-    // In a real app, you might want to call an API endpoint to invalidate a token
-  }, []);
-
-  const register = useCallback(async (details: { name: string; email: string; password: string; role: UserRole }) => {
-    // In a real app, this would be an API call
-    if (users.some(u => u.email === details.email)) {
-      throw new Error('User with this email already exists');
-    }
-    const newUser: User = {
-      id: `u-${users.length + 1}`,
-      name: details.name,
-      email: details.email,
-      role: details.role,
-      avatarUrl: `https://i.pravatar.cc/150?u=${details.email}`,
-      notificationSettings: { jobAlerts: true, messageAlerts: true, coopUpdates: false }
-    };
-    setUsers(prev => [...prev, newUser]);
-    setUser(newUser);
-    localStorage.setItem('user', JSON.stringify(newUser));
-  }, [users]);
+    addToast('You have been logged out.', 'info');
+  }, [addToast]);
   
-  const updateUserProfile = useCallback((updatedUser: User) => {
-    setUser(updatedUser);
-    setUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
-    localStorage.setItem('user', JSON.stringify(updatedUser));
+  const register = useCallback(async (data: RegisterData) => {
+      return new Promise<void>((resolve, reject) => {
+          setTimeout(() => {
+              const existingUser = userStore.find(u => u.email.toLowerCase() === data.email.toLowerCase());
+              if (existingUser) {
+                  return reject(new Error('A user with this email already exists.'));
+              }
+              const newUser: User = {
+                  id: `u-${userStore.length + 1}`,
+                  name: data.name,
+                  email: data.email,
+                  role: data.role,
+                  avatarUrl: `https://i.pravatar.cc/150?u=${data.email}`,
+                  notificationSettings: {
+                      jobAlerts: true,
+                      messageAlerts: true,
+                      coopUpdates: true,
+                  },
+                  careerProgress: 1,
+                  skills: [],
+              };
+              userStore.push(newUser);
+              setUser(newUser);
+              resolve();
+          }, 500);
+      });
   }, []);
 
 
   return (
-    <AuthContext.Provider value={{ user, users, isLoading, login, logout, register, updateUserProfile }}>
+    <AuthContext.Provider value={{ user, isLoading, login, logout, register }}>
       {children}
     </AuthContext.Provider>
   );

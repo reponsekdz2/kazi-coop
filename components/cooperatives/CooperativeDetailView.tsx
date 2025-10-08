@@ -1,76 +1,143 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Cooperative, UserRole } from '../../types';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
+import MemberList from './MemberList';
+import { PencilIcon, UserPlusIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../../contexts/AuthContext';
-import { useCooperative } from '../../contexts/CooperativeContext';
-// FIX: Import mock data from the new constants file.
-import { USERS } from '../../constants';
-import { BuildingOffice2Icon, UsersIcon, BanknotesIcon, PencilIcon } from '@heroicons/react/24/solid';
+import { cooperativeFinancialsData } from '../../constants';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import StatCard from '../ui/StatCard';
+import { UserGroupIcon, BanknotesIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
 import AgreeToRulesModal from '../ui/AgreeToRulesModal';
+import { useCooperative } from '../../contexts/CooperativeContext';
 import ContributionModal from '../ui/ContributionModal';
 import EditCooperativeModal from '../ui/EditCooperativeModal';
-import MemberList from './MemberList';
 
-interface CooperativeDetailViewProps {
-    cooperative: Cooperative;
-}
+type Tab = 'overview' | 'members' | 'loans' | 'settings';
 
-const CooperativeDetailView: React.FC<CooperativeDetailViewProps> = ({ cooperative }) => {
+const CooperativeDetailView: React.FC<{ cooperative: Cooperative }> = ({ cooperative }) => {
     const { user } = useAuth();
     const { joinCooperative } = useCooperative();
+    const [activeTab, setActiveTab] = useState<Tab>('overview');
     const [isAgreeModalOpen, setIsAgreeModalOpen] = useState(false);
     const [isContributeModalOpen, setIsContributeModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
-    const userMembership = useMemo(() => {
-        return cooperative.members.find(m => m.userId === user?.id);
-    }, [cooperative.members, user]);
-
-    const isManager = user?.id === cooperative.creatorId;
-
+    
+    const isMember = user ? cooperative.members.some(m => m.userId === user.id && m.status === 'active') : false;
+    const isCreator = user ? cooperative.creatorId === user.id : false;
+    
     const handleJoin = () => {
-        setIsAgreeModalOpen(true);
-    };
-
-    const handleAgreeAndJoin = () => {
         joinCooperative(cooperative.id);
         setIsAgreeModalOpen(false);
-    }
+    };
+
+    const OverviewTab: React.FC = () => (
+        <div className="space-y-6">
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <StatCard title="Total Members" value={cooperative.members.length} trend={0} icon={UserGroupIcon}/>
+                <StatCard title="Total Savings" value={`RWF ${cooperative.totalSavings.toLocaleString()}`} trend={0} icon={BanknotesIcon}/>
+                <StatCard title="Total Loans" value={`RWF ${cooperative.totalLoans.toLocaleString()}`} trend={0} icon={ArrowTrendingUpIcon}/>
+            </div>
+            <Card title="Financial Overview">
+                <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={cooperativeFinancialsData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Line type="monotone" dataKey="Total Savings" stroke="#8884d8" activeDot={{ r: 8 }} />
+                        <Line type="monotone" dataKey="Loans Disbursed" stroke="#82ca9d" />
+                    </LineChart>
+                </ResponsiveContainer>
+            </Card>
+            <Card title="Rules & Regulations">
+                <p className="text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{cooperative.rulesAndRegulations}</p>
+            </Card>
+        </div>
+    );
     
+    const MembersTab: React.FC = () => (
+        <Card title="Members">
+            <MemberList members={cooperative.members} cooperativeId={cooperative.id} />
+        </Card>
+    );
+    
+     const LoansTab: React.FC = () => (
+        <Card title="Loans">
+            <p>Loan management feature coming soon.</p>
+        </Card>
+    );
+    
+    const SettingsTab: React.FC = () => (
+         <Card title="Cooperative Settings">
+            <Button onClick={() => setIsEditModalOpen(true)}>
+                <PencilIcon className="h-4 w-4 mr-2 inline"/>
+                Edit Cooperative Details
+            </Button>
+        </Card>
+    );
+
+    const tabs = [
+        { id: 'overview', label: 'Overview' },
+        { id: 'members', label: 'Members' },
+        { id: 'loans', label: 'Loans' },
+    ];
+    
+    if (isCreator) {
+        tabs.push({ id: 'settings', label: 'Settings' });
+    }
+
     return (
-        <Card>
-            <div className="flex justify-between items-start">
-                <h2 className="text-2xl font-bold text-dark dark:text-light">{cooperative.name}</h2>
-                {isManager && <Button variant="secondary" size="sm" onClick={() => setIsEditModalOpen(true)}><PencilIcon className="h-4 w-4 mr-2 inline"/>Edit</Button>}
-            </div>
-            <div className="flex items-center gap-4 text-gray-500 dark:text-gray-400 my-2">
-                <span className="flex items-center"><BuildingOffice2Icon className="h-4 w-4 mr-1"/> Created by {USERS.find(u => u.id === cooperative.creatorId)?.name}</span>
-                <span className="flex items-center"><UsersIcon className="h-4 w-4 mr-1"/> {cooperative.members.length} Members</span>
-                <span className="flex items-center"><BanknotesIcon className="h-4 w-4 mr-1"/> RWF {cooperative.totalSavings.toLocaleString()} Total Savings</span>
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap mt-4">{cooperative.description}</p>
-            <h3 className="font-bold text-dark dark:text-light mt-4 mb-2">Rules & Regulations</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{cooperative.rulesAndRegulations}</p>
-            
-            <div className="mt-6">
-                {!userMembership && <Button onClick={handleJoin}>Join Cooperative</Button>}
-                {userMembership?.status === 'pending_approval' && <Button disabled>Request Pending</Button>}
-                {userMembership?.status === 'active' && <Button onClick={() => setIsContributeModalOpen(true)}>Make Contribution</Button>}
+        <div>
+            <Card className="mb-6">
+                <div className="flex flex-col md:flex-row justify-between md:items-start gap-4">
+                    <div>
+                        <h2 className="text-2xl font-bold text-dark dark:text-light">{cooperative.name}</h2>
+                        <p className="text-gray-600 dark:text-gray-400 max-w-xl">{cooperative.description}</p>
+                    </div>
+                    <div className="flex-shrink-0 flex gap-2">
+                        {isMember ? (
+                             <Button onClick={() => setIsContributeModalOpen(true)}>Make Contribution</Button>
+                        ) : (
+                             <Button onClick={() => setIsAgreeModalOpen(true)}>
+                                <UserPlusIcon className="h-5 w-5 mr-2 inline" />
+                                Join Ikimina
+                            </Button>
+                        )}
+                    </div>
+                </div>
+            </Card>
+
+             <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
+                <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+                     {tabs.map(tab => (
+                        <button key={tab.id} onClick={() => setActiveTab(tab.id as Tab)}
+                            className={`${
+                                activeTab === tab.id
+                                ? 'border-primary text-primary'
+                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
+                </nav>
             </div>
 
-            {isManager && (
-                <div className="mt-6 pt-6 border-t dark:border-gray-700">
-                     <h3 className="font-bold text-dark dark:text-light mb-2">Member Management</h3>
-                     <MemberList members={cooperative.members} cooperativeId={cooperative.id} />
-                </div>
-            )}
+            <div>
+                {activeTab === 'overview' && <OverviewTab />}
+                {activeTab === 'members' && <MembersTab />}
+                {activeTab === 'loans' && <LoansTab />}
+                {activeTab === 'settings' && isCreator && <SettingsTab />}
+            </div>
             
-            <AgreeToRulesModal isOpen={isAgreeModalOpen} onClose={() => setIsAgreeModalOpen(false)} cooperative={cooperative} onAgree={handleAgreeAndJoin} />
+            <AgreeToRulesModal isOpen={isAgreeModalOpen} onClose={() => setIsAgreeModalOpen(false)} cooperative={cooperative} onAgree={handleJoin} />
             <ContributionModal isOpen={isContributeModalOpen} onClose={() => setIsContributeModalOpen(false)} cooperative={cooperative} />
-            <EditCooperativeModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} cooperative={cooperative} onSave={() => {}} />
-        </Card>
+            <EditCooperativeModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} cooperative={cooperative} onSave={() => {}}/>
+        </div>
     );
 };
 

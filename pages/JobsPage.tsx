@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+
+import React, { useState, useMemo, useEffect } from 'react';
 import { useJobs } from '../contexts/JobContext';
 import { useAuth } from '../contexts/AuthContext';
 import { UserRole, Job, Company, Application } from '../types';
